@@ -10,7 +10,7 @@ Claude Code의 사고를 확장시키는 글로벌 규칙 모음.
 | `progressive-deepening.md` | 피상적 답변을 자동 감지하고 한 단계 더 깊이 파고드는 내부 품질 게이트 |
 | `meta-cognition.md` | Click/Clunk 판별, March of Nines, 문제 정의 > 문제 해결 |
 | `capability-overhang.md` | 숨겨진 지식 활성화 — 도메인 토큰 주입, 교차 도메인 연결, 스킬 합성 |
-| `context7.md` | 라이브러리/프레임워크 사용 시 Context7 MCP로 최신 문서를 조회하도록 강제 |
+
 
 ## 설치
 

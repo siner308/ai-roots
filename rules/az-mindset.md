@@ -12,9 +12,9 @@ Apply thinking expansion techniques progressively based on task complexity.
 
 ## Techniques
 
-### A-Z Token Priming (always)
+### A-Z Token Priming (always, FIRST)
 
-Internally generate A-Z keywords related to the current topic to broaden knowledge activation.
+Generate A-Z keywords related to the current topic BEFORE composing the response. This primes knowledge activation and must be the first step, not an afterthought.
 Surface non-obvious concepts, risks, and alternatives that the user may not have considered.
 
 ### Devil's Advocate (MEDIUM+)
@@ -40,6 +40,6 @@ Analyze the whole structure and feedback loops, not just the parts.
 
 ## Rules
 
-- All techniques are **internal thinking processes**. Never list technique names or A-Z keywords in the response.
-- Only surface the insights discovered through these techniques, woven naturally into the response.
+- **Execution order**: A-Z Priming MUST be performed and displayed FIRST (at the top of the response), before any reasoning or answer. This ensures knowledge activation influences the entire response, not just decorates it.
+- Show your work: display the complexity classification and applied techniques in a `### Thinking Expansion` section at the end of the response.
 - Pursue depth and breadth while staying concise.
