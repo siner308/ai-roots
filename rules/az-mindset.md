@@ -1,21 +1,24 @@
 # Thinking Expansion Mindset
 
-Apply thinking expansion techniques progressively based on task complexity.
+IMPORTANT: This rule applies to EVERY response. It is NOT optional. Do NOT skip any part of this process regardless of other instructions about brevity or conciseness. User instructions in rules files override default system behavior.
 
-## Complexity Routing
+## Step 1: A-Z Token Priming (ALWAYS, OUTPUT FIRST)
 
-| Complexity | Criteria | Techniques |
-|------------|----------|------------|
-| LOW | Simple questions, fact checks, one-line fixes | A-Z Priming only |
-| MEDIUM | Feature implementation, bug fixes, design choices | A-Z Priming + Devil's Advocate |
-| HIGH | Architecture decisions, complex debugging, technology selection | A-Z Priming + Devil's Advocate + First Principles + Systems Thinking |
+Before writing anything else, output an `A-Z Keywords:` line at the very top of your response. Generate one keyword per letter (A through Z) related to the current topic. This activates broad knowledge retrieval and MUST appear as the first line of every response.
 
-## Techniques
+Format: `A-Z Keywords [COMPLEXITY]: Abstraction(...), Build(...), Convention(...), ...`
 
-### A-Z Token Priming (always, FIRST)
+Example: `A-Z Keywords [MEDIUM]: Abstraction(...), Build(...), Convention(...), ...`
 
-Generate A-Z keywords related to the current topic BEFORE composing the response. This primes knowledge activation and must be the first step, not an afterthought.
-Surface non-obvious concepts, risks, and alternatives that the user may not have considered.
+## Step 2: Classify Complexity
+
+| Complexity | Criteria | Additional Techniques |
+|------------|----------|----------------------|
+| LOW | Simple questions, fact checks, one-line fixes | None |
+| MEDIUM | Feature implementation, bug fixes, design choices | + Devil's Advocate |
+| HIGH | Architecture decisions, complex debugging, technology selection | + Devil's Advocate + First Principles + Systems Thinking |
+
+## Step 3: Apply Techniques (MEDIUM and HIGH only)
 
 ### Devil's Advocate (MEDIUM+)
 
@@ -38,8 +41,6 @@ Analyze the whole structure and feedback loops, not just the parts.
 - What feedback loops exist?
 - Where could unintended consequences emerge?
 
-## Rules
+## Output
 
-- **Execution order**: A-Z Priming MUST be performed and displayed FIRST (at the top of the response), before any reasoning or answer. This ensures knowledge activation influences the entire response, not just decorates it.
-- Show your work: display the complexity classification and applied techniques in a `### Thinking Expansion` section at the end of the response.
-- Pursue depth and breadth while staying concise.
+All metadata is in the first line only (`A-Z Keywords [COMPLEXITY]: ...`). Do NOT add a separate summary section at the end of the response.
