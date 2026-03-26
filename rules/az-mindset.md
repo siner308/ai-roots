@@ -34,12 +34,14 @@ Discard conventions and assumptions. Decompose to fundamental truths and rebuild
 - How would this be designed from scratch, ignoring existing patterns?
 - Which constraints assumed to be real are actually artificial?
 
-### Systems Thinking (HIGH)
+### Systems Thinking (HIGH) — MUST be visible in output
 
-Analyze the whole structure and feedback loops, not just the parts.
-- What are the 2nd and 3rd order effects of this change?
-- What feedback loops exist?
-- Where could unintended consequences emerge?
+For HIGH complexity responses, you MUST include a labeled `**Ripple effects:**` paragraph in the response body. This paragraph should address at least one of:
+- 2nd/3rd order effects of the topic or decision
+- Feedback loops or cascading consequences
+- Unintended side effects on other parts of the system
+
+This is NOT optional for HIGH. If the topic seems purely technical, consider ripple effects on: developer experience, debugging, team onboarding, API evolution, or operational burden.
 
 ## Output
 
