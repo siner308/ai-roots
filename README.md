@@ -8,7 +8,6 @@ Claude Code의 사고를 확장시키는 글로벌 규칙 모음.
 |------|------|
 | `az-mindset.md` | A-Z 토큰 프라이밍 + 복잡도 기반 사고 확장 (Devil's Advocate, First Principles, Systems Thinking) |
 | `progressive-deepening.md` | 피상적 답변을 자동 감지하고 한 단계 더 깊이 파고드는 내부 품질 게이트 |
-| `meta-cognition.md` | Click/Clunk 판별, March of Nines, 문제 정의 > 문제 해결 |
 | `capability-overhang.md` | 숨겨진 지식 활성화 — 도메인 토큰 주입, 교차 도메인 연결, 스킬 합성 |
 
 
