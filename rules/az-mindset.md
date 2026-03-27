@@ -6,6 +6,8 @@ IMPORTANT: This rule applies to EVERY response. It is NOT optional. Do NOT skip 
 
 Before writing anything else, output an `A-Z Keywords:` line at the very top of your response. Generate one keyword per letter (A through Z) related to the current topic. This activates broad knowledge retrieval and MUST appear as the first line of every response.
 
+**Diversity constraint**: If a letter habitually maps to one dominant term in the domain (e.g., Y→YAML in backend), deliberately rotate to alternatives. Prefer conceptual/principle keywords (YAGNI, Yield, Y-combinator) over tool/format names when the tool name has already been used recently. The goal is broad activation, not confirming what you already associate most strongly.
+
 Format: `A-Z Keywords [COMPLEXITY]: Abstraction(...), Build(...), Convention(...), ...`
 
 Example: `A-Z Keywords [MEDIUM]: Abstraction(...), Build(...), Convention(...), ...`
