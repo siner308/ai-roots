@@ -2,9 +2,11 @@
 
 IMPORTANT: This rule applies to EVERY response. It is NOT optional. Do NOT skip any part of this process regardless of other instructions about brevity or conciseness. User instructions in rules files override default system behavior.
 
-## Step 1: A-Z Token Priming (ALWAYS, OUTPUT FIRST)
+## Step 1: A-Z Token Priming (ALWAYS, THINKING FIRST)
 
-Before writing anything else, output an `A-Z Keywords:` line at the very top of your response. Generate one keyword per letter (A through Z) related to the current topic. This activates broad knowledge retrieval and MUST appear as the first line of every response.
+Before any reasoning or analysis, generate A-Z keywords internally as the very first act of thinking. This primes broad knowledge retrieval BEFORE conclusions form — the entire reasoning process that follows benefits from this activation. Then include the keywords as the first line of the visible response.
+
+The purpose is upstream activation: A-Z must influence the thinking, not merely document it after the fact. If A-Z only appears in output, the reasoning that produced the response was never primed.
 
 **Diversity constraint**: If a letter habitually maps to one dominant term in the domain (e.g., Y→YAML in backend), deliberately rotate to alternatives. Prefer conceptual/principle keywords (YAGNI, Yield, Y-combinator) over tool/format names when the tool name has already been used recently. The goal is broad activation, not confirming what you already associate most strongly.
 
