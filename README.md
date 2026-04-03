@@ -1,18 +1,42 @@
 # ai-roots
 
-Claude Code의 사고를 확장시키는 글로벌 규칙 모음.
+[한국어](README.ko.md) | **English**
 
-## 규칙 목록
+A collection of global rules that expand Claude Code's thinking.
 
-| 파일 | 설명 |
-|------|------|
-| `az-mindset.md` | A-Z 토큰 프라이밍 + 복잡도 기반 사고 확장 (Devil's Advocate, First Principles, Systems Thinking) |
-| `progressive-deepening.md` | 피상적 답변을 자동 감지하고 한 단계 더 깊이 파고드는 내부 품질 게이트 |
-| `capability-overhang.md` | 숨겨진 지식 활성화 — 도메인 토큰 주입, 교차 도메인 연결, 스킬 합성 |
-| `evaluation-integrity.md` | 자기 평가 편향 방지 — 검증 가능성 분류, 생성/평가 분리, 드리프트 감지 |
+Even non-experts can solve complex problems through casual conversation — Claude automatically applies architect-grade reasoning.
 
+## Rules
 
-## 설치
+### Thinking Expansion
+| File | Description |
+|------|-------------|
+| `az-mindset.md` | A-Z token priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
+| `progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
+| `capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
+
+### Quality Assurance
+| File | Description |
+|------|-------------|
+| `evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
+| `claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
+
+### Problem-Solving Strategy
+| File | Description |
+|------|-------------|
+| `parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
+
+### User Growth
+| File | Description |
+|------|-------------|
+| `user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
+
+### Conventions
+| File | Description |
+|------|-------------|
+| `github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
+
+## Installation
 
 ```bash
 git clone https://github.com/siner308/ai-roots.git
@@ -21,13 +45,15 @@ chmod +x install.sh
 ./install.sh
 ```
 
-`~/.claude/rules/`에 심볼릭 링크가 생성됩니다. 레포에서 규칙을 수정하면 바로 반영됩니다.
+Symlinks are created in `~/.claude/rules/`. Edits to the repo are reflected immediately.
 
-## 영감
+## Inspiration
 
-- [AI Frontier EP82](https://aifrontier.kr/ko/episodes/ep82) — A-Z 토큰 프라이밍, Domain Token Injection, Skill Composition
+- [AI Frontier EP82](https://aifrontier.kr/ko/episodes/ep82) — A-Z Token Priming, Domain Token Injection, Skill Composition
 - [AI Frontier EP87](https://aifrontier.kr/ko/episodes/ep87) — March of Nines
 - [AI Frontier EP89](https://aifrontier.kr/ko/episodes/ep89) — Click vs Clunk, Problem Definition > Problem Solving
 - [AI Frontier EP91](https://aifrontier.kr/ko/episodes/ep91) — Capability Overhang
-- [AI Frontier EP92](https://aifrontier.kr/ko/episodes/ep92/) — 루프를 닫아라, Verifiable vs Non-verifiable
-- [Anthropic Harness Design](https://www.anthropic.com/engineering/harness-design-long-running-apps) — Generator/Evaluator 분리, Self-evaluation Bias
+- [AI Frontier EP92](https://aifrontier.kr/ko/episodes/ep92/) — Close the Loop, Verifiable vs Non-verifiable
+- [Anthropic Harness Design](https://www.anthropic.com/engineering/harness-design-long-running-apps) — Generator/Evaluator Separation, Self-evaluation Bias
+- [CCAF Exam Guide](https://everpath-course-content.s3-accelerate.amazonaws.com/instructor%2F8lsy243ftffjjy1cx9lm3o2bw%2Fpublic%2F1773274827%2FClaude+Certified+Architect+%E2%80%93+Foundations+Certification+Exam+Guide.pdf) — Agentic Architecture, Tool Design, Context Management
+- [CCAF 101 Study Notes](https://bitboom.github.io/ccaf101/) — CCAF Korean Study Notes
