@@ -37,62 +37,29 @@ CRITICAL: When creating or editing PRs (`gh pr create`, `gh pr edit`, PR body co
 
 ### Body Delivery — STRICT
 
-Shell heredocs (`cat <<'EOF'`) and `gh pr create --body` corrupt markdown: dashes become `•`, backticks are stripped, indentation is added. **Never pass PR body through shell string interpolation.**
+`gh pr create --body` and shell string interpolation corrupt markdown: dashes become `•`, backticks are stripped, indentation is added. **Always write body to a file first, then use `--body-file`.**
 
-Safe method — write body to file with Python, then use `--body-file`:
+Safe method — single-quoted heredoc to file, then `--body-file`:
 
 ```bash
-# 1. Write body to file (Python preserves exact bytes)
-python3 -c "
-body = '''## Summary
+# 1. Write body to file (single-quoted heredoc preserves all characters literally)
+cat <<'EOF' > /tmp/pr-body.md
+## Summary
 
-- First bullet
-- Second with \x60code ref\x60
+- First bullet with `code ref`
 
 ## Test plan
 
 - [ ] Verification item
-'''
-with open('/tmp/pr-body.md', 'w') as f:
-    f.write(body)
-"
+EOF
 
-# 2. Create PR with --body-file
+# 2. Create or edit PR with --body-file
 gh pr create --title "the pr title" --body-file /tmp/pr-body.md
+gh pr edit NUMBER --body-file /tmp/pr-body.md
 ```
 
-For edits, use the GitHub API directly (gh pr edit also corrupts):
-
-```bash
-python3 -c "
-import json
-body = open('/tmp/pr-body.md').read()
-with open('/tmp/pr-payload.json', 'w') as f:
-    json.dump({'body': body}, f)
-"
-curl -s -X PATCH \
-  -H "Authorization: token $(gh auth token)" \
-  -H "Content-Type: application/json" \
-  -d @/tmp/pr-payload.json \
-  https://api.github.com/repos/OWNER/REPO/pulls/NUMBER
-```
-
-Note: In Python strings, use `\x60` for backticks to avoid shell interpretation.
+**Do NOT** encode non-ASCII characters as Python byte escapes (e.g. `\xec\x97\x90`). Write Unicode text directly — both heredocs and Python preserve UTF-8 as-is.
 
 ### Pre-submit Verification
 
-After `gh pr create`, verify the raw body via API:
-
-```bash
-curl -s -H "Authorization: token $(gh auth token)" \
-  https://api.github.com/repos/OWNER/REPO/pulls/NUMBER \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['body'][:300])"
-```
-
-Check:
-1. `- ` bullets are ASCII dash `0x2d` (not `•` = `0xe2 0x80 0xa2`)
-2. `- [ ]` checkboxes have `- ` prefix
-3. Backticks `` ` `` are present around code references
-4. URLs are wrapped as `[text](url)`
-
-If any check fails, rewrite the body file and PATCH via API as shown above.
+After `gh pr create`, verify the body renders correctly on the PR page. If corruption is found, rewrite `/tmp/pr-body.md` and run `gh pr edit NUMBER --body-file /tmp/pr-body.md`.
