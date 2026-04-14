@@ -37,29 +37,54 @@ CRITICAL: When creating or editing PRs (`gh pr create`, `gh pr edit`, PR body co
 
 ### Body Delivery — STRICT
 
-`gh pr create --body` and shell string interpolation corrupt markdown: dashes become `•`, backticks are stripped, indentation is added. **Always write body to a file first, then use `--body-file`.**
+`gh` CLI corrupts markdown in ALL body delivery methods (`--body`, `--body-file`, `gh pr edit --body-file`): dashes become `•`, backticks are stripped, `- [ ]` becomes `[ ]`. **Never pass PR body through `gh` CLI. Always use the GitHub API directly.**
 
-Safe method — single-quoted heredoc to file, then `--body-file`:
+Safe method — create PR with empty body, then PATCH via API:
 
 ```bash
-# 1. Write body to file (single-quoted heredoc preserves all characters literally)
-cat <<'EOF' > /tmp/pr-body.md
-## Summary
+# 1. Create PR with empty body
+gh pr create --title "the pr title" --body "" --draft
 
-- First bullet with `code ref`
+# 2. Write body payload with Python (preserves exact bytes)
+python3 -c "
+import json
+body = '''## Summary
+
+- First bullet with \x60code ref\x60
 
 ## Test plan
 
 - [ ] Verification item
-EOF
+'''
+with open('/tmp/pr-payload.json', 'w', encoding='utf-8') as f:
+    json.dump({'body': body}, f, ensure_ascii=False)
+"
 
-# 2. Create or edit PR with --body-file
-gh pr create --title "the pr title" --body-file /tmp/pr-body.md
-gh pr edit NUMBER --body-file /tmp/pr-body.md
+# 3. PATCH via GitHub API
+curl -s -X PATCH \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d @/tmp/pr-payload.json \
+  https://api.github.com/repos/OWNER/REPO/pulls/NUMBER
 ```
 
-**Do NOT** encode non-ASCII characters as Python byte escapes (e.g. `\xec\x97\x90`). Write Unicode text directly — both heredocs and Python preserve UTF-8 as-is.
+For edits, reuse steps 2-3 with the updated body.
+
+Notes:
+- In Python strings, use `\x60` for backticks to avoid shell interpretation
+- **Do NOT** encode non-ASCII characters as byte escapes (e.g. `\xec\x97\x90`). Write Unicode text directly
 
 ### Pre-submit Verification
 
-After `gh pr create`, verify the body renders correctly on the PR page. If corruption is found, rewrite `/tmp/pr-body.md` and run `gh pr edit NUMBER --body-file /tmp/pr-body.md`.
+After creating/editing a PR, verify the raw body via API:
+
+```bash
+gh pr view NUMBER --json body --jq .body | head -10
+```
+
+Check:
+1. `- ` bullets are ASCII dash (not `•`)
+2. `- [ ]` checkboxes have `- ` prefix
+3. Backticks `` ` `` are present around code references
+
+If any check fails, rewrite the payload and PATCH via API as shown above.
