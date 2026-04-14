@@ -31,6 +31,11 @@ Even non-experts can solve complex problems through casual conversation — Clau
 |------|-------------|
 | `user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
 
+### Knowledge Capture
+| File | Description |
+|------|-------------|
+| `guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
+
 ### Conventions
 | File | Description |
 |------|-------------|
