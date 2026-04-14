@@ -49,6 +49,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 | 파일 | 설명 |
 |------|------|
 | `lessons/incremental-verification.md` | 불확실한 작업은 가장 작은 검증 단위로 쪼개기 — 인라인 테스트 먼저, 스크립트는 나중에, 점진적 확장 |
+| `lessons/background-task-monitoring.md` | 장시간 백그라운드 작업은 자동 주기 모니터링 설정 — 사용자가 "다 됐나요?" 물어보게 만들지 않기 |
 
 ## 설치
 
