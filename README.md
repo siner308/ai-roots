@@ -2,44 +2,53 @@
 
 [한국어](README.ko.md) | **English**
 
-A collection of global rules that expand Claude Code's thinking.
+A collection of thinking foundations and lessons learned that expand Claude Code's capabilities.
 
 Even non-experts can solve complex problems through casual conversation — Claude automatically applies architect-grade reasoning.
 
-## Rules
+## Roots — Thinking Foundations
 
 ### Thinking Expansion
 | File | Description |
 |------|-------------|
-| `az-mindset.md` | A-Z token priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
-| `progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
-| `capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
+| `roots/az-mindset.md` | A-Z token priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
+| `roots/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
+| `roots/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
 
 ### Quality Assurance
 | File | Description |
 |------|-------------|
-| `evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
-| `claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
+| `roots/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
+| `roots/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
 
 ### Problem-Solving Strategy
 | File | Description |
 |------|-------------|
-| `parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
+| `roots/parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
+| `roots/parallel-execution-modes.md` | Choose between sequential, subagent, and team-based parallelism based on task independence and communication needs |
 
 ### User Growth
 | File | Description |
 |------|-------------|
-| `user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
+| `roots/user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
 
 ### Knowledge Capture
 | File | Description |
 |------|-------------|
-| `guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
+| `roots/guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
 
 ### Conventions
 | File | Description |
 |------|-------------|
-| `github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
+| `roots/github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
+
+## Lessons — Retrospective Learnings
+
+Lessons are concrete patterns learned from real mistakes. They describe what works better, not what to avoid.
+
+| File | Description |
+|------|-------------|
+| `lessons/incremental-verification.md` | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
 
 ## Installation
 
@@ -50,7 +59,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-Symlinks are created in `~/.claude/rules/`. Edits to the repo are reflected immediately.
+The entire `ai-roots` directory is symlinked into `~/.claude/rules/ai-roots`. Claude Code recursively loads all `.md` files from both `roots/` and `lessons/`.
 
 ## Inspiration
 

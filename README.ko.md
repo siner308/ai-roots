@@ -2,44 +2,53 @@
 
 **한국어** | [English](README.md)
 
-Claude Code의 사고를 확장시키는 글로벌 규칙 모음.
+Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 
 비전문가도 적당한 채팅만으로 복잡한 문제를 해결할 수 있도록, Claude가 아키텍트급 사고를 자동으로 적용합니다.
 
-## 규칙 목록
+## Roots — 사고 기반
 
 ### 사고 확장
 | 파일 | 설명 |
 |------|------|
-| `az-mindset.md` | A-Z 토큰 프라이밍 + 복잡도 기반 사고 확장 (Devil's Advocate, First Principles, Systems Thinking) |
-| `progressive-deepening.md` | 피상적 답변을 자동 감지하고 한 단계 더 깊이 파고드는 내부 품질 게이트 |
-| `capability-overhang.md` | 숨겨진 지식 활성화 — 도메인 토큰 주입, 교차 도메인 연결, 스킬 합성 |
+| `roots/az-mindset.md` | A-Z 토큰 프라이밍 + 복잡도 기반 사고 확장 (Devil's Advocate, First Principles, Systems Thinking) |
+| `roots/progressive-deepening.md` | 피상적 답변을 자동 감지하고 한 단계 더 깊이 파고드는 내부 품질 게이트 |
+| `roots/capability-overhang.md` | 숨겨진 지식 활성화 — 도메인 토큰 주입, 교차 도메인 연결, 스킬 합성 |
 
 ### 품질 보증
 | 파일 | 설명 |
 |------|------|
-| `evaluation-integrity.md` | 자기 평가 편향 방지 — 검증 가능성 분류, 생성/평가 분리, 드리프트 감지 |
-| `claude-architect-principles.md` | 아키텍트급 문제 해결을 자동 적용 — enforcement 매칭, context 관리, 생성/리뷰 분리 |
+| `roots/evaluation-integrity.md` | 자기 평가 편향 방지 — 검증 가능성 분류, 생성/평가 분리, 드리프트 감지 |
+| `roots/claude-architect-principles.md` | 아키텍트급 문제 해결을 자동 적용 — enforcement 매칭, context 관리, 생성/리뷰 분리 |
 
 ### 문제 해결 전략
 | 파일 | 설명 |
 |------|------|
-| `parallel-hypothesis-investigation.md` | 복잡한 문제를 계층별 가설로 분리하고 병렬 에이전트로 동시 조사 |
+| `roots/parallel-hypothesis-investigation.md` | 복잡한 문제를 계층별 가설로 분리하고 병렬 에이전트로 동시 조사 |
+| `roots/parallel-execution-modes.md` | 작업 독립성과 통신 필요도에 따라 순차/서브에이전트/팀 기반 병렬 실행 선택 |
 
 ### 사용자 성장
 | 파일 | 설명 |
 |------|------|
-| `user-growth-coaching.md` | 문제 해결 후 사용자의 질문 방식을 교정하는 코칭 — 모호한 요청 패턴을 구체적 요청으로 유도 |
+| `roots/user-growth-coaching.md` | 문제 해결 후 사용자의 질문 방식을 교정하는 코칭 — 모호한 요청 패턴을 구체적 요청으로 유도 |
 
 ### 지식 포착
 | 파일 | 설명 |
 |------|------|
-| `guardrail-maker.md` | 사용자의 교정을 암묵지로 자동 감지하고, 같은 실수를 반복하지 않도록 가드레일 생성을 제안 |
+| `roots/guardrail-maker.md` | 사용자의 교정을 암묵지로 자동 감지하고, 같은 실수를 반복하지 않도록 가드레일 생성을 제안 |
 
 ### 컨벤션
 | 파일 | 설명 |
 |------|------|
-| `github-pr-markdown.md` | GitHub PR 작성 시 GFM 마크다운 컨벤션 강제 |
+| `roots/github-pr-markdown.md` | GitHub PR 작성 시 GFM 마크다운 컨벤션 강제 |
+
+## Lessons — 시행착오 교훈
+
+실제 실수에서 배운 구체적 패턴입니다. 피해야 할 것이 아니라, 더 나은 방법을 기록합니다.
+
+| 파일 | 설명 |
+|------|------|
+| `lessons/incremental-verification.md` | 불확실한 작업은 가장 작은 검증 단위로 쪼개기 — 인라인 테스트 먼저, 스크립트는 나중에, 점진적 확장 |
 
 ## 설치
 
@@ -50,7 +59,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-`~/.claude/rules/`에 심볼릭 링크가 생성됩니다. 레포에서 규칙을 수정하면 바로 반영됩니다.
+`ai-roots` 디렉토리 전체가 `~/.claude/rules/ai-roots`로 심링크됩니다. Claude Code가 `roots/`와 `lessons/` 하위의 모든 `.md` 파일을 재귀적으로 로드합니다.
 
 ## 영감
 
