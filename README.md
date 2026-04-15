@@ -11,7 +11,7 @@ Even non-experts can solve complex problems through casual conversation — Clau
 ### Thinking Expansion
 | File | Description |
 |------|-------------|
-| `roots/az-mindset.md` | A-Z token priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
+| `roots/concept-priming.md` | Domain-spread concept priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
 | `roots/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
 | `roots/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
 
