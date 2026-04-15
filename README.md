@@ -50,6 +50,7 @@ Lessons are concrete patterns learned from real mistakes. They describe what wor
 |------|-------------|
 | `lessons/incremental-verification.md` | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
 | `lessons/background-task-monitoring.md` | Auto-monitor long background tasks with periodic progress reporting — never leave the user asking "is it done?" |
+| `lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
 
 ## Installation
 
