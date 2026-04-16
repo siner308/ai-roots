@@ -55,6 +55,7 @@ fi
 CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 CACHE_FILE="$CLAUDE_DIR/.usage-cache.json"
 CACHE_TTL=90
+now_ts=$(date +%s)
 
 usage_part=""
 
@@ -62,7 +63,6 @@ usage_part=""
 fetch_needed=1
 if [ -f "$CACHE_FILE" ]; then
   cache_ts=$(jq -r '.timestamp // 0' "$CACHE_FILE" 2>/dev/null)
-  now_ts=$(date +%s)
   age=$((now_ts - cache_ts))
   if [ "$age" -lt "$CACHE_TTL" ]; then
     fetch_needed=0
@@ -85,7 +85,20 @@ if [ "$fetch_needed" -eq 1 ]; then
       resp=$(curl -s --max-time 5 -H "Authorization: Bearer $token" -H "anthropic-beta: oauth-2025-04-20" "https://api.anthropic.com/api/oauth/usage" 2>/dev/null)
       if echo "$resp" | jq -e '.five_hour' >/dev/null 2>&1; then
         now_ts=$(date +%s)
-        echo "$resp" | jq --argjson ts "$now_ts" '{timestamp: $ts, data: .}' > "${CACHE_FILE}.tmp" 2>/dev/null
+        # Enrich with epoch timestamps for countdown display
+        enriched=$(echo "$resp" | python3 -c "
+import json,sys
+from datetime import datetime
+d=json.load(sys.stdin)
+for k in ('five_hour','seven_day','seven_day_sonnet'):
+    v=d.get(k)
+    if v and v.get('resets_at'):
+        try: v['resets_at_epoch']=int(datetime.fromisoformat(v['resets_at']).timestamp())
+        except: pass
+json.dump(d,sys.stdout)
+" 2>/dev/null)
+        src="${enriched:-$resp}"
+        echo "$src" | jq --argjson ts "$now_ts" '{timestamp: $ts, data: .}' > "${CACHE_FILE}.tmp" 2>/dev/null
         mv "${CACHE_FILE}.tmp" "$CACHE_FILE" 2>/dev/null
       fi
     fi
@@ -111,21 +124,63 @@ if [ -f "$CACHE_FILE" ]; then
     fi
   }
 
+  # Format seconds as compact countdown (e.g. 2h30m, 5d2h)
+  format_countdown() {
+    secs=$1
+    if [ "$secs" -le 0 ] 2>/dev/null; then return; fi
+    mins=$((secs / 60))
+    if [ "$mins" -lt 60 ]; then
+      printf '%dm' "$mins"
+    else
+      h=$((mins / 60)); m=$((mins % 60))
+      if [ "$h" -ge 24 ]; then
+        d=$((h / 24)); rh=$((h % 24))
+        if [ "$rh" -gt 0 ]; then printf '%dd%dh' "$d" "$rh"; else printf '%dd' "$d"; fi
+      elif [ "$m" -gt 0 ]; then
+        printf '%dh%dm' "$h" "$m"
+      else
+        printf '%dh' "$h"
+      fi
+    fi
+  }
+
+  five_h_epoch=$(jq -r '.data.five_hour.resets_at_epoch // empty' "$CACHE_FILE" 2>/dev/null)
+  weekly_epoch=$(jq -r '.data.seven_day.resets_at_epoch // empty' "$CACHE_FILE" 2>/dev/null)
+  sonnet_epoch=$(jq -r '.data.seven_day_sonnet.resets_at_epoch // empty' "$CACHE_FILE" 2>/dev/null)
+
   parts=""
   if [ -n "$five_h" ]; then
     c=$(color_for_pct "$five_h")
     five_int=$(printf "%.0f" "$five_h")
-    parts="5h:${c}${five_int}%${ESC}[0m"
+    cd_str=""
+    if [ -n "$five_h_epoch" ]; then cd_str=$(format_countdown $((five_h_epoch - now_ts))); fi
+    if [ -n "$cd_str" ]; then
+      parts="5h:${c}${five_int}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
+    else
+      parts="5h:${c}${five_int}%${ESC}[0m"
+    fi
   fi
   if [ -n "$weekly" ]; then
     c=$(color_for_pct "$weekly")
     w_int=$(printf "%.0f" "$weekly")
-    parts="${parts:+${parts} }7d:${c}${w_int}%${ESC}[0m"
+    cd_str=""
+    if [ -n "$weekly_epoch" ]; then cd_str=$(format_countdown $((weekly_epoch - now_ts))); fi
+    if [ -n "$cd_str" ]; then
+      parts="${parts:+${parts} }7d:${c}${w_int}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
+    else
+      parts="${parts:+${parts} }7d:${c}${w_int}%${ESC}[0m"
+    fi
   fi
   if [ -n "$sonnet_w" ]; then
     c=$(color_for_pct "$sonnet_w")
     s_int=$(printf "%.0f" "$sonnet_w")
-    parts="${parts:+${parts} }sonnet:${c}${s_int}%${ESC}[0m"
+    cd_str=""
+    if [ -n "$sonnet_epoch" ]; then cd_str=$(format_countdown $((sonnet_epoch - now_ts))); fi
+    if [ -n "$cd_str" ]; then
+      parts="${parts:+${parts} }sonnet:${c}${s_int}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
+    else
+      parts="${parts:+${parts} }sonnet:${c}${s_int}%${ESC}[0m"
+    fi
   fi
 
   if [ -n "$parts" ]; then
