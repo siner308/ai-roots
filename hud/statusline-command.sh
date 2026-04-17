@@ -14,6 +14,23 @@ input=$(cat)
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // empty')
 model=$(echo "$input" | jq -r '.model.display_name // empty')
 used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
+transcript=$(echo "$input" | jq -r '.transcript_path // empty')
+
+# Effort resolution order:
+#   1. Session-level /effort or /model command (parsed from transcript tail)
+#   2. Persistent effortLevel in settings.json
+effort=""
+if [ -n "$transcript" ] && [ -f "$transcript" ]; then
+  # Transcript stores ANSI as literal \u001b[...m — strip before matching
+  effort=$(tail -500 "$transcript" 2>/dev/null \
+    | sed -E 's/\\u001b\[[0-9;]*m//g' \
+    | grep -oE 'Set effort level to [a-zA-Z]+|with [a-zA-Z]+ effort' \
+    | tail -1 \
+    | sed -E 's/Set effort level to //; s/with ([a-zA-Z]+) effort/\1/')
+fi
+if [ -z "$effort" ] && [ -f "$HOME/.claude/settings.json" ]; then
+  effort=$(jq -r '.effortLevel // empty' "$HOME/.claude/settings.json" 2>/dev/null)
+fi
 
 ESC=$(printf '\033')
 
@@ -49,6 +66,36 @@ fi
 model_part=""
 if [ -n "$model" ]; then
   model_part=" ${ESC}[2m${model}${ESC}[0m"
+fi
+
+# Effort part
+effort_part=""
+if [ -n "$effort" ]; then
+  if [ "$effort" = "max" ]; then
+    # Animated rainbow — shifts with time so repeated statusline redraws appear to flow
+    rainbow=$(python3 -c "
+import time
+text='max'
+palette=[196,202,208,214,226,190,118,82,46,49,51,45,33,21,57,93,129,165,201,197]
+tick=int(time.time()*5)
+out=''
+for i,ch in enumerate(text):
+    c=palette[(tick+i)%len(palette)]
+    out+=f'\x1b[1;38;5;{c}m{ch}'
+out+='\x1b[0m'
+print(out,end='')
+" 2>/dev/null)
+    effort_part=" ${ESC}[2meffort:${ESC}[0m${rainbow:-${ESC}[1;35mmax${ESC}[0m}"
+  else
+    case "$effort" in
+      low)            ec="${ESC}[32m" ;;
+      medium)         ec="${ESC}[33m" ;;
+      high)           ec="${ESC}[31m" ;;
+      xhigh|xHigh)    ec="${ESC}[35m" ;;
+      *)              ec="${ESC}[2m" ;;
+    esac
+    effort_part=" ${ESC}[2meffort:${ESC}[0m${ec}${effort}${ESC}[0m"
+  fi
 fi
 
 # --- Rate limits (cached) ---
@@ -188,4 +235,4 @@ if [ -f "$CACHE_FILE" ]; then
   fi
 fi
 
-printf "%s" "${ESC}[32m➜${ESC}[0m  ${ESC}[36m${dir_name}${ESC}[0m${git_part}${ctx_part}${usage_part}${model_part}"
+printf "%s" "${ESC}[32m➜${ESC}[0m  ${ESC}[36m${dir_name}${ESC}[0m${git_part}${ctx_part}${usage_part}${model_part}${effort_part}"
