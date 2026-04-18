@@ -235,4 +235,10 @@ if [ -f "$CACHE_FILE" ]; then
   fi
 fi
 
-printf "%s" "${ESC}[32m➜${ESC}[0m  ${ESC}[36m${dir_name}${ESC}[0m${git_part}${ctx_part}${usage_part}${model_part}${effort_part}"
+line1="${ESC}[32m➜${ESC}[0m  ${ESC}[36m${dir_name}${ESC}[0m${git_part}${ctx_part}${usage_part}"
+line2_inner="${model_part# }${effort_part}"
+if [ -n "$line2_inner" ]; then
+  printf "%s\n%s" "$line1" "$line2_inner"
+else
+  printf "%s" "$line1"
+fi
