@@ -26,6 +26,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 |------|------|
 | `roots/parallel-hypothesis-investigation.md` | 복잡한 문제를 계층별 가설로 분리하고 병렬 에이전트로 동시 조사 |
 | `roots/parallel-execution-modes.md` | 작업 독립성과 통신 필요도에 따라 순차/서브에이전트/팀 기반 병렬 실행 선택 |
+| `roots/model-effort-delegation.md` | 임계치 기반 모델/effort/subagent 선택 — 명세된 구현은 약한 모델에 위임, 판단은 Opus에 집중 |
 
 ### 사용자 성장
 | 파일 | 설명 |

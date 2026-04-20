@@ -26,6 +26,7 @@ Even non-experts can solve complex problems through casual conversation — Clau
 |------|-------------|
 | `roots/parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
 | `roots/parallel-execution-modes.md` | Choose between sequential, subagent, and team-based parallelism based on task independence and communication needs |
+| `roots/model-effort-delegation.md` | Threshold-based model/effort/subagent selection — delegate specified implementation to weaker models, keep judgment on Opus |
 
 ### User Growth
 | File | Description |
