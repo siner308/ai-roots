@@ -6,6 +6,16 @@ For every task, deliberately choose the **executor** (main session vs subagent),
 
 Keep the main session on Opus — for planning, review, conversation, and localized edits. Delegate large, independent work to Sonnet/Haiku subagents. **The more specific the plan, the better weaker models preserve quality** — so the prerequisite for delegation is a precise plan.
 
+## Execution Surface — Main vs Subagent vs Team
+
+| Surface | When to use | Cross-worker comms |
+|---------|-------------|--------------------|
+| **Main session (inline)** | Interactive, localized, mid-stream judgment needed | N/A |
+| **Subagent** | Independent, summarizable result, no debate required | None (returns single result) |
+| **Team** | Competing hypotheses, cross-layer coordination, multi-lens review | Direct messaging between teammates |
+
+See `parallel-execution-modes.md` for topology details. The model-selection rules below apply per executor — each subagent or teammate gets its own model choice.
+
 ## Delegation Trigger — Subagent vs Inline
 
 ### Delegate to a subagent when ANY of the following hold
