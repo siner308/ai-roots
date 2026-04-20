@@ -42,6 +42,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 | 파일 | 설명 |
 |------|------|
 | `roots/github-pr-markdown.md` | GitHub PR 작성 시 GFM 마크다운 컨벤션 강제 |
+| `roots/comment-discipline.md` | 주석은 기본적으로 쓰지 않는다 — WHY가 비자명할 때만 작성, WHAT 설명/작업 맥락 언급/제거 흔적 금지 |
 
 ## Lessons — 시행착오 교훈
 

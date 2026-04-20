@@ -42,6 +42,7 @@ Even non-experts can solve complex problems through casual conversation — Clau
 | File | Description |
 |------|-------------|
 | `roots/github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
+| `roots/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
 
 ## Lessons — Retrospective Learnings
 
