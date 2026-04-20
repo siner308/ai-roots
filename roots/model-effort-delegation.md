@@ -14,7 +14,13 @@ Keep the main session on Opus — for planning, review, conversation, and locali
 | **Subagent** | Independent, summarizable result, no debate required | None (returns single result) |
 | **Team** | Competing hypotheses, cross-layer coordination, multi-lens review | Direct messaging between teammates |
 
-See `parallel-execution-modes.md` for topology details. The model-selection rules below apply per executor — each subagent or teammate gets its own model choice.
+See `parallel-execution-modes.md` for topology details.
+
+**This rule applies per executor, not per session.** Teams do NOT bypass model-effort-delegation:
+- The team lead (orchestrator) plays the same role as main Opus — planning, coordination, review
+- Each teammate is selected independently by task type using the Model Selection table below
+- Downgrade conditions (plan precision + verification loop) must be satisfied per teammate before assigning Sonnet/Haiku
+- Escalation triggers apply to each teammate independently — a failing Sonnet teammate should be replaced or escalated, not tolerated because "the team is still running"
 
 ## Delegation Trigger — Subagent vs Inline
 
