@@ -43,6 +43,7 @@ Even non-experts can solve complex problems through casual conversation — Clau
 |------|-------------|
 | `roots/github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
 | `roots/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
+| `roots/css-discipline.md` | Close four commonly abused CSS axes — cascade (`!important`), box model (margin for spacing, overflow: hidden without purpose), unit soup (literal pixels/colors), style location (utility / scoped / inline trichotomy) |
 
 ## Lessons — Retrospective Learnings
 
