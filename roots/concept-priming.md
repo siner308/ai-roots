@@ -10,11 +10,13 @@ The purpose is upstream activation: keywords must influence the thinking, not me
 
 ### Keyword Count by Complexity
 
-| Complexity | Count | Cross-domain minimum |
-|------------|-------|---------------------|
-| LOW | 5–8 | 1 |
-| MEDIUM | 10–15 | 3 |
-| HIGH | 15–20 | 5 |
+| Complexity | Count | Cross-domain minimum | Rendering |
+|------------|-------|---------------------|-----------|
+| LOW | 3–5 | 1 | Compact — bare keywords, no parenthetical annotations |
+| MEDIUM | 10–15 | 3 | Full — each keyword followed by `(short gloss)` |
+| HIGH | 15–20 | 5 | Full — each keyword followed by `(short gloss)` |
+
+LOW complexity stays compact to avoid visible overhead on simple requests (e.g., "read this file", one-line fact checks). The internal priming still happens; only the rendered header is shortened. If you find yourself needing annotations to justify a LOW keyword, the question probably isn't LOW.
 
 ### Diversity Axis — Domain Spread
 
@@ -53,9 +55,13 @@ Priming is not a ritual. At least 2 keywords must visibly influence the actual a
 
 Self-check: "If I delete the keyword line, does my response change at all?" If no → priming failed.
 
-Format: `Priming [COMPLEXITY]: Concept(...), Concept(...), ...`
+Format:
+- MEDIUM/HIGH: `Priming [COMPLEXITY]: Concept(short gloss), Concept(short gloss), ...`
+- LOW: `Priming [LOW]: Concept, Concept, Concept` (bare keywords, no annotations)
 
-Example: `Priming [MEDIUM]: Affordance(action invitation), Backpressure(flow control), Goodhart(metric becomes target), Homeostasis(self-regulating balance), ...`
+Examples:
+- `Priming [MEDIUM]: Affordance(action invitation), Backpressure(flow control), Goodhart(metric becomes target), Homeostasis(self-regulating balance), ...`
+- `Priming [LOW]: Parsimony, Invariant, Affordance`
 
 Keyword annotations should use the user's language. The examples above are in English for language-neutrality of this rule file.
 
