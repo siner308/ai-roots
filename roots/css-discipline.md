@@ -4,14 +4,14 @@ Write CSS so the cascade and box model are predictable. Most "tricky" CSS bugs �
 
 This applies everywhere CSS exists: vanilla projects, React, Next.js, Svelte, Vue, raw HTML. The underlying principles — closed token sets, single-source spacing, predictable cascade — are framework-agnostic. Framework-specific bindings (Tailwind class names, Svelte scoped styles, CSS Modules) live in the project's own supplement.
 
-**When this rule is normative.** R1–R8 are authoring constraints when editing stylesheets, component-scoped styles, inline `style=""`, or CSS-adjacent JS (`element.style.*`, class toggling, CSS-in-JS). In tasks that do not touch styles, treat them as background knowledge rather than a checklist — do not refactor untouched CSS just because it violates a rule.
+**When this rule is normative.** R1–R9 are authoring constraints when editing stylesheets, component-scoped styles, inline `style=""`, or CSS-adjacent JS (`element.style.*`, class toggling, CSS-in-JS). In tasks that do not touch styles, treat them as background knowledge rather than a checklist — do not refactor untouched CSS just because it violates a rule.
 
 ## Core principles
 
 Four axes need positive conventions:
 
 - **Cascade** — keep specificity boring and override control intact.
-- **Box model** — a single mechanism for spacing; one named purpose when hiding overflow.
+- **Box model** — a single mechanism for spacing; overflow declared only when clipping or scroll is the intent.
 - **Unit discipline** — every value comes from a named set declared once.
 - **Style location** — decide upfront where each kind of style belongs.
 
@@ -22,8 +22,6 @@ All authored spacing (padding, gap, positioned top/right/bottom/left, layout-siz
 **Do**
 - Use the project's declared spacing scale (e.g. `{0, 4, 8, 16, 32, 64}` px registered as tokens or utility classes).
 - Use fixed-pixel dimensions for **chrome widgets** (icon sizes, button tap targets) when the value is in the set. If a chrome dimension is outside the set (e.g. a 24×24 SVG viewport), declare a named token first, then consume it via `var()`.
-- Use percentages, `auto`, and flex/grid `gap` for fluid layout.
-- Use viewport units (`vw`, `vh`) on the outermost shell only.
 
 **Rationale.** When spacing is open-ended, later readers cannot tell which values are load-bearing and which are accidents. A child with `margin-top: 8px` next to a parent with `gap: 8px` silently produces 16px — nothing in the source signals the doubling.
 
@@ -54,19 +52,18 @@ When a CSS rule loses a cascade battle, the fix lives upstream, not in the casca
 
 **Rationale.** `!important` wins once but surrenders override control permanently — any later style layer needs `!important` too, and specificity debugging becomes archeology.
 
-## R4 — Pair `overflow: hidden` with a stated purpose
+## R4 — Declare `overflow` only when clipping or scroll is the intent
 
-Four valid purposes. The purpose must be legible alongside the declaration.
+The CSS default (`visible`) serves most layouts. Declare `overflow` explicitly when clipping or scroll is the intended behavior.
 
-**Do — pair `overflow: hidden` with one of:**
-- **Letterbox / aspect-ratio container**: the same element declares `aspect-ratio: <ratio>`. `overflow: hidden` clips over-wide content rather than letting it push siblings.
-- **Scroll container on the other axis**: the same element declares `overflow-y: auto` or `overflow-x: auto` on the complementary axis. A container with `overflow: hidden` on both axes that scrolls nothing is rarely what was intended.
-- **Text ellipsis**: the same element declares `text-overflow: ellipsis` and `white-space: nowrap`.
-- **Rounded clipping**: the same element declares a non-zero `border-radius` and needs children (images, backgrounds, inner elements) to respect the rounded shape. Without `overflow: hidden` (or `overflow: clip`), children escape the corners. Prefer `overflow: clip` when available — it does not create a scroll container or a new stacking context.
+**Do**
+- Leave `overflow` unset when clipping is not needed.
+- Declare `overflow: clip` (preferred) or `overflow: hidden` when clipping is the intended behavior — `clip` avoids creating a scroll container or a new stacking context.
+- Declare `overflow: auto` when scroll is the intended behavior.
 
-**When a flex or grid child overflows the parent**, reach for R5 (shrink contract), not `overflow: hidden`. The hidden-overflow pattern hides a layout bug; the shrink contract fixes it.
+For flex or grid children overflowing their parent, reach for R5 (`min-*: 0` shrink contract). The hidden-overflow pattern hides the layout bug; the shrink contract fixes it.
 
-**Grep signal.** Any `overflow: hidden` without a companion `aspect-ratio`, `overflow-*: auto`, `text-overflow: ellipsis`, or non-zero `border-radius` on the same element is a review flag.
+**Rationale.** Most tricky overflow bugs come from reaching for `overflow: hidden` reflexively to cover a sizing problem. Treating the CSS default as the intentional baseline — and explicit declaration as the signal of intent — keeps clipping as a designed outcome, not a defensive reaction.
 
 ## R5 — Enable flex/grid shrink with `min-*: 0`
 
@@ -76,7 +73,7 @@ A flex or grid item that must shrink below its intrinsic size needs `min-width: 
 - Add `min-width: 0` (or `min-height: 0`) on flex children that contain long text or replaced elements and need to shrink.
 - For replaced elements (`<canvas>`, `<img>`, `<video>`, `<iframe>`) with intrinsic dimensions:
   - Either size them fully by CSS (remove inline `style.width` / `style.height` set by JS — see R3).
-  - Or wrap them in an R4-approved `aspect-ratio` + `overflow: hidden` container.
+  - Or wrap them in an `aspect-ratio` container with `overflow: clip` (see R4).
 - For aspect-preserving shrink of a replaced element inside flex/grid, pick **one axis** (width or height) and let `aspect-ratio` derive the other. Explicit values on both axes at once leaves `aspect-ratio` no computation axis and distorts the box.
 
 **Rationale.** Flex-item `min-width: auto` equals the child's intrinsic min-content size. A canvas with inline 768×512 size reports 768×512 as min-content, which `flex-shrink` cannot go below — the parent silently grows past the viewport.
@@ -149,9 +146,21 @@ Stacking contexts get a small named scale declared once:
 
 **Rationale.** A named scale encodes intent ("this is an overlay, above base, below modal") and survives reviews. Raw numbers become a specificity war.
 
+## R9 — Scale with viewport and user font-size
+
+Every UI surface adapts to both the user's viewport (screen size) and font-size preference.
+
+**Do**
+- Use `rem` for typography and typography-coupled values (font-size, line-height, type-driven padding/gap) — scales with user font-size preference (WCAG 1.4.4 Resize Text).
+- Use layout primitives (`%`, `fr`, `flex`/`grid` `gap`, `clamp()`, media/container queries) for viewport-responsive layouts.
+- Use `px` for chrome widgets (borders, hairlines, icon-box dimensions) where literal pixels are the intent.
+- Use `vw`/`vh`/`svh` on the outermost shell only.
+
+**Rationale.** The user controls two variables — their device (viewport) and their typography preference (browser font-size override). Respecting both is user-sovereignty: the page serves the user's environment instead of dictating to it.
+
 ## Adding to a closed set — exception procedure
 
-**When the set doesn't exist yet.** On a new project or a codebase that never declared a token layer, the procedure below cannot run — there is nothing to add to. The first task is to declare the layer itself: survey the literals already in use, cluster them into an intentional scale (spacing, color, z-index), and land the token file as its own commit with a few initial consumers. Once the set exists, all subsequent work flows through the steps below. Until then, treat R1–R8 as aspirations, not gates.
+**When the set doesn't exist yet.** On a new project or a codebase that never declared a token layer, the procedure below cannot run — there is nothing to add to. The first task is to declare the layer itself: survey the literals already in use, cluster them into an intentional scale (spacing, color, z-index), and land the token file as its own commit with a few initial consumers. Once the set exists, all subsequent work flows through the steps below. Until then, treat R1–R9 as aspirations, not gates.
 
 When you genuinely need a value outside an existing closed set:
 
@@ -165,13 +174,12 @@ The general shape is universal. The concrete routing (which token file, which up
 
 ## Enforcement signals for review
 
-R1–R8 above are **authoring guidance** — what to do while writing code. The signals below are **review heuristics** — what should fail a review (human or linter). Both trace back to the same principles, but the review list is deliberately narrower so false positives stay low. Signals are starting points for investigation, not automatic rejections; the documented carve-outs above (R3 third-party override, R4 border-radius clipping, R6 non-CSS consumers) remain legitimate.
+R1–R9 above are **authoring guidance** — what to do while writing code. The signals below are **review heuristics** — what should fail a review (human or linter). Both trace back to the same principles, but the review list is deliberately narrower so false positives stay low. Signals are starting points for investigation, not automatic rejections; the documented carve-outs above (R3 third-party override, R6 non-CSS consumers) remain legitimate.
 
 - `!important` anywhere in authored source (without the R3 third-party-source comment).
 - Hex, `rgb(`, `rgba(`, `hsl(`, `oklch(` literals in component source or scoped styles (R6 non-CSS-consumer carve-out excepted).
 - A direction-specific margin utility or property outside the single designated base layer or outside the `margin: auto` alignment family.
 - `z-index:` with a raw number instead of a token reference.
-- `overflow: hidden` with no companion `aspect-ratio`, `overflow-*: auto`, `text-overflow: ellipsis`, or non-zero `border-radius` on the same element.
 - JS writing `element.style.width` or `element.style.height` (except `element.style.setProperty('--*', value)` for custom properties).
 - Utility-framework arbitrary-value bracket syntax (`-\[.*\]`) without a documented project carve-out.
 
