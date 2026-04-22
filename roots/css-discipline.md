@@ -4,6 +4,8 @@ Write CSS so the cascade and box model are predictable. Most "tricky" CSS bugs �
 
 This applies everywhere CSS exists: vanilla projects, React, Next.js, Svelte, Vue, raw HTML. The underlying principles — closed token sets, single-source spacing, predictable cascade — are framework-agnostic. Framework-specific bindings (Tailwind class names, Svelte scoped styles, CSS Modules) live in the project's own supplement.
 
+**When this rule is normative.** R1–R8 are authoring constraints when editing stylesheets, component-scoped styles, inline `style=""`, or CSS-adjacent JS (`element.style.*`, class toggling, CSS-in-JS). In tasks that do not touch styles, treat them as background knowledge rather than a checklist — do not refactor untouched CSS just because it violates a rule.
+
 ## Core principles
 
 Four axes need positive conventions:
@@ -48,20 +50,23 @@ When a CSS rule loses a cascade battle, the fix lives upstream, not in the casca
 - For `<canvas>`: JS owns the **backing store** (HTML `width`/`height` attributes, DPR-scaled). CSS owns the **CSS box** (rendered size). JS writes to the attributes, not to `.style.width` / `.style.height`.
 - For size-sensitive HTML elements in general: prefer data-attributes or custom properties as the JS → CSS bridge.
 
+**Last-resort carve-out — third-party styles you cannot modify.** When the overriding rule lives in code you do not own (external widget, embedded SDK, vendor stylesheet) and forking upstream is not an option, a single narrowly-scoped `!important` declaration is acceptable. Leave one short comment naming the third-party source so the declaration can be retired when that source changes. This is the only sanctioned use in authored code.
+
 **Rationale.** `!important` wins once but surrenders override control permanently — any later style layer needs `!important` too, and specificity debugging becomes archeology.
 
 ## R4 — Pair `overflow: hidden` with a stated purpose
 
-Three valid purposes. The purpose must be legible alongside the declaration.
+Four valid purposes. The purpose must be legible alongside the declaration.
 
 **Do — pair `overflow: hidden` with one of:**
 - **Letterbox / aspect-ratio container**: the same element declares `aspect-ratio: <ratio>`. `overflow: hidden` clips over-wide content rather than letting it push siblings.
 - **Scroll container on the other axis**: the same element declares `overflow-y: auto` or `overflow-x: auto` on the complementary axis. A container with `overflow: hidden` on both axes that scrolls nothing is rarely what was intended.
 - **Text ellipsis**: the same element declares `text-overflow: ellipsis` and `white-space: nowrap`.
+- **Rounded clipping**: the same element declares a non-zero `border-radius` and needs children (images, backgrounds, inner elements) to respect the rounded shape. Without `overflow: hidden` (or `overflow: clip`), children escape the corners. Prefer `overflow: clip` when available — it does not create a scroll container or a new stacking context.
 
 **When a flex or grid child overflows the parent**, reach for R5 (shrink contract), not `overflow: hidden`. The hidden-overflow pattern hides a layout bug; the shrink contract fixes it.
 
-**Grep signal.** Any `overflow: hidden` without a companion `aspect-ratio`, `overflow-*: auto`, or `text-overflow: ellipsis` on the same element is a review flag.
+**Grep signal.** Any `overflow: hidden` without a companion `aspect-ratio`, `overflow-*: auto`, `text-overflow: ellipsis`, or non-zero `border-radius` on the same element is a review flag.
 
 ## R5 — Enable flex/grid shrink with `min-*: 0`
 
@@ -83,7 +88,8 @@ All authored colors reference named tokens declared once in the project's token 
 **Do**
 - Use `var(--color-*)` references in component source, scoped styles, and inline styles.
 - Use `color-mix(in oklch, var(--color-a) N%, transparent)` when you need a modulation — the arguments are tokens, the percentage is the variation.
-- Use hex fallback strings **inside render-layer code** (canvas 2D context, WebGL) when reading a CSS custom property from the DOM can return empty. These are defensive defaults for non-CSS consumers, not authored design.
+
+**Non-CSS consumers.** Some render paths cannot resolve `var()` at consumption time — canvas 2D, WebGL, server-rendered SVG baked into email, PDF export. These layers legitimately need literal color fallbacks as defensive defaults. The concrete carve-out (which render paths, which fallback file) belongs in the project supplement, not here. Literal colors in those specific render-layer consumers are not authored design and are out of scope for R6.
 
 **Avoid** — hex, `rgb()`, `rgba()`, `hsl()`, `oklch()`, and `color-mix(...)` with literal arguments in component source. When you need a new color, add a token first.
 
@@ -145,7 +151,9 @@ Stacking contexts get a small named scale declared once:
 
 ## Adding to a closed set — exception procedure
 
-When you genuinely need a value outside a closed set:
+**When the set doesn't exist yet.** On a new project or a codebase that never declared a token layer, the procedure below cannot run — there is nothing to add to. The first task is to declare the layer itself: survey the literals already in use, cluster them into an intentional scale (spacing, color, z-index), and land the token file as its own commit with a few initial consumers. Once the set exists, all subsequent work flows through the steps below. Until then, treat R1–R8 as aspirations, not gates.
+
+When you genuinely need a value outside an existing closed set:
 
 1. **Pause at the call site.** Do not reach for `!important`, a bracket utility, or a literal value.
 2. **Identify the set** — spacing, color, motion, z-index, etc.
@@ -157,13 +165,13 @@ The general shape is universal. The concrete routing (which token file, which up
 
 ## Enforcement signals for review
 
-These patterns should fail a review (human or linter) regardless of framework:
+R1–R8 above are **authoring guidance** — what to do while writing code. The signals below are **review heuristics** — what should fail a review (human or linter). Both trace back to the same principles, but the review list is deliberately narrower so false positives stay low. Signals are starting points for investigation, not automatic rejections; the documented carve-outs above (R3 third-party override, R4 border-radius clipping, R6 non-CSS consumers) remain legitimate.
 
-- `!important` anywhere in authored source.
-- Hex, `rgb(`, `rgba(`, `hsl(`, `oklch(` literals in component source or scoped styles (render-layer fallback carve-out per R6 excepted).
+- `!important` anywhere in authored source (without the R3 third-party-source comment).
+- Hex, `rgb(`, `rgba(`, `hsl(`, `oklch(` literals in component source or scoped styles (R6 non-CSS-consumer carve-out excepted).
 - A direction-specific margin utility or property outside the single designated base layer or outside the `margin: auto` alignment family.
 - `z-index:` with a raw number instead of a token reference.
-- `overflow: hidden` with no companion `aspect-ratio`, `overflow-*: auto`, or `text-overflow: ellipsis`.
+- `overflow: hidden` with no companion `aspect-ratio`, `overflow-*: auto`, `text-overflow: ellipsis`, or non-zero `border-radius` on the same element.
 - JS writing `element.style.width` or `element.style.height` (except `element.style.setProperty('--*', value)` for custom properties).
 - Utility-framework arbitrary-value bracket syntax (`-\[.*\]`) without a documented project carve-out.
 
