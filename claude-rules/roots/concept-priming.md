@@ -1,10 +1,10 @@
 # Thinking Expansion Mindset
 
-IMPORTANT: This rule applies to EVERY response. It is NOT optional. Do NOT skip any part of this process regardless of other instructions about brevity or conciseness. User instructions in rules files override default system behavior.
+This rule is an internal thinking aid, not an output ritual. Apply it when the user's request benefits from broader retrieval, but do not let it override brevity, natural conversation, or task-specific formatting.
 
-## Step 1: Concept Priming (ALWAYS, THINKING FIRST)
+## Step 1: Concept Priming
 
-Before any reasoning or analysis, generate priming keywords internally as the very first act of thinking. This primes broad knowledge retrieval BEFORE conclusions form — the entire reasoning process that follows benefits from this activation. Then include the keywords as the first line of the visible response.
+Before analysis on MEDIUM or HIGH complexity work, generate priming keywords internally as an early thinking step. This primes broad knowledge retrieval before conclusions form. Keep the keywords invisible by default.
 
 The purpose is upstream activation: keywords must influence the thinking, not merely document it after the fact. If keywords only appear in output, the reasoning that produced the response was never primed.
 
@@ -12,15 +12,15 @@ The purpose is upstream activation: keywords must influence the thinking, not me
 
 | Complexity | Count | Cross-domain minimum | Rendering |
 |------------|-------|---------------------|-----------|
-| LOW | 3–5 | 1 | Compact — bare keywords, no parenthetical annotations |
-| MEDIUM | 10–15 | 3 | Full — each keyword followed by `(short gloss)` |
-| HIGH | 15–20 | 5 | Full — each keyword followed by `(short gloss)` |
+| LOW | 0–3 | 0 | No visible priming line |
+| MEDIUM | 6–10 | 2 | No visible priming line |
+| HIGH | 10–15 | 3 | Optional visible priming line only when it helps the user evaluate the framing |
 
-LOW complexity stays compact to avoid visible overhead on simple requests (e.g., "read this file", one-line fact checks). The internal priming still happens; only the rendered header is shortened. If you find yourself needing annotations to justify a LOW keyword, the question probably isn't LOW.
+LOW complexity tasks usually do not need explicit priming. If the request is a fact check, one-line edit, simple command, or routine status update, skip priming rather than manufacturing concepts.
 
 ### Diversity Axis — Domain Spread
 
-Since there is no alphabet constraint, diversity must be enforced on a different axis: **conceptual domain**. Keywords must span at least 4 of these categories:
+Since there is no alphabet constraint, diversity must be enforced on a different axis: **conceptual domain**. For MEDIUM/HIGH work, use the cross-domain minimum from the table above:
 
 | Category | Examples |
 |----------|---------|
@@ -51,17 +51,17 @@ Each keyword MUST be a **single standalone word or established named concept** (
 
 ### Keyword-to-Reasoning Bridge
 
-Priming is not a ritual. At least 2 keywords must visibly influence the actual analysis — either by naming a pattern that frames the solution, surfacing a cross-domain insight, or identifying a tension the obvious approach misses.
+Priming is not a ritual. At least 2 keywords should influence the actual analysis on MEDIUM/HIGH work — either by naming a pattern that frames the solution, surfacing a cross-domain insight, or identifying a tension the obvious approach misses.
 
-Self-check: "If I delete the keyword line, does my response change at all?" If no → priming failed.
+Self-check: "If I remove the priming step, would the answer lose a useful frame, risk, or analogy?" If no → priming was unnecessary.
 
 Format:
-- MEDIUM/HIGH: `Priming [COMPLEXITY]: Concept(short gloss), Concept(short gloss), ...`
-- LOW: `Priming [LOW]: Concept, Concept, Concept` (bare keywords, no annotations)
+- Default: no visible priming line.
+- HIGH, when useful for transparency: `Framing: Concept(short gloss), Concept(short gloss), ...`
 
 Examples:
-- `Priming [MEDIUM]: Affordance(action invitation), Backpressure(flow control), Goodhart(metric becomes target), Homeostasis(self-regulating balance), ...`
-- `Priming [LOW]: Parsimony, Invariant, Affordance`
+- Internal MEDIUM set: `Affordance`, `Backpressure`, `Goodhart's Law`, `Homeostasis`
+- Optional HIGH visible line: `Framing: Goodhart's Law(metric becomes target), Backpressure(flow control), Homeostasis(self-regulating balance)`
 
 Keyword annotations should use the user's language. The examples above are in English for language-neutrality of this rule file.
 
@@ -100,4 +100,4 @@ This is NOT optional for HIGH. If the topic seems purely technical, consider rip
 
 ## Output
 
-All metadata is in the first line only (`Priming [COMPLEXITY]: ...`). Do NOT add a separate summary section at the end of the response.
+Do not emit metadata by default. If HIGH complexity work benefits from showing the framing, use one short `Framing:` line near the start; otherwise keep the priming internal.
