@@ -96,15 +96,15 @@ Wait for user confirmation before writing.
 
 | Signal | Location | Rationale |
 |--------|----------|-----------|
-| Universal principle (any project) | `ai-roots/roots/` | Symlinked to `~/.claude/rules/`, loaded everywhere |
-| Lesson learned from a mistake | `ai-roots/lessons/` | Concrete pattern from real failure — describes what works better |
+| Universal principle (any project) | `ai-roots/claude-rules/roots/` | Symlinked to `~/.claude/rules/`, loaded everywhere |
+| Lesson learned from a mistake | `ai-roots/claude-rules/lessons/` | Concrete pattern from real failure — describes what works better |
 | Project-specific convention | Project `CLAUDE.md` | Loaded per-project |
 | Project-specific, standalone topic | Project `.claude/rules/` | Modular, avoids bloating CLAUDE.md |
 | Updates an existing rule | Same file as existing | Avoids fragmentation |
 
-**Rules vs Lessons:** Rules (`roots/`) define principles and protocols — they say what to do. Lessons (`lessons/`) capture concrete patterns learned from real mistakes — they show what works better with before/after examples. If the correction is "never do X" → rule. If the correction is "we tried X and Y works better because Z" → lesson.
+**Rules vs Lessons:** Rules (`claude-rules/roots/`) define principles and protocols — they say what to do. Lessons (`claude-rules/lessons/`) capture concrete patterns learned from real mistakes — they show what works better with before/after examples. If the correction is "never do X" → rule. If the correction is "we tried X and Y works better because Z" → lesson.
 
-**Writing location:** `~/.claude/rules/ai-roots` is a symlink. Always resolve it to the actual git repository (`readlink -f ~/.claude/rules/ai-roots`) and write there — symlink targets are read-only by convention, and commits must go to the real repo.
+**Writing location:** `~/.claude/rules/ai-roots` is a symlink to this repository's `claude-rules/` directory. Always resolve it to the actual git path (`readlink -f ~/.claude/rules/ai-roots`) and write there — symlink targets are read-only by convention, and commits must go to the real repo.
 
 When unsure about scope, ask the user whether the rule applies to other projects too.
 

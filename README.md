@@ -11,39 +11,39 @@ Even non-experts can solve complex problems through casual conversation — Clau
 ### Thinking Expansion
 | File | Description |
 |------|-------------|
-| `roots/concept-priming.md` | Domain-spread concept priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
-| `roots/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
-| `roots/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
+| `claude-rules/roots/concept-priming.md` | Domain-spread concept priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
+| `claude-rules/roots/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
+| `claude-rules/roots/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
 
 ### Quality Assurance
 | File | Description |
 |------|-------------|
-| `roots/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
-| `roots/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
+| `claude-rules/roots/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
+| `claude-rules/roots/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
 
 ### Problem-Solving Strategy
 | File | Description |
 |------|-------------|
-| `roots/parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
-| `roots/parallel-execution-modes.md` | Choose between sequential, subagent, and team-based parallelism based on task independence and communication needs |
-| `roots/model-effort-delegation.md` | Threshold-based model/effort/subagent selection — delegate specified implementation to weaker models, keep judgment on Opus |
+| `claude-rules/roots/parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
+| `claude-rules/roots/parallel-execution-modes.md` | Choose between sequential, subagent, and team-based parallelism based on task independence and communication needs |
+| `claude-rules/roots/model-effort-delegation.md` | Threshold-based model/effort/subagent selection — delegate specified implementation to weaker models, keep judgment on Opus |
 
 ### User Growth
 | File | Description |
 |------|-------------|
-| `roots/user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
+| `claude-rules/roots/user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
 
 ### Knowledge Capture
 | File | Description |
 |------|-------------|
-| `roots/guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
+| `claude-rules/roots/guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
 
 ### Conventions
 | File | Description |
 |------|-------------|
-| `roots/github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
-| `roots/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
-| `roots/css-discipline.md` | Close four commonly abused CSS axes — cascade (`!important`), box model (margin for spacing, overflow: hidden without purpose), unit soup (literal pixels/colors), style location (utility / scoped / inline trichotomy) |
+| `claude-rules/roots/github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
+| `claude-rules/roots/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
+| `claude-rules/roots/css-discipline.md` | Close four commonly abused CSS axes — cascade (`!important`), box model (margin for spacing, overflow: hidden without purpose), unit soup (literal pixels/colors), style location (utility / scoped / inline trichotomy) |
 
 ## Lessons — Retrospective Learnings
 
@@ -51,9 +51,9 @@ Lessons are concrete patterns learned from real mistakes. They describe what wor
 
 | File | Description |
 |------|-------------|
-| `lessons/incremental-verification.md` | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
-| `lessons/background-task-monitoring.md` | Auto-monitor long background tasks with periodic progress reporting — never leave the user asking "is it done?" |
-| `lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
+| `claude-rules/lessons/incremental-verification.md` | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
+| `claude-rules/lessons/background-task-monitoring.md` | Auto-monitor long background tasks with periodic progress reporting — never leave the user asking "is it done?" |
+| `claude-rules/lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
 
 ## Multi-Agent Orchestration (Optional)
 
@@ -69,7 +69,7 @@ Skip it if none of these apply. Ample Claude Code capacity alone is a valid reas
 |------|-------------|
 | `.claude/agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Self-contained prompt usable via Claude Code's Agent tool, or pasted as system prompt when invoking `/codex:adversarial-review`. |
 
-Routing rules (three-turn cap for hard problems, adversarial review on security-sensitive paths, capability-based routing for image generation) live in `roots/model-effort-delegation.md` §Cross-Provider Delegation (Codex). These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
+Routing rules (three-turn cap for hard problems, adversarial review on security-sensitive paths, capability-based routing for image generation) live in `claude-rules/roots/model-effort-delegation.md` §Cross-Provider Delegation (Codex). These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
 
 ## Installation
 
@@ -80,7 +80,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The entire `ai-roots` directory is symlinked into `~/.claude/rules/ai-roots`. Claude Code recursively loads all `.md` files from both `roots/` and `lessons/`.
+Only `claude-rules/` is symlinked into `~/.claude/rules/ai-roots`, so README files, HUD scripts, and agent prompts are not loaded as always-on rules. Claude Code recursively loads all `.md` files from both `claude-rules/roots/` and `claude-rules/lessons/`.
 
 ## Inspiration
 
