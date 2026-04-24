@@ -20,7 +20,7 @@ Before invoking Codex, prepare a concise rescue brief containing:
 2. Run Codex in read-only mode unless the user explicitly asked for Codex to patch files:
 
 ```bash
-codex exec --sandbox read-only -
+codex exec -m gpt-5.5 -c reasoning_effort="high" --sandbox read-only -
 ```
 
 3. Paste the rescue brief into stdin, followed by:

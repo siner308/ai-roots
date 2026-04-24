@@ -7,7 +7,7 @@ Run Codex with no sandbox and no approval prompts.
 This command uses dangerous full access:
 
 ```bash
-codex exec --dangerously-bypass-approvals-and-sandbox --search -
+codex exec -m gpt-5.5 -c reasoning_effort="extra-high" --dangerously-bypass-approvals-and-sandbox --search -
 ```
 
 Use only when the user explicitly accepts the risk for the current repository. This mode can read and write outside the workspace, run destructive commands, access local credentials available to the process, and use the network without approval prompts.

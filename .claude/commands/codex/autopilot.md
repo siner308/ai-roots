@@ -7,7 +7,7 @@ Delegate implementation work to OpenAI Codex with bounded autonomy.
 Use `--full-auto` for trusted local repositories when Codex should read files, edit within the workspace, and run verification commands without repeated prompts:
 
 ```bash
-codex exec --full-auto -
+codex exec -m gpt-5.5 -c reasoning_effort="high" --full-auto -
 ```
 
 Paste a brief with:

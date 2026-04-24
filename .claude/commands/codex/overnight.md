@@ -9,7 +9,7 @@ Use when the user wants Codex to keep working unattended, such as overnight impl
 ## Default Mode
 
 ```bash
-codex exec --sandbox workspace-write --ask-for-approval never --search -
+codex exec -m gpt-5.5 -c reasoning_effort="high" --sandbox workspace-write --ask-for-approval never --search -
 ```
 
 This keeps Codex inside the workspace sandbox but prevents approval prompts from stopping the run. Use `--search` so Codex can research public docs when needed. If the task must install dependencies or call external CLIs from the shell, make that requirement explicit in the brief; do not silently escalate to dangerous mode.
