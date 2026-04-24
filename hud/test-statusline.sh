@@ -55,8 +55,27 @@ out=$(printf '%s' "$input" \
   | CLAUDE_CONFIG_DIR="$CLAUDE_DIR" HOME="$HOME_DIR" sh "$SCRIPT_DIR/statusline-command.sh" \
   | strip_ansi)
 
+assert_contains "$out" "✦ claude"
 assert_contains "$out" "5h:42%"
 assert_contains "$out" "7d:58%"
 assert_contains "$out" "sonnet:87%"
+
+cat > "$CLAUDE_DIR/.codex-usage-cache.json" <<'JSON'
+{
+  "timestamp": 9999999999,
+  "data": {
+    "primary":   {"used_percent": 27, "window_minutes": 300,   "resets_at": 9999999999},
+    "secondary": {"used_percent": 4,  "window_minutes": 10080, "resets_at": 9999999999}
+  }
+}
+JSON
+
+out=$(printf '%s' "$input" \
+  | CLAUDE_CONFIG_DIR="$CLAUDE_DIR" HOME="$HOME_DIR" sh "$SCRIPT_DIR/statusline-command.sh" \
+  | strip_ansi)
+
+assert_contains "$out" "✦ codex"
+assert_contains "$out" "5h:27%"
+assert_contains "$out" "7d:4%"
 
 echo "ok"

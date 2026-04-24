@@ -157,44 +157,44 @@ json.dump(d,sys.stdout)
   fi
 fi
 
+# Color based on utilization level
+color_for_pct() {
+  pct=$1
+  pct_int=$(printf "%.0f" "$pct")
+  if [ "$pct_int" -ge 80 ]; then
+    printf '%s' "${ESC}[31m"  # red
+  elif [ "$pct_int" -ge 50 ]; then
+    printf '%s' "${ESC}[33m"  # yellow
+  else
+    printf '%s' "${ESC}[32m"  # green
+  fi
+}
+
+# Format seconds as compact countdown (e.g. 2h30m, 5d2h)
+format_countdown() {
+  secs=$1
+  if [ "$secs" -le 0 ] 2>/dev/null; then return; fi
+  mins=$((secs / 60))
+  if [ "$mins" -lt 60 ]; then
+    printf '%dm' "$mins"
+  else
+    h=$((mins / 60)); m=$((mins % 60))
+    if [ "$h" -ge 24 ]; then
+      d=$((h / 24)); rh=$((h % 24))
+      if [ "$rh" -gt 0 ]; then printf '%dd%dh' "$d" "$rh"; else printf '%dd' "$d"; fi
+    elif [ "$m" -gt 0 ]; then
+      printf '%dh%dm' "$h" "$m"
+    else
+      printf '%dh' "$h"
+    fi
+  fi
+}
+
 # Read from cache
 if [ -f "$CACHE_FILE" ]; then
   five_h=$(jq -r '.data.five_hour.utilization // empty' "$CACHE_FILE" 2>/dev/null)
   weekly=$(jq -r '.data.seven_day.utilization // empty' "$CACHE_FILE" 2>/dev/null)
   sonnet_w=$(jq -r '.data.seven_day_sonnet.utilization // empty' "$CACHE_FILE" 2>/dev/null)
-
-  # Color based on utilization level
-  color_for_pct() {
-    pct=$1
-    pct_int=$(printf "%.0f" "$pct")
-    if [ "$pct_int" -ge 80 ]; then
-      printf '%s' "${ESC}[31m"  # red
-    elif [ "$pct_int" -ge 50 ]; then
-      printf '%s' "${ESC}[33m"  # yellow
-    else
-      printf '%s' "${ESC}[32m"  # green
-    fi
-  }
-
-  # Format seconds as compact countdown (e.g. 2h30m, 5d2h)
-  format_countdown() {
-    secs=$1
-    if [ "$secs" -le 0 ] 2>/dev/null; then return; fi
-    mins=$((secs / 60))
-    if [ "$mins" -lt 60 ]; then
-      printf '%dm' "$mins"
-    else
-      h=$((mins / 60)); m=$((mins % 60))
-      if [ "$h" -ge 24 ]; then
-        d=$((h / 24)); rh=$((h % 24))
-        if [ "$rh" -gt 0 ]; then printf '%dd%dh' "$d" "$rh"; else printf '%dd' "$d"; fi
-      elif [ "$m" -gt 0 ]; then
-        printf '%dh%dm' "$h" "$m"
-      else
-        printf '%dh' "$h"
-      fi
-    fi
-  }
 
   five_h_epoch=$(jq -r '.data.five_hour.resets_at_epoch // empty' "$CACHE_FILE" 2>/dev/null)
   weekly_epoch=$(jq -r '.data.seven_day.resets_at_epoch // empty' "$CACHE_FILE" 2>/dev/null)
@@ -240,10 +240,118 @@ if [ -f "$CACHE_FILE" ]; then
   fi
 fi
 
-line1="${ESC}[32m➜${ESC}[0m  ${ESC}[36m${dir_name}${ESC}[0m${git_part}${ctx_part}${usage_part}"
-line2_inner="${model_part# }${effort_part}"
-if [ -n "$line2_inner" ]; then
-  printf "%s\n%s" "$line1" "$line2_inner"
-else
-  printf "%s" "$line1"
+# --- Codex rate limits (parsed from latest local session jsonl, cached) ---
+CODEX_DIR_HOME="$HOME/.codex/sessions"
+CODEX_CACHE="$CLAUDE_DIR/.codex-usage-cache.json"
+CODEX_LOCK="$CODEX_CACHE.lock"
+codex_part=""
+
+codex_fetch_needed=1
+if [ -f "$CODEX_CACHE" ]; then
+  cx_cache_ts=$(jq -r '.timestamp // 0' "$CODEX_CACHE" 2>/dev/null)
+  if [ $((now_ts - cx_cache_ts)) -lt "$CACHE_TTL" ]; then
+    codex_fetch_needed=0
+  fi
 fi
+
+if [ "$codex_fetch_needed" -eq 1 ] && [ -d "$CODEX_DIR_HOME" ]; then
+  if mkdir "$CODEX_LOCK" 2>/dev/null; then
+    (
+    trap 'rmdir "$CODEX_LOCK" 2>/dev/null' EXIT INT TERM
+    latest=$(find "$CODEX_DIR_HOME" -type f -name "*.jsonl" -mtime -7 2>/dev/null \
+      | xargs -I {} stat -f '%m %N' {} 2>/dev/null \
+      | sort -rn | head -1 | cut -d' ' -f2-)
+    if [ -n "$latest" ] && [ -f "$latest" ]; then
+      result=$(python3 - "$latest" <<'PY' 2>/dev/null
+import json, sys
+path = sys.argv[1]
+last = None
+try:
+    with open(path) as fh:
+        for line in fh:
+            if '"rate_limits"' not in line:
+                continue
+            try:
+                obj = json.loads(line)
+            except Exception:
+                continue
+            stack = [obj]
+            while stack:
+                o = stack.pop()
+                if isinstance(o, dict):
+                    rl = o.get('rate_limits')
+                    if isinstance(rl, dict):
+                        last = rl
+                    stack.extend(o.values())
+                elif isinstance(o, list):
+                    stack.extend(o)
+except Exception:
+    pass
+if last:
+    print(json.dumps(last))
+PY
+)
+      if [ -n "$result" ]; then
+        ts=$(date +%s)
+        printf '{"timestamp":%s,"data":%s}' "$ts" "$result" > "${CODEX_CACHE}.tmp" 2>/dev/null \
+          && mv "${CODEX_CACHE}.tmp" "$CODEX_CACHE" 2>/dev/null
+      fi
+    fi
+    ) &
+  fi
+fi
+
+if [ -f "$CODEX_CACHE" ]; then
+  cx_5h=$(jq -r '.data.primary.used_percent // empty' "$CODEX_CACHE" 2>/dev/null)
+  cx_7d=$(jq -r '.data.secondary.used_percent // empty' "$CODEX_CACHE" 2>/dev/null)
+  cx_5h_e=$(jq -r '.data.primary.resets_at // empty' "$CODEX_CACHE" 2>/dev/null)
+  cx_7d_e=$(jq -r '.data.secondary.resets_at // empty' "$CODEX_CACHE" 2>/dev/null)
+
+  cx_parts=""
+  if [ -n "$cx_5h" ]; then
+    c=$(color_for_pct "$cx_5h"); v=$(printf "%.0f" "$cx_5h")
+    cd_str=""
+    if [ -n "$cx_5h_e" ]; then cd_str=$(format_countdown $((cx_5h_e - now_ts))); fi
+    if [ -n "$cd_str" ]; then
+      cx_parts="5h:${c}${v}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
+    else
+      cx_parts="5h:${c}${v}%${ESC}[0m"
+    fi
+  fi
+  if [ -n "$cx_7d" ]; then
+    c=$(color_for_pct "$cx_7d"); v=$(printf "%.0f" "$cx_7d")
+    cd_str=""
+    if [ -n "$cx_7d_e" ]; then cd_str=$(format_countdown $((cx_7d_e - now_ts))); fi
+    if [ -n "$cd_str" ]; then
+      cx_parts="${cx_parts:+${cx_parts} }7d:${c}${v}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
+    else
+      cx_parts="${cx_parts:+${cx_parts} }7d:${c}${v}%${ESC}[0m"
+    fi
+  fi
+
+  if [ -n "$cx_parts" ]; then
+    codex_part=" ${ESC}[2m[${ESC}[0m${cx_parts}${ESC}[2m]${ESC}[0m"
+  fi
+fi
+
+# Line 1: prompt + ctx + model + effort
+line1="${ESC}[32m➜${ESC}[0m  ${ESC}[36m${dir_name}${ESC}[0m${git_part}${ctx_part}${model_part}${effort_part}"
+
+# Line 2: claude usage (icon ✦)
+line2=""
+if [ -n "$usage_part" ]; then
+  line2="${ESC}[2m✦ claude${ESC}[0m${usage_part}"
+fi
+
+# Line 3: codex usage (icon ◆)
+line3=""
+if [ -n "$codex_part" ]; then
+  line3="${ESC}[2m✦ codex${ESC}[0m${codex_part}"
+fi
+
+out="$line1"
+[ -n "$line2" ] && out="${out}
+${line2}"
+[ -n "$line3" ] && out="${out}
+${line3}"
+printf "%s" "$out"
