@@ -69,6 +69,7 @@ Skip it if none of these apply. Ample Claude Code capacity alone is a valid reas
 |------|-------------|
 | `.claude/agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Self-contained prompt usable via Claude Code's Agent tool, or pasted as system prompt when invoking `/codex:adversarial-review`. |
 | `.claude/commands/codex/adversarial-review.md` | Slash command template that runs `codex review --uncommitted` with the adversarial reviewer prompt. |
+| `.claude/commands/codex/autopilot.md` | Bounded implementation handoff using `codex exec --full-auto`; dangerous no-sandbox mode is explicitly gated. |
 | `.claude/commands/codex/diff-review.md` | General read-only Codex production-review command. |
 | `.claude/commands/codex/rescue.md` | Read-only Codex rescue handoff for stuck debugging after the three-turn cap. |
 

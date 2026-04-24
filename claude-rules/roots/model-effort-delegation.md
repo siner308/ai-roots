@@ -110,6 +110,12 @@ Current examples:
 
 Capability routing is **independent of the three-turn cap and the security review**: if Claude needs an image, delegate on turn one; if Claude needs adversarial review, delegate after a security-sensitive change. These are separate triggers with separate targets — do not wait for reliability failure to trigger a capability delegation.
 
+### Codex Autopilot Approval Policy
+
+Use `/codex:autopilot` for bounded implementation work when Codex should act as an independent worker. The default command must use `codex exec --full-auto`, which OpenAI documents as `--sandbox workspace-write --ask-for-approval on-request`: Codex can work inside the workspace, while network access and writes outside the workspace still require approval.
+
+Do not use `--dangerously-bypass-approvals-and-sandbox` as a default. OpenAI documents it as dangerous full access: no sandbox and no approvals. It is acceptable only when the user explicitly requests it and an external isolation boundary exists, such as a disposable devcontainer or VM. If the isolation story is unclear, use `--full-auto` or read-only non-interactive mode instead.
+
 ### What Counts as "Security-Sensitive"
 
 `/codex:adversarial-review` is mandatory when a change modifies behavior on any of:
@@ -211,4 +217,4 @@ Right: Delegate to Haiku Explore agent
 - Never downgrade model or effort when blast radius is high
 - Escalate to Opus after 3 failures or when a design decision surfaces
 - Briefings must include file paths, signatures, verification, and a request for decision reasoning
-- **If Codex is configured** (optional): cap inline attempts at 3 turns on hard problems and delegate to `/codex:rescue` beyond that; invoke `/codex:adversarial-review` on every security-sensitive change; route OpenAI-exclusive capabilities (image generation via DALL-E / `gpt-image`, TTS, etc.) to Codex on turn one
+- **If Codex is configured** (optional): cap inline attempts at 3 turns on hard problems and delegate to `/codex:rescue` beyond that; invoke `/codex:adversarial-review` on every security-sensitive change; use `/codex:autopilot` with `--full-auto` for bounded implementation handoffs; route OpenAI-exclusive capabilities (image generation via DALL-E / `gpt-image`, TTS, etc.) to Codex on turn one
