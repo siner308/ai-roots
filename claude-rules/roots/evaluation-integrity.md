@@ -24,6 +24,24 @@ Before starting any iterative work, classify the domain.
 2. **Name specific defects, not vibes.** Self-evaluation must produce concrete, falsifiable criticism. "This could be better" is not evaluation. "This function silently drops errors on lines 12-15" is.
 3. **Zero defects found = bias signal.** When self-review catches nothing, explicitly state: "Self-review found no issues; independent verification recommended."
 
+## Multi-advisor Synthesis
+
+When the evaluator is not you alone — a subagent review, a cross-provider review (e.g. `/codex:adversarial-review`), or multiple criterion-axis agents from `parallel-hypothesis-investigation.md` — the synthesis step has its own bias: the temptation to smooth over disagreements so the final answer sounds confident.
+
+Resist it. When consolidating 2+ independent evaluators, the output MUST separate three buckets:
+
+1. **Agreed** — findings or recommendations that appeared in every evaluator. Highest confidence.
+2. **Conflicting** — findings where evaluators disagree, or one flagged an issue the others missed. Name each disagreement explicitly; do not paper over it. A finding that appeared in only one evaluator belongs here, not in "Agreed".
+3. **Chosen direction + rationale** — the decision you are making given the conflicts, and why. If a conflict is unresolved, say so and escalate rather than picking silently.
+
+Rules:
+
+- An evaluator's silence on a topic is not agreement — it is absence. Do not promote single-evaluator findings to "Agreed" because nobody else contradicted them.
+- If all buckets are empty, the evaluators did not actually evaluate. Re-brief them with concrete criteria before synthesizing.
+- When the conflict is between your own pre-synthesis opinion and an external evaluator, the external finding goes in the Conflicting bucket, not in a separate "my take" section. You do not get a privileged seat at your own synthesis.
+
+This format is not ceremonial — it is the mechanism that prevents the synthesizer from becoming a fourth generator that rationalizes away disagreement.
+
 ## Drift Signals
 
 Symptoms that you are drifting in non-verifiable territory:
@@ -41,4 +59,5 @@ When any signal fires: stop iterating, surface the decision to the human.
 - In verifiable domains, self-iteration is encouraged — the bias is corrected by the verification step.
 - In non-verifiable domains, prefer presenting 2-3 distinct options over converging on one polished answer.
 - Never claim "I reviewed my work and it looks correct" without naming specific things you checked.
+- When consolidating 2+ independent evaluators, always produce the Agreed / Conflicting / Chosen+rationale structure. Silent smoothing of disagreement is a drift signal.
 - Model-dependent scaffolding (context resets, sprint chunking, step-by-step prompts) is valid but temporal. It belongs in project-level CLAUDE.md managed by humans — not here. A model cannot reliably assess whether it still needs its own guardrails.
