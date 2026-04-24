@@ -17,10 +17,14 @@ for cmd in jq curl python3; do
   fi
 done
 
-# Copy statusline script
-cp "$SCRIPT_DIR/statusline-command.sh" "$DEST"
-chmod +x "$DEST"
-echo "installed: $DEST"
+# Symlink statusline script so repo edits propagate without reinstall
+SRC="$SCRIPT_DIR/statusline-command.sh"
+chmod +x "$SRC"
+if [ -L "$DEST" ] || [ -f "$DEST" ]; then
+  rm -f "$DEST"
+fi
+ln -s "$SRC" "$DEST"
+echo "linked: $DEST -> $SRC"
 
 # Configure settings.json
 if [ -f "$SETTINGS" ]; then
