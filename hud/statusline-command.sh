@@ -101,6 +101,7 @@ fi
 # --- Rate limits (cached) ---
 CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 CACHE_FILE="$CLAUDE_DIR/.usage-cache.json"
+LOCK_DIR="$CACHE_FILE.lock"
 CACHE_TTL=90
 now_ts=$(date +%s)
 
@@ -118,7 +119,10 @@ fi
 
 if [ "$fetch_needed" -eq 1 ]; then
   # Background fetch to avoid blocking statusline
-  (
+  if mkdir "$LOCK_DIR" 2>/dev/null; then
+    (
+    trap 'rmdir "$LOCK_DIR" 2>/dev/null' EXIT INT TERM
+    mkdir -p "$CLAUDE_DIR" 2>/dev/null
     token=""
     # macOS: try Keychain first
     if command -v security >/dev/null 2>&1; then
@@ -149,7 +153,8 @@ json.dump(d,sys.stdout)
         mv "${CACHE_FILE}.tmp" "$CACHE_FILE" 2>/dev/null
       fi
     fi
-  ) &
+    ) &
+  fi
 fi
 
 # Read from cache
