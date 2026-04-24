@@ -11,7 +11,7 @@ Use when the task needs current information, official documentation lookup, ecos
 Run Codex in read-only non-interactive mode with web search enabled:
 
 ```bash
-codex exec -m gpt-5.5 -c reasoning_effort="medium" --sandbox read-only --ask-for-approval never --search -
+codex exec -m gpt-5.5 -c model_reasoning_effort=xhigh --sandbox read-only --ask-for-approval never --search -
 ```
 
 Paste a brief with:

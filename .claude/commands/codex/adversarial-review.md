@@ -13,7 +13,7 @@ Use after behavioral changes touching authentication, authorization, database wr
 3. Run Codex against all uncommitted changes:
 
 ```bash
-cat "$HOME/.claude/agents/adversarial-reviewer.md" | codex review -m gpt-5.5 -c reasoning_effort="extra-high" --uncommitted -
+cat "$HOME/.claude/agents/adversarial-reviewer.md" | codex review -m gpt-5.5 -c model_reasoning_effort=xhigh --uncommitted -
 ```
 
 4. Treat Codex output as independent evidence. If it disagrees with Claude's conclusion, investigate the disagreement before deciding.

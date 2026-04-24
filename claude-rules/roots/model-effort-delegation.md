@@ -97,15 +97,17 @@ The first two motivate the reliability routing rules below; the third motivates 
 
 Choose the narrowest Codex mode that can finish the delegated job:
 
+**Reasoning effort:** Always use `xhigh` — pass `-c model_reasoning_effort=xhigh` on every `codex` invocation. This is the maximum available level and should never be omitted.
+
 | Need | Command | Codex flags | Why |
 |------|---------|-------------|-----|
-| Independent code review | `/codex:diff-review` | `codex review --uncommitted` | Read-only reviewer; no implementation drift |
-| Security-sensitive review | `/codex:adversarial-review` | `codex review --uncommitted` + adversarial prompt | Cross-family gate for auth, data, network, secrets, trust boundaries |
-| Current docs or web research | `/codex:research` | `--sandbox read-only --ask-for-approval never --search` | Web-backed research without write access |
-| Stuck after three failed attempts | `/codex:rescue` | `--sandbox read-only` by default | Fresh reasoning stack without changing files |
-| Bounded implementation | `/codex:autopilot` | `--full-auto` | Workspace edits allowed; risky actions still request approval |
-| Unattended long implementation | `/codex:overnight` | `--sandbox workspace-write --ask-for-approval never --search` | Avoids approval stalls while preserving workspace sandbox |
-| Explicit no-sandbox run | `/codex:yolo-overnight` | `--dangerously-bypass-approvals-and-sandbox --search` | Only when the user explicitly accepts no sandbox/no approvals |
+| Independent code review | `/codex:diff-review` | `codex review --uncommitted -c model_reasoning_effort=xhigh` | Read-only reviewer; no implementation drift |
+| Security-sensitive review | `/codex:adversarial-review` | `codex review --uncommitted -c model_reasoning_effort=xhigh` + adversarial prompt | Cross-family gate for auth, data, network, secrets, trust boundaries |
+| Current docs or web research | `/codex:research` | `--sandbox read-only --ask-for-approval never --search -c model_reasoning_effort=xhigh` | Web-backed research without write access |
+| Stuck after three failed attempts | `/codex:rescue` | `--sandbox read-only -c model_reasoning_effort=xhigh` by default | Fresh reasoning stack without changing files |
+| Bounded implementation | `/codex:autopilot` | `--full-auto -c model_reasoning_effort=xhigh` | Workspace edits allowed; risky actions still request approval |
+| Unattended long implementation | `/codex:overnight` | `--sandbox workspace-write --ask-for-approval never --search -c model_reasoning_effort=xhigh` | Avoids approval stalls while preserving workspace sandbox |
+| Explicit no-sandbox run | `/codex:yolo-overnight` | `--dangerously-bypass-approvals-and-sandbox --search -c model_reasoning_effort=xhigh` | Only when the user explicitly accepts no sandbox/no approvals |
 
 Do not use a broader mode just because it is more convenient. Research does not need write access. Image generation or web research needs ecosystem capability, not no-sandbox access. Dependency installation, external CLIs, and private network calls are separate requirements that must be named in the brief.
 
