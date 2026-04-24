@@ -68,6 +68,9 @@ Skip it if none of these apply. Ample Claude Code capacity alone is a valid reas
 | File | Description |
 |------|-------------|
 | `.claude/agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Self-contained prompt usable via Claude Code's Agent tool, or pasted as system prompt when invoking `/codex:adversarial-review`. |
+| `.claude/commands/codex/adversarial-review.md` | Slash command template that runs `codex review --uncommitted` with the adversarial reviewer prompt. |
+| `.claude/commands/codex/diff-review.md` | General read-only Codex production-review command. |
+| `.claude/commands/codex/rescue.md` | Read-only Codex rescue handoff for stuck debugging after the three-turn cap. |
 
 Routing rules (three-turn cap for hard problems, adversarial review on security-sensitive paths, capability-based routing for image generation) live in `claude-rules/roots/model-effort-delegation.md` §Cross-Provider Delegation (Codex). These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
 
@@ -81,6 +84,12 @@ chmod +x install.sh
 ```
 
 Only `claude-rules/` is symlinked into `~/.claude/rules/ai-roots`, so README files, HUD scripts, and agent prompts are not loaded as always-on rules. Claude Code recursively loads all `.md` files from both `claude-rules/roots/` and `claude-rules/lessons/`.
+
+To also install optional Codex delegation commands:
+
+```bash
+./install.sh --with-codex
+```
 
 ## Inspiration
 

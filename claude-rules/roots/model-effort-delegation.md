@@ -83,7 +83,7 @@ Escalation is part of the rule, not a failure. Stubbornly pushing a weak model l
 
 ## Cross-Provider Delegation (Codex)
 
-> **Applicability** — This section applies only when OpenAI Codex is configured alongside Claude Code. Codex is **optional** (`./install.sh --with-codex`, or `./install.sh` and answer yes to the prompt). Projects with ample Claude Code capacity may intentionally skip it; the in-platform delegation above remains in force either way. Without Codex, `Agent` with a distinct `subagent_type` (or a separate Claude Code team lens) can substitute for `/codex:adversarial-review` when cross-family verification is not available — the cross-model diversity is weaker, but the generator-vs-evaluator separation still holds.
+> **Applicability** — This section applies only when OpenAI Codex is configured alongside Claude Code. Codex is **optional** (`./install.sh --with-codex` installs the `/codex:*` commands and reviewer agent). Projects with ample Claude Code capacity may intentionally skip it; the in-platform delegation above remains in force either way. Without Codex, `Agent` with a distinct `subagent_type` (or a separate Claude Code team lens) can substitute for `/codex:adversarial-review` when cross-family verification is not available — the cross-model diversity is weaker, but the generator-vs-evaluator separation still holds.
 
 Beyond in-platform subagents, a second delegation axis exists: **OpenAI Codex**, running alongside Claude Code as an independent reasoning stack. Cross-provider delegation serves three distinct purposes:
 
@@ -95,7 +95,7 @@ The first two motivate the reliability routing rules below; the third motivates 
 
 ### Routing Rules
 
-When handling complex implementation tasks or debugging elusive race conditions, do not attempt to solve the problem in more than three turns. If unsuccessful, proactively delegate to the `/codex:rescue` sub-agent.
+When handling complex implementation tasks or debugging elusive race conditions, do not attempt to solve the problem in more than three turns. If unsuccessful, proactively delegate through the `/codex:rescue` command.
 
 After every significant code change involving security-sensitive paths (e.g., authentication, database writes, or network access), you must invoke the `/codex:adversarial-review` command to challenge your implementation.
 
