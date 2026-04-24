@@ -55,6 +55,22 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 | `lessons/background-task-monitoring.md` | 장시간 백그라운드 작업은 자동 주기 모니터링 설정 — 사용자가 "다 됐나요?" 물어보게 만들지 않기 |
 | `lessons/simulate-dont-just-scan.md` | 실제로 실행했을 때 어떤 결과가 나올지 머릿속으로 시뮬레이션 — 소스를 읽은 것과 런타임 동작을 이해한 것은 다르다 |
 
+## 다중 에이전트 오케스트레이션 (선택)
+
+Claude Code와 OpenAI Codex를 함께 쓸 때 참고. Codex 연동은 **선택 사항** — 아래 중 하나라도 필요하면 사용을 권장합니다:
+
+- (a) **Cross-family 어드버서리얼 리뷰** — 다른 학습 분포가 Claude 혼자 놓치는 사각지대를 잡아냄
+- (b) **Anchoring 탈출** — 어려운 문제에서 3-턴 cap 후 fresh stack으로 anchoring 트랩 해제
+- (c) **OpenAI 생태계 전용 기능** — 이미지 생성(DALL-E, `gpt-image`) 등 Claude Code가 기본으로 가지지 않는 OpenAI 전용 모달리티
+
+위 중 해당사항이 없다면 건너뛰어도 됩니다. Claude Code 토큰이 넉넉한 것만으로도 건너뛰는 충분한 이유가 됩니다.
+
+| 파일 | 설명 |
+|------|------|
+| `.claude/agents/adversarial-reviewer.md` | 보안 우선 어드버서리얼 리뷰어 페르소나. Claude Code의 Agent 도구로도 호출 가능하고, `/codex:adversarial-review` 호출 시 system prompt로 붙여쓸 수 있는 self-contained 프롬프트 |
+
+라우팅 규칙 (어려운 문제 3-턴 cap, 보안 민감 경로 adversarial review, 이미지 생성 등 capability 라우팅)은 `roots/model-effort-delegation.md` §Cross-Provider Delegation (Codex)에 있습니다. 이것은 **Claude 측** 규칙 — 언제 Codex를 호출할지를 Claude에게 알려주는 것이고, Codex의 동작 방식을 규정하지 않습니다.
+
 ## 설치
 
 ```bash

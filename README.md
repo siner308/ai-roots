@@ -55,6 +55,22 @@ Lessons are concrete patterns learned from real mistakes. They describe what wor
 | `lessons/background-task-monitoring.md` | Auto-monitor long background tasks with periodic progress reporting — never leave the user asking "is it done?" |
 | `lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
 
+## Multi-Agent Orchestration (Optional)
+
+Claude Code and OpenAI Codex running together. Codex integration is **optional** — use it if you want any of:
+
+- (a) **Cross-family adversarial review** — a second training distribution catches blind spots Claude alone misses
+- (b) **Rescue from anchoring** on hard problems — a fresh stack breaks the 3-turn anchoring trap
+- (c) **OpenAI-ecosystem capabilities** — image generation (DALL-E, `gpt-image`), and other OpenAI-exclusive modalities Claude Code does not carry natively
+
+Skip it if none of these apply. Ample Claude Code capacity alone is a valid reason to skip.
+
+| File | Description |
+|------|-------------|
+| `.claude/agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Self-contained prompt usable via Claude Code's Agent tool, or pasted as system prompt when invoking `/codex:adversarial-review`. |
+
+Routing rules (three-turn cap for hard problems, adversarial review on security-sensitive paths, capability-based routing for image generation) live in `roots/model-effort-delegation.md` §Cross-Provider Delegation (Codex). These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
+
 ## Installation
 
 ```bash
