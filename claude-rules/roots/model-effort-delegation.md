@@ -126,6 +126,42 @@ Current examples:
 
 Capability routing is **independent of the three-turn cap and the security review**: if Claude needs an image, delegate on turn one; if Claude needs adversarial review, delegate after a security-sensitive change. These are separate triggers with separate targets — do not wait for reliability failure to trigger a capability delegation.
 
+### Codex Live Execution (tmux)
+
+By default, subprocess output of `/codex:*` commands is captured into Claude's transcript and invisible to the user until Claude relays it. This hides Codex's live reasoning — which is often the most valuable part of delegating to a second stack.
+
+When `$TMUX` is set (i.e. Claude Code is running inside a tmux session), wrap every `/codex:*` invocation in a split-pane + `tee` + sentinel pattern so the user sees output streaming in real time AND Claude gets a clean log file to read on completion. When `$TMUX` is unset, fall back to the plain invocation documented in each command.
+
+**Pattern:**
+
+```bash
+LOG="/tmp/codex-$(date +%Y%m%d-%H%M%S).log"
+RUNNER="$(mktemp)"
+cat > "$RUNNER" <<EOF
+#!/bin/bash
+<codex invocation for this command, writing to stdout/stderr>
+echo '=== CODEX DONE ===' >> "$LOG"
+read -p 'press enter to close'
+EOF
+# redirect the codex invocation's output through tee to $LOG inside the runner
+chmod +x "$RUNNER"
+tmux split-window -h "$RUNNER 2>&1 | tee '$LOG'"
+# Event-driven wait — completion notification fires when sentinel hits.
+# Run this in background so the main session stays responsive.
+tail -f "$LOG" | grep -qm1 'CODEX DONE'
+# After the tail exits, Read "$LOG" for authoritative output.
+```
+
+**Rules:**
+
+- **Event-driven wait only.** Use `tail -f | grep -qm1 <sentinel>` (or the `Monitor` tool on the log file) run in background. Do NOT use `ScheduleWakeup` polling to check completion — the sentinel is a deterministic signal, polling adds cost without information. See `lessons/background-task-monitoring.md` for the full decision ladder.
+- **Sentinel is mandatory.** The `=== CODEX DONE ===` marker is what makes the wait deterministic. A tail without a sentinel can't distinguish "idle" from "done."
+- **Keep the pane open on exit.** The trailing `read -p` lets the user scroll the output after completion. Claude is reading from the log file, not the pane, so the pane's lifetime does not block Claude.
+- **Stdin-piping commands** (adversarial-review, rescue, overnight, research, yolo-overnight, autopilot) still take their prompt via stdin — redirect from a temp file written before the tmux call, e.g. `codex exec -- - < "$PROMPT_FILE"`.
+- **Fallback when not in tmux.** If `[ -z "$TMUX" ]`, run the command's documented bash block directly. Do not try to spawn a new Terminal window silently — that surprises the user more than a foreground invocation.
+
+This convention applies to every `/codex:*` command uniformly; individual command files document the specific codex invocation, not the wrapping.
+
 ### Codex Autopilot Approval Policy
 
 Use `/codex:autopilot` for bounded implementation work when Codex should act as an independent worker. The default command must use `codex exec --full-auto`, which OpenAI documents as `--sandbox workspace-write --ask-for-approval on-request`: Codex can work inside the workspace, while network access and writes outside the workspace still require approval.
