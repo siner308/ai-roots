@@ -93,6 +93,22 @@ Beyond in-platform subagents, a second delegation axis exists: **OpenAI Codex**,
 
 The first two motivate the reliability routing rules below; the third motivates capability-based routing.
 
+### Codex Mode Selection
+
+Choose the narrowest Codex mode that can finish the delegated job:
+
+| Need | Command | Codex flags | Why |
+|------|---------|-------------|-----|
+| Independent code review | `/codex:diff-review` | `codex review --uncommitted` | Read-only reviewer; no implementation drift |
+| Security-sensitive review | `/codex:adversarial-review` | `codex review --uncommitted` + adversarial prompt | Cross-family gate for auth, data, network, secrets, trust boundaries |
+| Current docs or web research | `/codex:research` | `--sandbox read-only --ask-for-approval never --search` | Web-backed research without write access |
+| Stuck after three failed attempts | `/codex:rescue` | `--sandbox read-only` by default | Fresh reasoning stack without changing files |
+| Bounded implementation | `/codex:autopilot` | `--full-auto` | Workspace edits allowed; risky actions still request approval |
+| Unattended long implementation | `/codex:overnight` | `--sandbox workspace-write --ask-for-approval never --search` | Avoids approval stalls while preserving workspace sandbox |
+| Explicit no-sandbox run | `/codex:yolo-overnight` | `--dangerously-bypass-approvals-and-sandbox --search` | Only when the user explicitly accepts no sandbox/no approvals |
+
+Do not use a broader mode just because it is more convenient. Research does not need write access. Image generation or web research needs ecosystem capability, not no-sandbox access. Dependency installation, external CLIs, and private network calls are separate requirements that must be named in the brief.
+
 ### Routing Rules
 
 When handling complex implementation tasks or debugging elusive race conditions, do not attempt to solve the problem in more than three turns. If unsuccessful, proactively delegate through the `/codex:rescue` command.
@@ -114,7 +130,9 @@ Capability routing is **independent of the three-turn cap and the security revie
 
 Use `/codex:autopilot` for bounded implementation work when Codex should act as an independent worker. The default command must use `codex exec --full-auto`, which OpenAI documents as `--sandbox workspace-write --ask-for-approval on-request`: Codex can work inside the workspace, while network access and writes outside the workspace still require approval.
 
-Do not use `--dangerously-bypass-approvals-and-sandbox` as a default. OpenAI documents it as dangerous full access: no sandbox and no approvals. It is acceptable only when the user explicitly requests it and an external isolation boundary exists, such as a disposable devcontainer or VM. If the isolation story is unclear, use `--full-auto` or read-only non-interactive mode instead.
+Use `/codex:overnight` when the user wants Codex to continue unattended. This mode removes approval prompts but keeps the workspace sandbox. It is the default for "work while I sleep" requests when the task has clear acceptance criteria and verification.
+
+Do not use `--dangerously-bypass-approvals-and-sandbox` as a default. OpenAI documents it as dangerous full access: no sandbox and no approvals. Use `/codex:yolo-overnight` only when the user explicitly requests no-sandbox/no-approval behavior for this task and accepts that local credentials, workspace-external files, network access, and destructive commands are no longer guarded by Codex approvals. If consent is unclear, use `/codex:overnight` instead.
 
 ### What Counts as "Security-Sensitive"
 
@@ -217,4 +235,4 @@ Right: Delegate to Haiku Explore agent
 - Never downgrade model or effort when blast radius is high
 - Escalate to Opus after 3 failures or when a design decision surfaces
 - Briefings must include file paths, signatures, verification, and a request for decision reasoning
-- **If Codex is configured** (optional): cap inline attempts at 3 turns on hard problems and delegate to `/codex:rescue` beyond that; invoke `/codex:adversarial-review` on every security-sensitive change; use `/codex:autopilot` with `--full-auto` for bounded implementation handoffs; route OpenAI-exclusive capabilities (image generation via DALL-E / `gpt-image`, TTS, etc.) to Codex on turn one
+- **If Codex is configured** (optional): choose the narrowest `/codex:*` mode; cap inline attempts at 3 turns on hard problems and delegate to `/codex:rescue` beyond that; invoke `/codex:adversarial-review` on every security-sensitive change; use `/codex:research` for web-backed research; use `/codex:autopilot` for bounded implementation; use `/codex:overnight` for unattended work; reserve `/codex:yolo-overnight` for explicit no-sandbox/no-approval consent; route OpenAI-exclusive capabilities (image generation via DALL-E / `gpt-image`, TTS, etc.) to Codex on turn one

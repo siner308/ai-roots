@@ -71,9 +71,12 @@ Skip it if none of these apply. Ample Claude Code capacity alone is a valid reas
 | `.claude/commands/codex/adversarial-review.md` | Slash command template that runs `codex review --uncommitted` with the adversarial reviewer prompt. |
 | `.claude/commands/codex/autopilot.md` | Bounded implementation handoff using `codex exec --full-auto`; dangerous no-sandbox mode is explicitly gated. |
 | `.claude/commands/codex/diff-review.md` | General read-only Codex production-review command. |
+| `.claude/commands/codex/overnight.md` | Unattended workspace-sandbox implementation using `workspace-write`, approval `never`, and web search. |
+| `.claude/commands/codex/research.md` | Read-only web-backed research command using `--search`. |
 | `.claude/commands/codex/rescue.md` | Read-only Codex rescue handoff for stuck debugging after the three-turn cap. |
+| `.claude/commands/codex/yolo-overnight.md` | Explicit no-sandbox/no-approval command for user-accepted dangerous runs. |
 
-Routing rules (three-turn cap for hard problems, adversarial review on security-sensitive paths, capability-based routing for image generation) live in `claude-rules/roots/model-effort-delegation.md` §Cross-Provider Delegation (Codex). These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
+Routing rules (mode selection, three-turn cap for hard problems, adversarial review on security-sensitive paths, research, overnight work, and capability-based routing for image generation) live in `claude-rules/roots/model-effort-delegation.md` §Cross-Provider Delegation (Codex). These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
 
 ## Installation
 
