@@ -99,15 +99,24 @@ Choose the narrowest Codex mode that can finish the delegated job:
 
 **Reasoning effort:** Always use `xhigh` — pass `-c model_reasoning_effort=xhigh` on every `codex` invocation. This is the maximum available level and should never be omitted.
 
-| Need | Command | Codex flags | Why |
-|------|---------|-------------|-----|
+**Flag placement (codex-cli ≥ 0.125):** `--search`, `-a/--ask-for-approval`, and `--dangerously-bypass-approvals-and-sandbox` are **top-level codex flags** — they must precede the subcommand (`exec`, `review`, etc.). `--sandbox`, `--full-auto`, and `-c key=value` are **exec subcommand flags** — they go after `exec`. Putting top-level flags after the subcommand fails with `error: unexpected argument '--ask-for-approval' found` (or similar). Verify with `codex --help` and `codex exec --help`; placement has shifted across versions.
+
+Canonical shape:
+```
+codex [TOP-LEVEL FLAGS] exec [EXEC FLAGS] -- - < prompt   # e.g. codex --search -a never exec --sandbox read-only -c model_reasoning_effort=xhigh -- -
+codex review [REVIEW FLAGS]                                # e.g. codex review --uncommitted -c model_reasoning_effort=xhigh
+```
+`codex review` is its own subcommand and does not accept `--sandbox` / `-a` (it runs read-only by design).
+
+| Need | Command | Codex invocation | Why |
+|------|---------|------------------|-----|
 | Independent code review | `/codex:diff-review` | `codex review --uncommitted -c model_reasoning_effort=xhigh` | Read-only reviewer; no implementation drift |
 | Security-sensitive review | `/codex:adversarial-review` | `codex review --uncommitted -c model_reasoning_effort=xhigh` + adversarial prompt | Cross-family gate for auth, data, network, secrets, trust boundaries |
-| Current docs or web research | `/codex:research` | `--sandbox read-only --ask-for-approval never --search -c model_reasoning_effort=xhigh` | Web-backed research without write access |
-| Stuck after three failed attempts | `/codex:rescue` | `--sandbox read-only -c model_reasoning_effort=xhigh` by default | Fresh reasoning stack without changing files |
-| Bounded implementation | `/codex:autopilot` | `--full-auto -c model_reasoning_effort=xhigh` | Workspace edits allowed; risky actions still request approval |
-| Unattended long implementation | `/codex:overnight` | `--sandbox workspace-write --ask-for-approval never --search -c model_reasoning_effort=xhigh` | Avoids approval stalls while preserving workspace sandbox |
-| Explicit no-sandbox run | `/codex:yolo-overnight` | `--dangerously-bypass-approvals-and-sandbox --search -c model_reasoning_effort=xhigh` | Only when the user explicitly accepts no sandbox/no approvals |
+| Current docs or web research | `/codex:research` | `codex --search -a never exec --sandbox read-only -c model_reasoning_effort=xhigh` | Web-backed research without write access |
+| Stuck after three failed attempts | `/codex:rescue` | `codex exec --sandbox read-only -c model_reasoning_effort=xhigh` by default | Fresh reasoning stack without changing files |
+| Bounded implementation | `/codex:autopilot` | `codex exec --full-auto -c model_reasoning_effort=xhigh` | Workspace edits allowed; risky actions still request approval |
+| Unattended long implementation | `/codex:overnight` | `codex --search -a never exec --sandbox workspace-write -c model_reasoning_effort=xhigh` | Avoids approval stalls while preserving workspace sandbox |
+| Explicit no-sandbox run | `/codex:yolo-overnight` | `codex --search --dangerously-bypass-approvals-and-sandbox exec -c model_reasoning_effort=xhigh` | Only when the user explicitly accepts no sandbox/no approvals |
 
 Do not use a broader mode just because it is more convenient. Research does not need write access. Image generation or web research needs ecosystem capability, not no-sandbox access. Dependency installation, external CLIs, and private network calls are separate requirements that must be named in the brief.
 
@@ -171,7 +180,7 @@ Use `/codex:autopilot` for bounded implementation work when Codex should act as 
 
 Use `/codex:overnight` when the user wants Codex to continue unattended. This mode removes approval prompts but keeps the workspace sandbox. It is the default for "work while I sleep" requests when the task has clear acceptance criteria and verification.
 
-Do not use `--dangerously-bypass-approvals-and-sandbox` as a default. OpenAI documents it as dangerous full access: no sandbox and no approvals. Use `/codex:yolo-overnight` only when the user explicitly requests no-sandbox/no-approval behavior for this task and accepts that local credentials, workspace-external files, network access, and destructive commands are no longer guarded by Codex approvals. If consent is unclear, use `/codex:overnight` instead.
+Do not use `--dangerously-bypass-approvals-and-sandbox` as a default. OpenAI documents it as dangerous full access: no sandbox and no approvals. Use `/codex:yolo-overnight` only when the user explicitly requests no-sandbox/no-approval behavior for this task and accepts that local credentials, workspace-external files, network access, and destructive commands are no longer guarded by Codex approvals. If consent is unclear, use `/codex:overnight` instead. Note that `--dangerously-bypass-approvals-and-sandbox` is a top-level codex flag — place it before `exec` (e.g. `codex --search --dangerously-bypass-approvals-and-sandbox exec ...`), not after.
 
 ### What Counts as "Security-Sensitive"
 
