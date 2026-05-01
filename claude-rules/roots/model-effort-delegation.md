@@ -142,10 +142,10 @@ RUNNER="$(mktemp)"
 cat > "$RUNNER" <<EOF
 #!/bin/bash
 <codex invocation for this command, writing to stdout/stderr>
-echo '=== CODEX DONE ===' >> "$LOG"
+echo
+echo '=== CODEX DONE ==='
 read -p 'press enter to close'
 EOF
-# redirect the codex invocation's output through tee to $LOG inside the runner
 chmod +x "$RUNNER"
 tmux split-window -h "$RUNNER 2>&1 | tee '$LOG'"
 # Event-driven wait — completion notification fires when sentinel hits.
@@ -157,8 +157,9 @@ tail -f "$LOG" | grep -qm1 'CODEX DONE'
 **Rules:**
 
 - **Event-driven wait only.** Use `tail -f | grep -qm1 <sentinel>` (or the `Monitor` tool on the log file) run in background. Do NOT use `ScheduleWakeup` polling to check completion — the sentinel is a deterministic signal, polling adds cost without information. See `lessons/background-task-monitoring.md` for the full decision ladder.
-- **Sentinel is mandatory.** The `=== CODEX DONE ===` marker is what makes the wait deterministic. A tail without a sentinel can't distinguish "idle" from "done."
+- **Sentinel is mandatory and must be inside the `tee` pipeline.** The `=== CODEX DONE ===` marker is what makes the wait deterministic. Echo it via `stdout` (so `tee` writes it to the log) *immediately after* codex exits and *before* the `read -p` that pauses the pane. **Do NOT write the sentinel via `>> "$LOG"` from the runner script** — the runner itself is *not* inside the `tee` pipeline (only its stdout is), so the redirect races with `tee`'s flush. **Do NOT put the sentinel echo *after* `read -p`** — `read -p` blocks until the user presses Enter, so the sentinel never reaches the log until then.
 - **Keep the pane open on exit.** The trailing `read -p` lets the user scroll the output after completion. Claude is reading from the log file, not the pane, so the pane's lifetime does not block Claude.
+- **If the sentinel never fires, fall back to direct log read.** If the user reports "codex is done" but the background `tail` never exited (sentinel write failed or got eaten by the runner), `Read` the log file directly and grep for the verdict. Do NOT keep the user waiting on a missed signal — sentinels can drop, the log is authoritative.
 - **Stdin-piping commands** (adversarial-review, rescue, overnight, research, yolo-overnight, autopilot) still take their prompt via stdin — redirect from a temp file written before the tmux call, e.g. `codex exec -- - < "$PROMPT_FILE"`.
 - **Fallback when not in tmux.** If `[ -z "$TMUX" ]`, run the command's documented bash block directly. Do not try to spawn a new Terminal window silently — that surprises the user more than a foreground invocation.
 
@@ -215,6 +216,38 @@ Past three unsuccessful attempts, marginal information per additional turn colla
 - Treat Codex findings as **independent evidence**: if Codex disagrees with Claude's conclusion, investigate the disagreement — do not resolve it by asking Claude alone to reconsider.
 - Codex delegation is orthogonal to the Opus/Sonnet/Haiku selection above — in-platform model tiers still apply to Claude-side work.
 - **Capability routing fires on turn one** — image generation, TTS, or other OpenAI-exclusive tool needs route to Codex immediately. Do not waste turns constructing text-based workarounds (ASCII art, hand-coded SVG) for tasks whose real deliverable is an image or audio artifact.
+- **Stale-revision verification on every Codex round.** Codex sometimes outputs analysis from a *previous* invocation (line numbers and findings frozen to an old revision of the same path) when called repeatedly on the same file. Two countermeasures:
+  - In every round-N prompt, ask Codex to *first* echo the current revision identifier — file `head -1`, git HEAD short SHA, or a unique header line that only the latest revision carries. The verdict is trustworthy only when that identifier matches what you just wrote.
+  - When a Codex verdict reproduces *exact* line numbers from a prior round whose file has since changed substantively, treat the verdict as stale and retry with a fresh session (not `codex resume`). The first try is not always the failure — but a stale verdict is worse than a missed round because it claims to have seen current state.
+- **Project CLAUDE.md may strengthen these defaults.** This rule defines the *minimum* delegation policy. A project's `CLAUDE.md` (or per-repo memory) can require stricter behavior — e.g., "every PR (not just security-sensitive) requires both reviewers SAFE in the same round" or "every plan round logs to a tracked artifact." Project-specific strengthening overrides the minimum; the minimum still applies where the project is silent.
+
+## Plan-stage Review
+
+Two-reviewer review (Claude subagent + Codex) is also valuable *before* code is written, when the artifact under review is a **plan** rather than a diff. Catches design decisions that would be expensive to retract once implementation starts (wrong abstraction, missed edge case, fictional API).
+
+**When plan-stage review pays off:**
+
+- The plan touches multiple files / new modules / new abstractions.
+- The plan depends on framework or library APIs the planner has not personally verified (e.g., "use `Foo.bar()` to do X" without testing that `bar()` exists at the expected signature).
+- The implementation work is large enough that throwing it away mid-stream is costly (≥ 1 PR or ≥ a few hundred lines).
+- A user explicitly asks for plan review before implementation.
+
+**When to skip:**
+
+- The plan is one or two file edits with obvious shape — review cost > expected catch.
+- The plan is exploratory ("try X, see what happens") and you want to learn from the implementation, not pre-flight it.
+
+**Format:**
+
+- Use `VERDICT: PLAN_APPROVED | REVISE_PLAN` (not `SAFE | NEEDS_CHANGES` — those are diff-review verdicts and conflate "code is correct" with "design is sound").
+- Findings still classify as P0 (blocking design flaw), P1 (material missing decision), P2 (minor gap), P3 (informational).
+- **Plan review is advisory, not blocking.** PR-stage review remains mandatory; plan-stage findings are absorbed into the plan and re-reviewed only if they materially change implementation. The user makes the call on whether to revise or proceed.
+
+**Anti-patterns:**
+
+- Stale-revision review: see "Cross-Provider Rules" below — Codex reading round N-1 cached analysis instead of round N. Identical with diff review but more common in plan loops where the file path doesn't change.
+- Round inflation: more than ~3 plan rounds usually means the plan owner has not converged on the design yet. Step back from review and clarify the goals with the user instead of looping.
+- Treating advisory as blocking: plan review is a *help*, not a gate. If a finding is small enough that you'd accept it during PR review anyway, accept it now and move on.
 
 ## Subagent Briefing Standard
 
@@ -273,4 +306,7 @@ Right: Delegate to Haiku Explore agent
 - Never downgrade model or effort when blast radius is high
 - Escalate to Opus after 3 failures or when a design decision surfaces
 - Briefings must include file paths, signatures, verification, and a request for decision reasoning
+- Plan-stage two-reviewer review is available before implementation — advisory only, `VERDICT: PLAN_APPROVED | REVISE_PLAN`. Use it when implementation work is large or depends on unverified APIs; skip when the plan is one-or-two-file obvious.
 - **If Codex is configured** (optional): choose the narrowest `/codex:*` mode; cap inline attempts at 3 turns on hard problems and delegate to `/codex:rescue` beyond that; invoke `/codex:adversarial-review` on every security-sensitive change; use `/codex:research` for web-backed research; use `/codex:autopilot` for bounded implementation; use `/codex:overnight` for unattended work; reserve `/codex:yolo-overnight` for explicit no-sandbox/no-approval consent; route OpenAI-exclusive capabilities (image generation via DALL-E / `gpt-image`, TTS, etc.) to Codex on turn one
+- **Codex stale-revision check**: every round-N Codex prompt asks Codex to echo the current revision identifier first; treat verdicts that reproduce stale line numbers as untrusted and retry with a fresh session.
+- **Project CLAUDE.md can strengthen these defaults** — e.g., per-PR two-reviewer rule. Project rules override the minimum where they are stricter; the minimum applies where the project is silent.
