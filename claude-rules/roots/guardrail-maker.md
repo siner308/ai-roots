@@ -8,45 +8,23 @@ Scan every user message for correction signals. Detection is semantic, not liter
 
 ### Tier 1 — Direct Corrections (High Confidence)
 
-The user explicitly tells you something is wrong and provides the right answer.
-
-- **Identity/meaning correction**: You misidentified what something is, what a term means, or how a concept works. The user clarifies the correct meaning.
-- **Behavioral prohibition**: The user tells you to stop doing something or to never do it.
-- **Behavioral mandate**: The user tells you to always do something a certain way.
-- **Substitution**: The user tells you to use X instead of Y.
-- **Temporal directive**: The user sets a rule going forward ("from now on", "in the future").
+The user explicitly tells you something is wrong and provides the right answer. Includes identity/meaning corrections, prohibitions ("don't / stop / never"), mandates ("always / from now on"), and substitutions ("use X instead of Y").
 
 ### Tier 2 — Repeated Corrections (High Confidence)
 
-The user signals they have corrected this before — in this conversation or a prior one. These are the highest-value guardrail candidates because the gap is actively causing repeated waste.
-
-- The user expresses that they already told you this
-- The user points out you made the same mistake again
-- The user asks how many times they need to repeat themselves
+The user signals they have corrected this before. Highest-value candidates because the gap is actively causing repeated waste — "I already told you this", "same mistake again", "how many times do I have to say it".
 
 ### Tier 3 — Convention Declarations (Medium Confidence)
 
-The user states a project or team rule, even without a preceding mistake. They are preemptively sharing knowledge.
-
-- The user describes how things are done in their project, team, or codebase
-- The user states a naming convention, architectural pattern, or workflow rule
-- The user explains a domain-specific term or relationship
+The user states a project, team, or domain rule preemptively, without a preceding mistake — naming conventions, architectural patterns, workflow rules, domain term definitions.
 
 ### Tier 4 — Implicit Corrections (Medium Confidence)
 
-The user signals something is off without being fully explicit. Verify worthiness more carefully before proposing.
-
-- The user says your output is "not quite right" or "close but not exactly"
-- The user rephrases or re-explains something you appeared to understand
-- The user silently fixes your output and continues (e.g., edits your suggested code in their next message)
+The user signals something is off without being fully explicit — "not quite right", "close but not exactly", silent rephrasing of something you appeared to understand, or quietly fixing your output and continuing. Verify worthiness more carefully before proposing.
 
 ### Tier 5 — Frustration Signals (Highest Urgency)
 
-The user shows emotional frustration about a repeated or obvious mistake. Treat with Tier 2 urgency — this means the guardrail gap is causing significant friction.
-
-- Expressions of exasperation in any language
-- The user re-sends the same instruction with added emphasis (caps, bold, repetition)
-- Short, sharp responses after your mistake ("no.", "wrong.", "again?")
+Emotional frustration about a repeated or obvious mistake — exasperation in any language, re-sent instructions with added emphasis, short sharp responses ("no.", "wrong.", "again?"). Treat with Tier 2 urgency.
 
 ## Response Protocol
 
@@ -104,7 +82,7 @@ Wait for user confirmation before writing.
 
 **Rules vs Lessons:** Rules (`claude-rules/roots/`) define principles and protocols — they say what to do. Lessons (`claude-rules/lessons/`) capture concrete patterns learned from real mistakes — they show what works better with before/after examples. If the correction is "never do X" → rule. If the correction is "we tried X and Y works better because Z" → lesson.
 
-**Writing location:** `~/.claude/rules/ai-roots` is a symlink to this repository's `claude-rules/` directory. Always resolve it to the actual git path (`readlink -f ~/.claude/rules/ai-roots`) and write there — symlink targets are read-only by convention, and commits must go to the real repo.
+**Writing location:** `~/.claude/rules/ai-roots/{roots,lessons}` are per-subdirectory symlinks into this repository's `claude-rules/{roots,lessons}/`. Resolve the actual repo path with `readlink -f ~/.claude/rules/ai-roots/roots` (then drop the trailing `roots`) and write into the real git-tracked tree — never into `~/.claude/rules/...` directly, since the parent `ai-roots/` is now a real directory and writes there will not be tracked by git.
 
 When unsure about scope, ask the user whether the rule applies to other projects too.
 

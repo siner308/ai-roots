@@ -16,6 +16,26 @@ When work can be parallelized, there are three distinct strategies. Choose based
 2. **Do workers need to talk to each other?** If yes → teams. If no → subagents.
 3. **Is the work complex enough to justify coordination overhead?** Research, review, competing hypotheses, cross-layer changes → teams. Focused lookups, test runs, file analysis → subagents.
 
+## Inline vs Subagent Threshold
+
+Even when only one worker is needed, the choice between handling work inline (main session) and delegating to a subagent matters.
+
+**Delegate to a subagent when ANY hold:**
+- Expected duration ≥ 5 minutes AND result can be summarized briefly
+- Independent — no mid-execution user input or main-context reference needed
+- Two or more parallelizable tasks → spawn concurrently
+- Verbose output (bulk grep, long logs, hundreds of files) would pollute main context
+- Long-running work suitable for background — builds, test suites, pipelines
+
+**Keep inline:**
+- 1–2 file localized edits
+- Follow-up edits on a file just read (no re-exploration needed)
+- Interactive work requiring ongoing user dialogue
+- Tasks needing mid-stream judgment or producing long streaming output
+- Briefing cost would exceed the work itself
+
+For model selection (Opus/Sonnet/Haiku) within the chosen executor, see `model-effort-delegation.md`.
+
 ## Subagents (Agent tool)
 
 Spawn via the `Agent` tool. Each subagent runs in its own context window and returns a single result to the caller. Workers are invisible to each other.

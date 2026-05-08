@@ -52,7 +52,7 @@ Lessons are concrete patterns learned from real mistakes. They describe what wor
 | File | Description |
 |------|-------------|
 | `claude-rules/lessons/incremental-verification.md` | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
-| `claude-rules/lessons/background-task-monitoring.md` | Auto-monitor long background tasks with periodic progress reporting — never leave the user asking "is it done?" |
+| `claude-rules/lessons/background-task-monitoring.md` | Pick the cheapest visibility mechanism for long background tasks — completion notification first, event streams second, interval polling only as fallback |
 | `claude-rules/lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
 
 ## Multi-Agent Orchestration (Optional)
@@ -76,7 +76,7 @@ Skip it if none of these apply. Ample Claude Code capacity alone is a valid reas
 | `.claude/commands/codex/rescue.md` | Read-only Codex rescue handoff for stuck debugging after the three-turn cap. |
 | `.claude/commands/codex/yolo-overnight.md` | Explicit no-sandbox/no-approval command for user-accepted dangerous runs. |
 
-Routing rules (mode selection, three-turn cap for hard problems, adversarial review on security-sensitive paths, research, overnight work, and capability-based routing for image generation) live in `claude-rules/roots/model-effort-delegation.md` §Cross-Provider Delegation (Codex). These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
+Routing rules (mode selection, three-turn cap for hard problems, adversarial review on security-sensitive paths, research, overnight work, and capability-based routing for image generation) live in `claude-rules/codex/codex-delegation.md`. This file is linked into `~/.claude/rules/` only when `./install.sh --with-codex` is run, so non-Codex users do not load Codex policy. These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
 
 ## Installation
 
@@ -87,7 +87,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-Only `claude-rules/` is symlinked into `~/.claude/rules/ai-roots`, so README files, HUD scripts, and agent prompts are not loaded as always-on rules. Claude Code recursively loads all `.md` files from both `claude-rules/roots/` and `claude-rules/lessons/`.
+`claude-rules/roots/` and `claude-rules/lessons/` are symlinked into `~/.claude/rules/ai-roots/`, so README files, HUD scripts, and agent prompts are not loaded as always-on rules. Claude Code recursively loads all `.md` files from those directories. `claude-rules/codex/` is only linked when `--with-codex` is passed, so non-Codex users do not load Codex routing rules.
 
 To also install optional Codex delegation commands:
 
