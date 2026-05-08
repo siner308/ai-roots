@@ -137,42 +137,45 @@ Current examples:
 
 Capability routing is **independent of the three-turn cap and the security review**: if Claude needs an image, delegate on turn one; if Claude needs adversarial review, delegate after a security-sensitive change. These are separate triggers with separate targets — do not wait for reliability failure to trigger a capability delegation.
 
-### Codex Live Execution (tmux)
+### Codex Execution Mechanics
 
-By default, subprocess output of `/codex:*` commands is captured into Claude's transcript and invisible to the user until Claude relays it. This hides Codex's live reasoning — which is often the most valuable part of delegating to a second stack.
+`/codex:*` commands run as a separate subprocess. Two concerns to manage:
 
-When `$TMUX` is set (i.e. Claude Code is running inside a tmux session), wrap every `/codex:*` invocation in a split-pane + `tee` + sentinel pattern so the user sees output streaming in real time AND Claude gets a clean log file to read on completion. When `$TMUX` is unset, fall back to the plain invocation documented in each command.
+1. **Claude must know when codex finishes** so the next turn fires without the user prompting.
+2. **The user benefits from seeing codex's reasoning** — that live stream is half the value of delegating to a second stack.
 
-**Pattern:**
+Solve them independently. Conflating them (as the previous tmux-split-pane-with-sentinel pattern did) makes the wake-up mechanism fragile — the deferred `tail -f | grep` ran on the main thread and silently failed to wake Claude when sentinels did land, while the split pane required manual close. See `lessons/codex-tmux-monitoring.md`.
+
+**Default pattern — `run_in_background` + tee log:**
 
 ```bash
 LOG="/tmp/codex-$(date +%Y%m%d-%H%M%S).log"
-RUNNER="$(mktemp)"
-cat > "$RUNNER" <<EOF
-#!/bin/bash
-<codex invocation for this command, writing to stdout/stderr>
-echo
-echo '=== CODEX DONE ==='
-read -p 'press enter to close'
-EOF
-chmod +x "$RUNNER"
-tmux split-window -h "$RUNNER 2>&1 | tee '$LOG'"
-# Event-driven wait — completion notification fires when sentinel hits.
-# Run this in background so the main session stays responsive.
-tail -f "$LOG" | grep -qm1 'CODEX DONE'
-# After the tail exits, Read "$LOG" for authoritative output.
+# Run codex in the background. Completion notification wakes Claude.
+Bash(
+  run_in_background: true,
+  command: "<codex invocation for this command> 2>&1 | tee '$LOG'"
+)
+# When the background task completes, Read "$LOG" for the authoritative output.
 ```
 
-**Rules:**
+This relies on the harness's built-in completion notification (Rung 1 of `lessons/background-task-monitoring.md`) — when the background Bash exits, Claude wakes up automatically. No sentinel, no `tail -f`, no split pane to close.
 
-- **Event-driven wait only.** Use `tail -f | grep -qm1 <sentinel>` (or the `Monitor` tool on the log file) run in background. Do NOT use `ScheduleWakeup` polling to check completion — the sentinel is a deterministic signal, polling adds cost without information. See `lessons/background-task-monitoring.md` for the full decision ladder.
-- **Sentinel is mandatory and must be inside the `tee` pipeline.** The `=== CODEX DONE ===` marker is what makes the wait deterministic. Echo it via `stdout` (so `tee` writes it to the log) *immediately after* codex exits and *before* the `read -p` that pauses the pane. **Do NOT write the sentinel via `>> "$LOG"` from the runner script** — the runner itself is *not* inside the `tee` pipeline (only its stdout is), so the redirect races with `tee`'s flush. **Do NOT put the sentinel echo *after* `read -p`** — `read -p` blocks until the user presses Enter, so the sentinel never reaches the log until then.
-- **Keep the pane open on exit.** The trailing `read -p` lets the user scroll the output after completion. Claude is reading from the log file, not the pane, so the pane's lifetime does not block Claude.
-- **If the sentinel never fires, fall back to direct log read.** If the user reports "codex is done" but the background `tail` never exited (sentinel write failed or got eaten by the runner), `Read` the log file directly and grep for the verdict. Do NOT keep the user waiting on a missed signal — sentinels can drop, the log is authoritative.
-- **Stdin-piping commands** (adversarial-review, rescue, overnight, research, yolo-overnight, autopilot) still take their prompt via stdin — redirect from a temp file written before the tmux call, e.g. `codex exec -- - < "$PROMPT_FILE"`.
-- **Fallback when not in tmux.** If `[ -z "$TMUX" ]`, run the command's documented bash block directly. Do not try to spawn a new Terminal window silently — that surprises the user more than a foreground invocation.
+**If the user wants live output**, tell them the log path and let them run `tail -f /tmp/codex-*.log` in their own terminal. Do not spawn the live view from Claude's side — `tee` already wrote everything to the log, and any monitoring Claude adds adds failure modes without adding information the user couldn't get for free.
 
-This convention applies to every `/codex:*` command uniformly; individual command files document the specific codex invocation, not the wrapping.
+**Stdin-piping commands** (`adversarial-review`, `rescue`, `overnight`, `research`, `yolo-overnight`, `autopilot`) take their prompt via stdin. Write the prompt to a temp file first, then redirect:
+
+```bash
+PROMPT="$(mktemp)"
+cat > "$PROMPT" <<'EOF'
+<reviewer prompt or task brief>
+EOF
+Bash(
+  run_in_background: true,
+  command: "codex exec ... -- - < '$PROMPT' 2>&1 | tee '$LOG'"
+)
+```
+
+This convention applies uniformly to every `/codex:*` command; individual command files document the specific codex invocation, not the wrapping.
 
 ### Codex Autopilot Approval Policy
 
@@ -318,4 +321,5 @@ Right: Delegate to Haiku Explore agent
 - Plan-stage two-reviewer review is available before implementation — advisory only, `VERDICT: PLAN_APPROVED | REVISE_PLAN`. Use it when implementation work is large or depends on unverified APIs; skip when the plan is one-or-two-file obvious.
 - **If Codex is configured** (optional): choose the narrowest `/codex:*` mode; cap inline attempts at 3 turns on hard problems and delegate to `/codex:rescue` beyond that; invoke `/codex:adversarial-review` on every security-sensitive change; use `/codex:research` for web-backed research; use `/codex:autopilot` for bounded implementation; use `/codex:overnight` for unattended work; reserve `/codex:yolo-overnight` for explicit no-sandbox/no-approval consent; route OpenAI-exclusive capabilities (image generation via DALL-E / `gpt-image`, TTS, etc.) to Codex on turn one
 - **Codex stale-revision check**: every round-N Codex prompt asks Codex to echo the current revision identifier first; treat verdicts that reproduce stale line numbers as untrusted and retry with a fresh session.
+- **Codex execution**: invoke via `run_in_background: true` Bash with `tee` to a `/tmp/codex-*.log` so the harness's completion notification wakes Claude. If the user wants live output, give them the log path; do not build sentinel-watching wrappers from Claude's side.
 - **Project CLAUDE.md can strengthen these defaults** — e.g., per-PR two-reviewer rule. Project rules override the minimum where they are stricter; the minimum applies where the project is silent.
