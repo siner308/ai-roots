@@ -21,7 +21,8 @@ These add noise without signal and should never be written:
 
 - **WHAT restatements**: `// increment counter`, `// loop through users`, `// return the result`
 - **Signature echoes in docstrings**: repeating parameter names, types, and return values that are already in the signature
-- **Task-context references**: `// added for the X flow`, `// used by Y`, `// fixes issue #123`, `// as requested in review`. These belong in the PR description and git log, and they rot as the codebase evolves.
+- **Task-context references**: `// added for the X flow`, `// used by Y`, `// fixes issue #123`, `// as requested in review`, `// Claude suggested this`, `// per chat`. These belong in the PR description and git log, not the source.
+- **Scratchpad notes**: `// 일단 이렇게`, `// for now`, `// 임시로`, `// 확실하지 않음`, `// revisit later`. In-progress thinking is not a future reader's concern.
 - **Removal traces**: `// removed old logic`, `// no longer needed`, `// deprecated — use X instead`. If it's removed, delete it; don't leave a gravestone.
 - **Section dividers**: `// === Helpers ===`, `// --- Setup ---`. If the file needs signposting, it's too big — split it.
 - **TODO/FIXME without an owner or ticket**: an untracked TODO is a promise nobody will keep. Either file it as an issue or don't write it.
@@ -43,4 +44,4 @@ When you catch any signal, delete the comment and trust the code.
 - When comments are warranted, lead with WHY. A single precise sentence beats a paragraph.
 - Never reference the current task, PR, or caller in code comments — those contexts belong in the PR body or commit message, not the source.
 - When briefing a subagent for implementation work, restate this rule. The base instruction is not reliably preserved through delegation.
-- Apply the same discipline to docstrings. A docstring that only restates the signature is noise.
+- Apply the same discipline to docstrings — signature paraphrase is noise. Carve-out: when language tooling enforces public-API docs (Go `revive`, Rust `missing_docs`, Python `pydocstyle`), a one-line contract description on exported identifiers is fine. The body must describe the contract, not paraphrase the signature.
