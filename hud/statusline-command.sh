@@ -103,7 +103,19 @@ CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 CACHE_FILE="$CLAUDE_DIR/.usage-cache.json"
 LOCK_DIR="$CACHE_FILE.lock"
 CACHE_TTL=90
+LOCK_STALE_SECS=300
 now_ts=$(date +%s)
+
+# Remove a lock dir whose mtime is older than LOCK_STALE_SECS — the previous
+# fetch process died before its EXIT trap could fire (SIGKILL, shell teardown).
+reap_stale_lock() {
+  lock=$1
+  [ -d "$lock" ] || return 0
+  mt=$(stat -f %m "$lock" 2>/dev/null) || return 0
+  if [ $((now_ts - mt)) -gt "$LOCK_STALE_SECS" ]; then
+    rmdir "$lock" 2>/dev/null
+  fi
+}
 
 usage_part=""
 
@@ -118,6 +130,7 @@ if [ -f "$CACHE_FILE" ]; then
 fi
 
 if [ "$fetch_needed" -eq 1 ]; then
+  reap_stale_lock "$LOCK_DIR"
   # Background fetch to avoid blocking statusline
   if mkdir "$LOCK_DIR" 2>/dev/null; then
     (
@@ -255,6 +268,7 @@ if [ -f "$CODEX_CACHE" ]; then
 fi
 
 if [ "$codex_fetch_needed" -eq 1 ] && [ -d "$CODEX_DIR_HOME" ]; then
+  reap_stale_lock "$CODEX_LOCK"
   if mkdir "$CODEX_LOCK" 2>/dev/null; then
     (
     trap 'rmdir "$CODEX_LOCK" 2>/dev/null' EXIT INT TERM
