@@ -1,7 +1,8 @@
 #!/bin/bash
 # ai-roots installer
-# Symlinks rules into ~/.claude/rules/ai-roots/ and skills into ~/.claude/skills/ai-roots.
-# Also links the adversarial-reviewer agent into ~/.claude/agents/.
+# Symlinks rules into ~/.claude/rules/ai-roots/ and each skill subfolder into
+# ~/.claude/skills/<skill-name>. Also links the adversarial-reviewer agent into
+# ~/.claude/agents/.
 
 set -e
 
@@ -15,7 +16,7 @@ SKILLS_DST="$HOME/.claude/skills"
 AGENTS_DST="$HOME/.claude/agents"
 
 RULES_TARGET="$RULES_DST/ai-roots"
-SKILLS_TARGET="$SKILLS_DST/ai-roots"
+LEGACY_SKILLS_TARGET="$SKILLS_DST/ai-roots"
 AGENT_TARGET="$AGENTS_DST/adversarial-reviewer.md"
 
 if [ ! -d "$RULES_SRC" ]; then
@@ -50,15 +51,39 @@ fi
 ln -s "$RULES_SRC" "$RULES_TARGET"
 echo "linked rules: $RULES_SRC -> $RULES_TARGET"
 
-if [ -L "$SKILLS_TARGET" ]; then
-  rm "$SKILLS_TARGET"
-elif [ -e "$SKILLS_TARGET" ]; then
-  BACKUP="$SKILLS_TARGET.bak.$(date +%Y%m%d%H%M%S)"
-  echo "backing up: $SKILLS_TARGET -> $BACKUP"
-  mv "$SKILLS_TARGET" "$BACKUP"
+# Migration: previous versions linked the whole skills/ folder as
+# ~/.claude/skills/ai-roots. Claude Code's skill loader expects
+# ~/.claude/skills/<skill-name>/SKILL.md, so that layout was never picked up.
+# Remove the legacy link if present.
+if [ -L "$LEGACY_SKILLS_TARGET" ]; then
+  echo "removing legacy skills symlink: $LEGACY_SKILLS_TARGET"
+  rm "$LEGACY_SKILLS_TARGET"
+elif [ -e "$LEGACY_SKILLS_TARGET" ]; then
+  BACKUP="$LEGACY_SKILLS_TARGET.bak.$(date +%Y%m%d%H%M%S)"
+  echo "backing up legacy skills dir: $LEGACY_SKILLS_TARGET -> $BACKUP"
+  mv "$LEGACY_SKILLS_TARGET" "$BACKUP"
 fi
-ln -s "$SKILLS_SRC" "$SKILLS_TARGET"
-echo "linked skills: $SKILLS_SRC -> $SKILLS_TARGET"
+
+# Link each skill subfolder individually so Claude Code recognizes each
+# <skill-name>/SKILL.md.
+for skill_dir in "$SKILLS_SRC"/*/; do
+  [ -d "$skill_dir" ] || continue
+  skill_name="$(basename "$skill_dir")"
+  if [ ! -f "$skill_dir/SKILL.md" ]; then
+    echo "skipping $skill_name: missing SKILL.md"
+    continue
+  fi
+  skill_target="$SKILLS_DST/$skill_name"
+  if [ -L "$skill_target" ]; then
+    rm "$skill_target"
+  elif [ -e "$skill_target" ]; then
+    BACKUP="$skill_target.bak.$(date +%Y%m%d%H%M%S)"
+    echo "backing up: $skill_target -> $BACKUP"
+    mv "$skill_target" "$BACKUP"
+  fi
+  ln -s "${skill_dir%/}" "$skill_target"
+  echo "linked skill: ${skill_dir%/} -> $skill_target"
+done
 
 if [ -L "$AGENT_TARGET" ]; then
   rm "$AGENT_TARGET"
