@@ -6,7 +6,7 @@ Prefer durable, version-controlled artifacts (rule files, `CLAUDE.md`, project d
 
 ## When NOT to Use Memory
 
-- **Conventions, principles, behavioral rules** — these belong in `claude-rules/roots/` (universal) or project `CLAUDE.md` (project-specific). Both are version-controlled and identical on every device.
+- **Conventions, principles, behavioral rules** — these belong in `rules/roots/` (universal) or project `CLAUDE.md` (project-specific). Both are version-controlled and identical on every device.
 - **Project facts that outlive the conversation** — these belong in the project's documentation, `CLAUDE.md`, or a dedicated rule file.
 - **Authoring rules for shared repositories** — meta-rules about how to write rules belong in the repository itself, not in memory.
 - **Anything that would benefit a teammate or a future session on another device** — by definition, memory cannot deliver it.
@@ -22,7 +22,7 @@ Prefer durable, version-controlled artifacts (rule files, `CLAUDE.md`, project d
 
 When tempted to save a memory entry:
 
-1. Could this be a rule in `claude-rules/roots/`? → write a rule instead.
+1. Could this be a rule in `rules/roots/`? → write a rule instead.
 2. Could this be a project `CLAUDE.md` or repo-local documentation entry? → write that instead.
 3. Is it strictly personal and not shareable? → memory is appropriate.
 4. Otherwise, default to NOT saving. Repeating the context next session is cheaper than letting devices diverge silently.

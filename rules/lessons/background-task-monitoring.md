@@ -69,7 +69,7 @@ A 5-minute Codex review gains nothing from minute-by-minute polling — the resu
 ## When to Apply
 
 - Any `run_in_background: true` task expected to outlive a single turn
-- Codex delegations (`/codex:overnight`, `/codex:autopilot`) — usually Rung 1
+- Codex delegations (long-running `codex exec`, `/ai-roots:review`) — usually Rung 1
 - Data pipelines, migrations, crawlers with observable phases — usually Rung 2
 - External async jobs without completion hooks — Rung 3
 

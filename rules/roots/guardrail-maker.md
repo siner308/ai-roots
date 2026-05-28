@@ -74,15 +74,15 @@ Wait for user confirmation before writing.
 
 | Signal | Location | Rationale |
 |--------|----------|-----------|
-| Universal principle (any project) | `ai-roots/claude-rules/roots/` | Symlinked to `~/.claude/rules/`, loaded everywhere |
-| Lesson learned from a mistake | `ai-roots/claude-rules/lessons/` | Concrete pattern from real failure — describes what works better |
+| Universal principle (any project) | `ai-roots/rules/roots/` | Symlinked to `~/.claude/rules/ai-roots/`, loaded everywhere |
+| Lesson learned from a mistake | `ai-roots/rules/lessons/` | Concrete pattern from real failure — describes what works better |
 | Project-specific convention | Project `CLAUDE.md` | Loaded per-project |
 | Project-specific, standalone topic | Project `.claude/rules/` | Modular, avoids bloating CLAUDE.md |
 | Updates an existing rule | Same file as existing | Avoids fragmentation |
 
-**Rules vs Lessons:** Rules (`claude-rules/roots/`) define principles and protocols — they say what to do. Lessons (`claude-rules/lessons/`) capture concrete patterns learned from real mistakes — they show what works better with before/after examples. If the correction is "never do X" → rule. If the correction is "we tried X and Y works better because Z" → lesson.
+**Rules vs Lessons:** Rules (`rules/roots/`) define principles and protocols — they say what to do. Lessons (`rules/lessons/`) capture concrete patterns learned from real mistakes — they show what works better with before/after examples. If the correction is "never do X" → rule. If the correction is "we tried X and Y works better because Z" → lesson.
 
-**Writing location:** `~/.claude/rules/ai-roots/{roots,lessons}` are per-subdirectory symlinks into this repository's `claude-rules/{roots,lessons}/`. Resolve the actual repo path with `readlink -f ~/.claude/rules/ai-roots/roots` (then drop the trailing `roots`) and write into the real git-tracked tree — never into `~/.claude/rules/...` directly, since the parent `ai-roots/` is now a real directory and writes there will not be tracked by git.
+**Writing location:** `~/.claude/rules/ai-roots` is a symlink to this repository's `rules/` directory. Resolve the actual repo path with `readlink -f ~/.claude/rules/ai-roots` and write into the real git-tracked tree (`rules/roots/...` or `rules/lessons/...`) — never into `~/.claude/rules/ai-roots/...` directly, since symlinks can be confusing to reason about and the canonical source is the git repo.
 
 When unsure about scope, ask the user whether the rule applies to other projects too.
 

@@ -57,7 +57,7 @@ Escalation is part of the rule, not a failure. Stubbornly pushing a weak model l
 
 ## Cross-Provider Delegation (Codex)
 
-If Codex is installed (`./install.sh --with-codex`), see `codex/codex-delegation.md` for mode selection, three-turn rescue protocol, security-sensitive review triggers, capability routing, execution mechanics, and plan-stage review. Codex delegation is orthogonal to the Opus/Sonnet/Haiku selection above — in-platform model tiers still apply to Claude-side work.
+If Codex CLI is available on `PATH`, see `codex/codex-delegation.md` for mode selection, three-turn rescue protocol, security-sensitive review triggers (`/ai-roots:review`), capability routing, execution mechanics, and plan-stage review. Codex delegation is orthogonal to the Opus/Sonnet/Haiku selection above — in-platform model tiers still apply to Claude-side work.
 
 ## Subagent Briefing Standard
 
@@ -116,5 +116,5 @@ Right: Delegate to Haiku Explore agent
 - Never downgrade model or effort when blast radius is high
 - Escalate to Opus after 3 failures or when a design decision surfaces
 - Briefings must include file paths, signatures, verification, and a request for decision reasoning
-- If Codex is installed, see `codex/codex-delegation.md` for cross-provider rules (three-turn cap, adversarial review, capability routing, plan-stage review).
+- If Codex CLI is available, see `codex/codex-delegation.md` for cross-provider rules (three-turn cap, adversarial review via `/ai-roots:review`, capability routing, plan-stage review).
 - **Project CLAUDE.md can strengthen these defaults** — e.g., per-PR two-reviewer rule. Project rules override the minimum where they are stricter; the minimum applies where the project is silent.

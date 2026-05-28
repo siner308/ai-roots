@@ -11,39 +11,39 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 ### 사고 확장
 | 파일 | 설명 |
 |------|------|
-| `claude-rules/roots/concept-priming.md` | 도메인 스프레드 개념 프라이밍 + 복잡도 기반 사고 확장 (Devil's Advocate, First Principles, Systems Thinking) |
-| `claude-rules/roots/progressive-deepening.md` | 피상적 답변을 자동 감지하고 한 단계 더 깊이 파고드는 내부 품질 게이트 |
-| `claude-rules/roots/capability-overhang.md` | 숨겨진 지식 활성화 — 도메인 토큰 주입, 교차 도메인 연결, 스킬 합성 |
+| `rules/roots/concept-priming.md` | 도메인 스프레드 개념 프라이밍 + 복잡도 기반 사고 확장 (Devil's Advocate, First Principles, Systems Thinking) |
+| `rules/roots/progressive-deepening.md` | 피상적 답변을 자동 감지하고 한 단계 더 깊이 파고드는 내부 품질 게이트 |
+| `rules/roots/capability-overhang.md` | 숨겨진 지식 활성화 — 도메인 토큰 주입, 교차 도메인 연결, 스킬 합성 |
 
 ### 품질 보증
 | 파일 | 설명 |
 |------|------|
-| `claude-rules/roots/evaluation-integrity.md` | 자기 평가 편향 방지 — 검증 가능성 분류, 생성/평가 분리, 드리프트 감지 |
-| `claude-rules/roots/claude-architect-principles.md` | 아키텍트급 문제 해결을 자동 적용 — enforcement 매칭, context 관리, 생성/리뷰 분리 |
+| `rules/roots/evaluation-integrity.md` | 자기 평가 편향 방지 — 검증 가능성 분류, 생성/평가 분리, 드리프트 감지 |
+| `rules/roots/claude-architect-principles.md` | 아키텍트급 문제 해결을 자동 적용 — enforcement 매칭, context 관리, 생성/리뷰 분리 |
 
 ### 문제 해결 전략
 | 파일 | 설명 |
 |------|------|
-| `claude-rules/roots/parallel-hypothesis-investigation.md` | 복잡한 문제를 계층별 가설로 분리하고 병렬 에이전트로 동시 조사 |
-| `claude-rules/roots/parallel-execution-modes.md` | 작업 독립성과 통신 필요도에 따라 순차/서브에이전트/팀 기반 병렬 실행 선택 |
-| `claude-rules/roots/model-effort-delegation.md` | 임계치 기반 모델/effort/subagent 선택 — 명세된 구현은 약한 모델에 위임, 판단은 Opus에 집중 |
+| `rules/roots/parallel-hypothesis-investigation.md` | 복잡한 문제를 계층별 가설로 분리하고 병렬 에이전트로 동시 조사 |
+| `rules/roots/parallel-execution-modes.md` | 작업 독립성과 통신 필요도에 따라 순차/서브에이전트/팀 기반 병렬 실행 선택 |
+| `rules/roots/model-effort-delegation.md` | 임계치 기반 모델/effort/subagent 선택 — 명세된 구현은 약한 모델에 위임, 판단은 Opus에 집중 |
 
 ### 사용자 성장
 | 파일 | 설명 |
 |------|------|
-| `claude-rules/roots/user-growth-coaching.md` | 문제 해결 후 사용자의 질문 방식을 교정하는 코칭 — 모호한 요청 패턴을 구체적 요청으로 유도 |
+| `rules/roots/user-growth-coaching.md` | 문제 해결 후 사용자의 질문 방식을 교정하는 코칭 — 모호한 요청 패턴을 구체적 요청으로 유도 |
 
 ### 지식 포착
 | 파일 | 설명 |
 |------|------|
-| `claude-rules/roots/guardrail-maker.md` | 사용자의 교정을 암묵지로 자동 감지하고, 같은 실수를 반복하지 않도록 가드레일 생성을 제안 |
+| `rules/roots/guardrail-maker.md` | 사용자의 교정을 암묵지로 자동 감지하고, 같은 실수를 반복하지 않도록 가드레일 생성을 제안 |
 
 ### 컨벤션
 | 파일 | 설명 |
 |------|------|
-| `claude-rules/roots/github-pr-markdown.md` | GitHub PR 작성 시 GFM 마크다운 컨벤션 강제 |
-| `claude-rules/roots/comment-discipline.md` | 주석은 기본적으로 쓰지 않는다 — WHY가 비자명할 때만 작성, WHAT 설명/작업 맥락 언급/제거 흔적 금지 |
-| `claude-rules/roots/css-discipline.md` | CSS에서 흔히 남용되는 4가지 축을 닫는다 — 캐스케이드(`!important`), 박스 모델(간격용 margin, 목적 없는 overflow: hidden), 단위 혼란(리터럴 픽셀/컬러), 스타일 위치(유틸리티/스코프/인라인 3계층) |
+| `rules/roots/github-pr-markdown.md` | GitHub PR 작성 시 GFM 마크다운 컨벤션 강제 |
+| `rules/roots/comment-discipline.md` | 주석은 기본적으로 쓰지 않는다 — WHY가 비자명할 때만 작성, WHAT 설명/작업 맥락 언급/제거 흔적 금지 |
+| `rules/roots/css-discipline.md` | CSS에서 흔히 남용되는 4가지 축을 닫는다 — 캐스케이드(`!important`), 박스 모델(간격용 margin, 목적 없는 overflow: hidden), 단위 혼란(리터럴 픽셀/컬러), 스타일 위치(유틸리티/스코프/인라인 3계층) |
 
 ## Lessons — 시행착오 교훈
 
@@ -51,32 +51,24 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 
 | 파일 | 설명 |
 |------|------|
-| `claude-rules/lessons/incremental-verification.md` | 불확실한 작업은 가장 작은 검증 단위로 쪼개기 — 인라인 테스트 먼저, 스크립트는 나중에, 점진적 확장 |
-| `claude-rules/lessons/background-task-monitoring.md` | 장시간 백그라운드 작업은 가장 저렴한 가시성 메커니즘 선택 — 완료 알림이 기본, 이벤트 스트림은 그 다음, 주기 폴링은 최후 fallback |
-| `claude-rules/lessons/simulate-dont-just-scan.md` | 실제로 실행했을 때 어떤 결과가 나올지 머릿속으로 시뮬레이션 — 소스를 읽은 것과 런타임 동작을 이해한 것은 다르다 |
+| `rules/lessons/incremental-verification.md` | 불확실한 작업은 가장 작은 검증 단위로 쪼개기 — 인라인 테스트 먼저, 스크립트는 나중에, 점진적 확장 |
+| `rules/lessons/background-task-monitoring.md` | 장시간 백그라운드 작업은 가장 저렴한 가시성 메커니즘 선택 — 완료 알림이 기본, 이벤트 스트림은 그 다음, 주기 폴링은 최후 fallback |
+| `rules/lessons/simulate-dont-just-scan.md` | 실제로 실행했을 때 어떤 결과가 나올지 머릿속으로 시뮬레이션 — 소스를 읽은 것과 런타임 동작을 이해한 것은 다르다 |
+| `rules/lessons/codex-tmux-monitoring.md` | 백그라운드 Codex 실행 모니터링용 tmux split-pane + sentinel 패턴이 실패한 이유 — wake-up과 live-output을 별개 메커니즘으로 분리하라 |
 
-## 다중 에이전트 오케스트레이션 (선택)
+## Skill — `/ai-roots:review`
 
-Claude Code와 OpenAI Codex를 함께 쓸 때 참고. Codex 연동은 **선택 사항** — 아래 중 하나라도 필요하면 사용을 권장합니다:
+`~/.claude/skills/ai-roots/` 아래 단일 스킬이 설치됩니다: `/ai-roots:review`.
 
-- (a) **Cross-family 어드버서리얼 리뷰** — 다른 학습 분포가 Claude 혼자 놓치는 사각지대를 잡아냄
-- (b) **Anchoring 탈출** — 어려운 문제에서 3-턴 cap 후 fresh stack으로 anchoring 트랩 해제
-- (c) **OpenAI 생태계 전용 기능** — 이미지 생성(DALL-E, `gpt-image`) 등 Claude Code가 기본으로 가지지 않는 OpenAI 전용 모달리티
-
-위 중 해당사항이 없다면 건너뛰어도 됩니다. Claude Code 토큰이 넉넉한 것만으로도 건너뛰는 충분한 이유가 됩니다.
+현재 uncommitted diff에 대해 **두 평가자 코드 리뷰**를 수행합니다. Claude Code subagent (`adversarial-reviewer` 페르소나)와 `codex review`를 병렬로 띄우고, 두 결과를 `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis의 Agreed / Conflicting / Chosen-direction 포맷으로 종합합니다.
 
 | 파일 | 설명 |
 |------|------|
-| `.claude/agents/adversarial-reviewer.md` | 보안 우선 어드버서리얼 리뷰어 페르소나. Claude Code의 Agent 도구로도 호출 가능하고, `/codex:adversarial-review` 호출 시 system prompt로 붙여쓸 수 있는 self-contained 프롬프트 |
-| `.claude/commands/codex/adversarial-review.md` | adversarial reviewer prompt로 `codex review --uncommitted`를 실행하는 slash command 템플릿 |
-| `.claude/commands/codex/autopilot.md` | `codex exec --full-auto`를 쓰는 bounded implementation handoff. 위험한 no-sandbox 모드는 명시적으로 제한 |
-| `.claude/commands/codex/diff-review.md` | 일반적인 read-only Codex production review command |
-| `.claude/commands/codex/overnight.md` | `workspace-write`, approval `never`, web search를 쓰는 unattended workspace-sandbox implementation command |
-| `.claude/commands/codex/research.md` | `--search`를 쓰는 read-only web-backed research command |
-| `.claude/commands/codex/rescue.md` | 3-turn cap 이후 막힌 디버깅을 Codex에 read-only로 넘기는 rescue handoff |
-| `.claude/commands/codex/yolo-overnight.md` | 사용자가 위험을 명시적으로 수락한 경우의 no-sandbox/no-approval command |
+| `skills/review.md` | `/ai-roots:review` 스킬 본문. Claude subagent + `codex review`를 병렬로 띄우고 `evaluation-integrity.md`에 따라 종합 |
+| `.claude/agents/adversarial-reviewer.md` | 보안 우선 어드버서리얼 리뷰어 페르소나. Claude 측 리뷰어의 `subagent_type`으로 쓰이고, 동시에 `codex review`에 stdin으로 전달됨 |
+| `rules/codex/codex-delegation.md` | Cross-provider 정책 — 언제 `/ai-roots:review`를 호출할지, 3-턴 rescue protocol, 리뷰가 아닌 Codex 모드의 직접 호출 cheatsheet, capability routing, 실행 메커니즘, plan-stage review |
 
-라우팅 규칙 (mode selection, 어려운 문제 3-턴 cap, 보안 민감 경로 adversarial review, research, overnight work, 이미지 생성 등 capability 라우팅)은 `claude-rules/codex/codex-delegation.md`에 있습니다. 이 파일은 `./install.sh --with-codex`로 설치할 때만 `~/.claude/rules/`로 심링크되므로, Codex를 쓰지 않는 사용자는 Codex 정책을 로드하지 않습니다. 이것은 **Claude 측** 규칙 — 언제 Codex를 호출할지를 Claude에게 알려주는 것이고, Codex의 동작 방식을 규정하지 않습니다.
+Codex CLI가 `PATH`에 없으면 스킬은 Claude 측 단일 평가자로 fallback합니다 (cross-provider 다양성은 잃지만 synthesis 구조는 유지).
 
 ## 설치
 
@@ -87,13 +79,13 @@ chmod +x install.sh
 ./install.sh
 ```
 
-`claude-rules/roots/`와 `claude-rules/lessons/`가 `~/.claude/rules/ai-roots/` 아래로 심링크됩니다. README, HUD 스크립트, agent prompt는 상시 rules로 로드되지 않습니다. `claude-rules/codex/`는 `--with-codex`를 줄 때만 심링크되어, Codex를 쓰지 않는 사용자는 Codex 라우팅 규칙을 로드하지 않습니다.
+설치 스크립트는 세 개의 심링크를 만듭니다:
 
-선택적 Codex delegation command까지 설치하려면:
+- `rules/` → `~/.claude/rules/ai-roots` — Claude Code가 이 아래의 모든 `.md` 파일을 상시 rules로 재귀 로딩합니다.
+- `skills/` → `~/.claude/skills/ai-roots` — `/ai-roots:review` 스킬이 모든 프로젝트에서 사용 가능해집니다.
+- `.claude/agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md` — 리뷰어 페르소나를 Agent 도구의 `subagent_type`으로 등록합니다.
 
-```bash
-./install.sh --with-codex
-```
+README, HUD 스크립트, `evals/` 워크스페이스(있다면)는 심링크되지 않으므로 상시 rules로 로드되지 않습니다.
 
 ## 영감
 

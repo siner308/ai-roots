@@ -11,39 +11,39 @@ Even non-experts can solve complex problems through casual conversation — Clau
 ### Thinking Expansion
 | File | Description |
 |------|-------------|
-| `claude-rules/roots/concept-priming.md` | Domain-spread concept priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
-| `claude-rules/roots/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
-| `claude-rules/roots/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
+| `rules/roots/concept-priming.md` | Domain-spread concept priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
+| `rules/roots/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
+| `rules/roots/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
 
 ### Quality Assurance
 | File | Description |
 |------|-------------|
-| `claude-rules/roots/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
-| `claude-rules/roots/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
+| `rules/roots/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
+| `rules/roots/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
 
 ### Problem-Solving Strategy
 | File | Description |
 |------|-------------|
-| `claude-rules/roots/parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
-| `claude-rules/roots/parallel-execution-modes.md` | Choose between sequential, subagent, and team-based parallelism based on task independence and communication needs |
-| `claude-rules/roots/model-effort-delegation.md` | Threshold-based model/effort/subagent selection — delegate specified implementation to weaker models, keep judgment on Opus |
+| `rules/roots/parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
+| `rules/roots/parallel-execution-modes.md` | Choose between sequential, subagent, and team-based parallelism based on task independence and communication needs |
+| `rules/roots/model-effort-delegation.md` | Threshold-based model/effort/subagent selection — delegate specified implementation to weaker models, keep judgment on Opus |
 
 ### User Growth
 | File | Description |
 |------|-------------|
-| `claude-rules/roots/user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
+| `rules/roots/user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
 
 ### Knowledge Capture
 | File | Description |
 |------|-------------|
-| `claude-rules/roots/guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
+| `rules/roots/guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
 
 ### Conventions
 | File | Description |
 |------|-------------|
-| `claude-rules/roots/github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
-| `claude-rules/roots/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
-| `claude-rules/roots/css-discipline.md` | Close four commonly abused CSS axes — cascade (`!important`), box model (margin for spacing, overflow: hidden without purpose), unit soup (literal pixels/colors), style location (utility / scoped / inline trichotomy) |
+| `rules/roots/github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
+| `rules/roots/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
+| `rules/roots/css-discipline.md` | Close four commonly abused CSS axes — cascade (`!important`), box model (margin for spacing, overflow: hidden without purpose), unit soup (literal pixels/colors), style location (utility / scoped / inline trichotomy) |
 
 ## Lessons — Retrospective Learnings
 
@@ -51,32 +51,24 @@ Lessons are concrete patterns learned from real mistakes. They describe what wor
 
 | File | Description |
 |------|-------------|
-| `claude-rules/lessons/incremental-verification.md` | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
-| `claude-rules/lessons/background-task-monitoring.md` | Pick the cheapest visibility mechanism for long background tasks — completion notification first, event streams second, interval polling only as fallback |
-| `claude-rules/lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
+| `rules/lessons/incremental-verification.md` | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
+| `rules/lessons/background-task-monitoring.md` | Pick the cheapest visibility mechanism for long background tasks — completion notification first, event streams second, interval polling only as fallback |
+| `rules/lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
+| `rules/lessons/codex-tmux-monitoring.md` | Why the previous tmux split-pane + sentinel pattern for monitoring background Codex runs failed — decompose wake-up vs live-output into separate mechanisms |
 
-## Multi-Agent Orchestration (Optional)
+## Skill — `/ai-roots:review`
 
-Claude Code and OpenAI Codex running together. Codex integration is **optional** — use it if you want any of:
+A single skill is installed under `~/.claude/skills/ai-roots/`: `/ai-roots:review`.
 
-- (a) **Cross-family adversarial review** — a second training distribution catches blind spots Claude alone misses
-- (b) **Rescue from anchoring** on hard problems — a fresh stack breaks the 3-turn anchoring trap
-- (c) **OpenAI-ecosystem capabilities** — image generation (DALL-E, `gpt-image`), and other OpenAI-exclusive modalities Claude Code does not carry natively
-
-Skip it if none of these apply. Ample Claude Code capacity alone is a valid reason to skip.
+It performs a **two-evaluator code review** on the current uncommitted diff. A Claude Code subagent (`adversarial-reviewer` persona) and a `codex review` invocation run in parallel, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis.
 
 | File | Description |
 |------|-------------|
-| `.claude/agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Self-contained prompt usable via Claude Code's Agent tool, or pasted as system prompt when invoking `/codex:adversarial-review`. |
-| `.claude/commands/codex/adversarial-review.md` | Slash command template that runs `codex review --uncommitted` with the adversarial reviewer prompt. |
-| `.claude/commands/codex/autopilot.md` | Bounded implementation handoff using `codex exec --full-auto`; dangerous no-sandbox mode is explicitly gated. |
-| `.claude/commands/codex/diff-review.md` | General read-only Codex production-review command. |
-| `.claude/commands/codex/overnight.md` | Unattended workspace-sandbox implementation using `workspace-write`, approval `never`, and web search. |
-| `.claude/commands/codex/research.md` | Read-only web-backed research command using `--search`. |
-| `.claude/commands/codex/rescue.md` | Read-only Codex rescue handoff for stuck debugging after the three-turn cap. |
-| `.claude/commands/codex/yolo-overnight.md` | Explicit no-sandbox/no-approval command for user-accepted dangerous runs. |
+| `skills/review.md` | The `/ai-roots:review` skill body. Spawns Claude subagent + `codex review` in parallel; synthesizes per `evaluation-integrity.md`. |
+| `.claude/agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Used both as the `subagent_type` for the Claude-side reviewer and piped via stdin to `codex review`. |
+| `rules/codex/codex-delegation.md` | Cross-provider policy — when to invoke `/ai-roots:review`, three-turn rescue protocol, direct Codex invocation cheatsheet for non-review modes, capability routing, execution mechanics, plan-stage review. |
 
-Routing rules (mode selection, three-turn cap for hard problems, adversarial review on security-sensitive paths, research, overnight work, and capability-based routing for image generation) live in `claude-rules/codex/codex-delegation.md`. This file is linked into `~/.claude/rules/` only when `./install.sh --with-codex` is run, so non-Codex users do not load Codex policy. These are **Claude-side** rules — they tell Claude when to invoke Codex, not how Codex should behave.
+If Codex CLI is not on `PATH`, the skill falls back to a single Claude-side evaluator (the cross-provider diversity is lost but the synthesis structure still applies).
 
 ## Installation
 
@@ -87,13 +79,13 @@ chmod +x install.sh
 ./install.sh
 ```
 
-`claude-rules/roots/` and `claude-rules/lessons/` are symlinked into `~/.claude/rules/ai-roots/`, so README files, HUD scripts, and agent prompts are not loaded as always-on rules. Claude Code recursively loads all `.md` files from those directories. `claude-rules/codex/` is only linked when `--with-codex` is passed, so non-Codex users do not load Codex routing rules.
+The installer creates three symlinks:
 
-To also install optional Codex delegation commands:
+- `rules/` → `~/.claude/rules/ai-roots` — Claude Code recursively loads all `.md` files here as always-on rules.
+- `skills/` → `~/.claude/skills/ai-roots` — the `/ai-roots:review` skill becomes available in any project.
+- `.claude/agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md` — registers the reviewer persona as an Agent tool `subagent_type`.
 
-```bash
-./install.sh --with-codex
-```
+README files, HUD scripts, and the `evals/` workspace (if any) are not symlinked, so they are not loaded as always-on rules.
 
 ## Inspiration
 
