@@ -1,6 +1,6 @@
 # Codex Delegation
 
-> **Applicability** — This rule applies when OpenAI Codex CLI is available on `PATH` alongside Claude Code. Without Codex, the `/ai-roots:review` skill falls back to a single-evaluator review (Claude subagent only); the cross-provider generator-vs-evaluator separation is weaker but the rules-side policy below still applies to Claude-side work.
+> **Applicability** — This rule applies when OpenAI Codex CLI is available on `PATH` alongside Claude Code. Without Codex, the `/review` skill falls back to a single-evaluator review (Claude subagent only); the cross-provider generator-vs-evaluator separation is weaker but the rules-side policy below still applies to Claude-side work.
 
 Cross-provider delegation serves three purposes:
 
@@ -12,7 +12,7 @@ The first two motivate reliability routing; the third motivates capability routi
 
 ## Entry Point
 
-The only ai-roots-provided surface that wraps Codex is the **`/ai-roots:review` skill** (`skills/review.md`). It spawns a Claude Code subagent and a `codex review --uncommitted` in parallel, then synthesizes per `evaluation-integrity.md` §Multi-advisor synthesis. Use it for any review-class delegation: general diff review, security-sensitive review, both.
+The only ai-roots-provided surface that wraps Codex is the **`/review` skill** (`skills/review.md`). It spawns a Claude Code subagent and a `codex review --uncommitted` in parallel, then synthesizes per `evaluation-integrity.md` §Multi-advisor synthesis. Use it for any review-class delegation: general diff review, security-sensitive review, both.
 
 For non-review Codex work (rescue debugging, research, bounded implementation), invoke `codex` directly via Bash with the appropriate flags. There is no longer a slash-command wrapper for those modes — see the per-mode invocations below.
 
@@ -33,7 +33,7 @@ codex review [REVIEW FLAGS]    # read-only by design; does not accept --sandbox 
 
 | Need | Invocation |
 |------|------------|
-| Independent + security-sensitive review | `/ai-roots:review` skill |
+| Independent + security-sensitive review | `/review` skill |
 | Stuck after three failed attempts | `codex exec --sandbox read-only -m gpt-5.5 -c model_reasoning_effort=xhigh -` with rescue brief on stdin |
 | Current docs or web research | `codex --search -a never exec --sandbox read-only -m gpt-5.5 -c model_reasoning_effort=xhigh -` |
 | Bounded implementation (workspace edits, approval on-request) | `codex exec --full-auto -m gpt-5.5 -c model_reasoning_effort=xhigh -` |
@@ -46,7 +46,7 @@ Do not pick a broader mode for convenience. Research does not need write access.
 
 **Three-turn cap on stuck problems.** Do not attempt a 4th inline turn on the same hypothesis. Delegate to a Codex rescue (read-only sandbox) with all ruled-out hypotheses included.
 
-**Adversarial review on security-sensitive changes.** After every behavioral change touching authentication, authorization, database writes, network boundaries, secret handling, or trust boundaries, invoke `/ai-roots:review`. Read-only reads or pure internal refactors do not trigger. The reviewer persona — skeptical, security-first, classifies findings P0–P3, returns `VERDICT: SAFE` only when no critical issues surface at high coverage — lives in `.claude/agents/adversarial-reviewer.md` and is piped via stdin to `codex review` by the skill.
+**Adversarial review on security-sensitive changes.** After every behavioral change touching authentication, authorization, database writes, network boundaries, secret handling, or trust boundaries, invoke `/review`. Read-only reads or pure internal refactors do not trigger. The reviewer persona — skeptical, security-first, classifies findings P0–P3, returns `VERDICT: SAFE` only when no critical issues surface at high coverage — lives in `.claude/agents/adversarial-reviewer.md` and is piped via stdin to `codex review` by the skill.
 
 **Capability routing fires on turn one.** Image generation, TTS, or other OpenAI-exclusive tool needs route to Codex immediately. Do not waste turns on text-based workarounds (ASCII art, hand-coded SVG) when the deliverable is an image or audio artifact.
 
@@ -104,7 +104,7 @@ Two-reviewer review is also valuable *before* code is written, when the artifact
 ## Cross-Provider Rules
 
 - Three-turn cap is a forcing function, not a hard ceiling. If Turn 3 produces a confirmed breakthrough, finish; otherwise escalate.
-- Never skip `/ai-roots:review` on security-sensitive paths to save tokens.
+- Never skip `/review` on security-sensitive paths to save tokens.
 - When invoking a Codex rescue, include ruled-out hypotheses so Codex does not redo the same work.
 - Treat Codex findings as **independent evidence**: investigate disagreements with Claude's conclusion; do not resolve them by asking Claude alone to reconsider.
 - Codex delegation is orthogonal to the Opus/Sonnet/Haiku tiers in `model-effort-delegation.md` — those still apply to Claude-side work.

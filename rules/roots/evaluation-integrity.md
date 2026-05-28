@@ -26,7 +26,7 @@ Before starting any iterative work, classify the domain.
 
 ## Multi-advisor Synthesis
 
-When the evaluator is not you alone — a subagent review, a cross-provider review (e.g. `/ai-roots:review`), or multiple criterion-axis agents from `parallel-hypothesis-investigation.md` — the synthesis step has its own bias: the temptation to smooth over disagreements so the final answer sounds confident.
+When the evaluator is not you alone — a subagent review, a cross-provider review (e.g. `/review`), or multiple criterion-axis agents from `parallel-hypothesis-investigation.md` — the synthesis step has its own bias: the temptation to smooth over disagreements so the final answer sounds confident.
 
 Resist it. When consolidating 2+ independent evaluators, the output MUST separate three buckets:
 

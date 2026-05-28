@@ -70,16 +70,4 @@ fi
 ln -s "$AGENT_SRC" "$AGENT_TARGET"
 echo "linked agent: $AGENT_SRC -> $AGENT_TARGET"
 
-# Clean up stale Codex command/rule symlinks left by previous installer versions.
-STALE_COMMANDS="$HOME/.claude/commands/codex"
-STALE_RULES_CODEX="$RULES_TARGET/codex"
-for stale in "$STALE_COMMANDS"; do
-  if [ -L "$stale" ]; then
-    rm "$stale"
-    echo "removed stale symlink: $stale"
-  fi
-done
-# If the parent commands dir is now empty, leave it alone — it may hold other
-# user customizations. The user can rmdir manually if desired.
-
 echo "done."

@@ -1,9 +1,9 @@
 ---
 name: review
-description: Two-evaluator code review. Spawn a Claude Code subagent and a Codex review in parallel on the current uncommitted diff, then synthesize findings using the Agreed / Conflicting / Chosen-direction format from rules/roots/evaluation-integrity.md §Multi-advisor synthesis. Use whenever the user requests a review of pending changes and both Claude and Codex are available.
+description: "[ai-roots] Two-evaluator code review provided by the ai-roots skill set. Spawn a Claude Code subagent and a Codex review in parallel on the current uncommitted diff, then synthesize findings using the Agreed / Conflicting / Chosen-direction format from rules/roots/evaluation-integrity.md §Multi-advisor synthesis. Use whenever the user requests a review of pending changes and both Claude and Codex are available."
 ---
 
-# ai-roots:review
+# /review (ai-roots)
 
 Independent two-evaluator review for the current uncommitted diff. The two evaluators run in parallel and do not see each other's output until synthesis.
 

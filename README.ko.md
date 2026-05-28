@@ -56,17 +56,17 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 | `rules/lessons/simulate-dont-just-scan.md` | 실제로 실행했을 때 어떤 결과가 나올지 머릿속으로 시뮬레이션 — 소스를 읽은 것과 런타임 동작을 이해한 것은 다르다 |
 | `rules/lessons/codex-tmux-monitoring.md` | 백그라운드 Codex 실행 모니터링용 tmux split-pane + sentinel 패턴이 실패한 이유 — wake-up과 live-output을 별개 메커니즘으로 분리하라 |
 
-## Skill — `/ai-roots:review`
+## Skill — `/review` (ai-roots)
 
-`~/.claude/skills/ai-roots/` 아래 단일 스킬이 설치됩니다: `/ai-roots:review`.
+`~/.claude/skills/ai-roots/` 아래 단일 스킬이 설치되며, 호출명은 `/review`입니다. 이 스킬은 Claude Code 플러그인으로 패키징되어 있지 않아 호출명에 `ai-roots:` 접두사가 붙지 않습니다. 다른 `review` 계열 스킬과 구분할 수 있도록 스킬 설명 맨 앞에 `[ai-roots]` 태그가 붙어 있습니다.
 
 현재 uncommitted diff에 대해 **두 평가자 코드 리뷰**를 수행합니다. Claude Code subagent (`adversarial-reviewer` 페르소나)와 `codex review`를 병렬로 띄우고, 두 결과를 `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis의 Agreed / Conflicting / Chosen-direction 포맷으로 종합합니다.
 
 | 파일 | 설명 |
 |------|------|
-| `skills/review.md` | `/ai-roots:review` 스킬 본문. Claude subagent + `codex review`를 병렬로 띄우고 `evaluation-integrity.md`에 따라 종합 |
+| `skills/review.md` | `/review` 스킬 본문. Claude subagent + `codex review`를 병렬로 띄우고 `evaluation-integrity.md`에 따라 종합 |
 | `.claude/agents/adversarial-reviewer.md` | 보안 우선 어드버서리얼 리뷰어 페르소나. Claude 측 리뷰어의 `subagent_type`으로 쓰이고, 동시에 `codex review`에 stdin으로 전달됨 |
-| `rules/codex/codex-delegation.md` | Cross-provider 정책 — 언제 `/ai-roots:review`를 호출할지, 3-턴 rescue protocol, 리뷰가 아닌 Codex 모드의 직접 호출 cheatsheet, capability routing, 실행 메커니즘, plan-stage review |
+| `rules/codex/codex-delegation.md` | Cross-provider 정책 — 언제 `/review`를 호출할지, 3-턴 rescue protocol, 리뷰가 아닌 Codex 모드의 직접 호출 cheatsheet, capability routing, 실행 메커니즘, plan-stage review |
 
 Codex CLI가 `PATH`에 없으면 스킬은 Claude 측 단일 평가자로 fallback합니다 (cross-provider 다양성은 잃지만 synthesis 구조는 유지).
 
@@ -82,7 +82,7 @@ chmod +x install.sh
 설치 스크립트는 세 개의 심링크를 만듭니다:
 
 - `rules/` → `~/.claude/rules/ai-roots` — Claude Code가 이 아래의 모든 `.md` 파일을 상시 rules로 재귀 로딩합니다.
-- `skills/` → `~/.claude/skills/ai-roots` — `/ai-roots:review` 스킬이 모든 프로젝트에서 사용 가능해집니다.
+- `skills/` → `~/.claude/skills/ai-roots` — `/review` 스킬(설명에 `[ai-roots]` 태그)이 모든 프로젝트에서 사용 가능해집니다.
 - `.claude/agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md` — 리뷰어 페르소나를 Agent 도구의 `subagent_type`으로 등록합니다.
 
 README, HUD 스크립트, `evals/` 워크스페이스(있다면)는 심링크되지 않으므로 상시 rules로 로드되지 않습니다.

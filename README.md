@@ -56,17 +56,17 @@ Lessons are concrete patterns learned from real mistakes. They describe what wor
 | `rules/lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
 | `rules/lessons/codex-tmux-monitoring.md` | Why the previous tmux split-pane + sentinel pattern for monitoring background Codex runs failed — decompose wake-up vs live-output into separate mechanisms |
 
-## Skill — `/ai-roots:review`
+## Skill — `/review` (ai-roots)
 
-A single skill is installed under `~/.claude/skills/ai-roots/`: `/ai-roots:review`.
+A single skill is installed under `~/.claude/skills/ai-roots/` and is invoked as `/review`. Because the skill is not packaged as a Claude Code plugin, the call name carries no `ai-roots:` prefix; the ai-roots origin is signaled by the `[ai-roots]` tag at the start of the skill description, which lets you distinguish it from other `review`-named skills.
 
 It performs a **two-evaluator code review** on the current uncommitted diff. A Claude Code subagent (`adversarial-reviewer` persona) and a `codex review` invocation run in parallel, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis.
 
 | File | Description |
 |------|-------------|
-| `skills/review.md` | The `/ai-roots:review` skill body. Spawns Claude subagent + `codex review` in parallel; synthesizes per `evaluation-integrity.md`. |
+| `skills/review.md` | The `/review` skill body. Spawns Claude subagent + `codex review` in parallel; synthesizes per `evaluation-integrity.md`. |
 | `.claude/agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Used both as the `subagent_type` for the Claude-side reviewer and piped via stdin to `codex review`. |
-| `rules/codex/codex-delegation.md` | Cross-provider policy — when to invoke `/ai-roots:review`, three-turn rescue protocol, direct Codex invocation cheatsheet for non-review modes, capability routing, execution mechanics, plan-stage review. |
+| `rules/codex/codex-delegation.md` | Cross-provider policy — when to invoke `/review`, three-turn rescue protocol, direct Codex invocation cheatsheet for non-review modes, capability routing, execution mechanics, plan-stage review. |
 
 If Codex CLI is not on `PATH`, the skill falls back to a single Claude-side evaluator (the cross-provider diversity is lost but the synthesis structure still applies).
 
@@ -82,7 +82,7 @@ chmod +x install.sh
 The installer creates three symlinks:
 
 - `rules/` → `~/.claude/rules/ai-roots` — Claude Code recursively loads all `.md` files here as always-on rules.
-- `skills/` → `~/.claude/skills/ai-roots` — the `/ai-roots:review` skill becomes available in any project.
+- `skills/` → `~/.claude/skills/ai-roots` — the `/review` skill (tagged `[ai-roots]` in its description) becomes available in any project.
 - `.claude/agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md` — registers the reviewer persona as an Agent tool `subagent_type`.
 
 README files, HUD scripts, and the `evals/` workspace (if any) are not symlinked, so they are not loaded as always-on rules.
