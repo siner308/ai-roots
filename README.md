@@ -60,7 +60,7 @@ Lessons are concrete patterns learned from real mistakes. They describe what wor
 
 A single skill is installed under `~/.claude/skills/review/` and is invoked as `/review`. Because the skill is not packaged as a Claude Code plugin, the call name carries no `ai-roots:` prefix; the ai-roots origin is signaled by the `[ai-roots]` tag at the start of the skill description, which lets you distinguish it from other `review`-named skills (e.g., Claude Code's built-in `/review`).
 
-It performs a **two-evaluator code review** on the current uncommitted diff. A Claude Code subagent (`adversarial-reviewer` persona) and a `codex review` invocation run in parallel, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis.
+It performs a **two-evaluator code review** on a resolved target. By default the target is the current branch's changes against its base branch — the PR diff (when a PR exists) plus local uncommitted edits — but `--base <ref>`, `--commit <sha>`, `--uncommitted`, and trailing path filters override it. A Claude Code subagent (`adversarial-reviewer` persona) and a `codex review` invocation run in parallel on the same diff, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis.
 
 | File | Description |
 |------|-------------|

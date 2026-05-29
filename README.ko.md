@@ -60,7 +60,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 
 `~/.claude/skills/review/` 아래 단일 스킬이 설치되며, 호출명은 `/review`입니다. 이 스킬은 Claude Code 플러그인으로 패키징되어 있지 않아 호출명에 `ai-roots:` 접두사가 붙지 않습니다. 다른 `review` 계열 스킬(예: Claude Code 빌트인 `/review`)과 구분할 수 있도록 스킬 설명 맨 앞에 `[ai-roots]` 태그가 붙어 있습니다.
 
-현재 uncommitted diff에 대해 **두 평가자 코드 리뷰**를 수행합니다. Claude Code subagent (`adversarial-reviewer` 페르소나)와 `codex review`를 병렬로 띄우고, 두 결과를 `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis의 Agreed / Conflicting / Chosen-direction 포맷으로 종합합니다.
+결정된 리뷰 타겟에 대해 **두 평가자 코드 리뷰**를 수행합니다. 기본 타겟은 현재 브랜치와 base 브랜치 사이의 변경 — PR이 있으면 PR diff + 로컬 uncommitted 변경 — 이며, `--base <ref>`, `--commit <sha>`, `--uncommitted`, 뒤따르는 경로 필터로 재정의할 수 있습니다. Claude Code subagent (`adversarial-reviewer` 페르소나)와 `codex review`를 동일한 diff에 대해 병렬로 띄우고, 두 결과를 `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis의 Agreed / Conflicting / Chosen-direction 포맷으로 종합합니다.
 
 | 파일 | 설명 |
 |------|------|
