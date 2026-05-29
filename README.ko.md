@@ -65,7 +65,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 | 파일 | 설명 |
 |------|------|
 | `skills/review/SKILL.md` | `/review` 스킬 본문. Claude subagent + `codex review`를 병렬로 띄우고 `evaluation-integrity.md`에 따라 종합 |
-| `.claude/agents/adversarial-reviewer.md` | 보안 우선 어드버서리얼 리뷰어 페르소나. Claude 측 리뷰어의 `subagent_type`으로 쓰이고, 동시에 `codex review`에 stdin으로 전달됨 |
+| `agents/adversarial-reviewer.md` | 보안 우선 어드버서리얼 리뷰어 페르소나. Claude 측 리뷰어의 `subagent_type`으로 쓰이고, 동시에 `codex review`에 stdin으로 전달됨 |
 | `rules/codex/codex-delegation.md` | Cross-provider 정책 — 언제 `/review`를 호출할지, 3-턴 rescue protocol, 리뷰가 아닌 Codex 모드의 직접 호출 cheatsheet, capability routing, 실행 메커니즘, plan-stage review |
 
 Codex CLI가 `PATH`에 없으면 스킬은 Claude 측 단일 평가자로 fallback합니다 (cross-provider 다양성은 잃지만 synthesis 구조는 유지).
@@ -83,7 +83,7 @@ chmod +x install.sh
 
 - `rules/` → `~/.claude/rules/ai-roots` — Claude Code가 이 아래의 모든 `.md` 파일을 상시 rules로 재귀 로딩합니다.
 - `skills/<name>/` → `~/.claude/skills/<name>` — 각 스킬 서브폴더를 개별 심링크로 걸어 Claude Code 스킬 로더가 `SKILL.md`를 인식하게 합니다. 현재: `skills/review/` → `~/.claude/skills/review` (설명에 `[ai-roots]` 태그).
-- `.claude/agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md` — 리뷰어 페르소나를 Agent 도구의 `subagent_type`으로 등록합니다.
+- `agents/<name>.md` → `~/.claude/agents/<name>.md` — 각 agent 파일을 개별 심링크로 걸어 Claude Code가 Agent 도구의 `subagent_type`으로 등록하게 합니다. 현재: `agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md`.
 
 이전 버전 설치 스크립트가 만든 `~/.claude/skills/ai-roots` (전체 `skills/` 디렉터리를 단일 심링크로 건 형태)는 새 설치 스크립트가 자동으로 제거합니다 — 그 레이아웃은 Claude Code 스킬 로더가 인식하지 못했습니다.
 

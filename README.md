@@ -65,7 +65,7 @@ It performs a **two-evaluator code review** on the current uncommitted diff. A C
 | File | Description |
 |------|-------------|
 | `skills/review/SKILL.md` | The `/review` skill body. Spawns Claude subagent + `codex review` in parallel; synthesizes per `evaluation-integrity.md`. |
-| `.claude/agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Used both as the `subagent_type` for the Claude-side reviewer and piped via stdin to `codex review`. |
+| `agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Used both as the `subagent_type` for the Claude-side reviewer and piped via stdin to `codex review`. |
 | `rules/codex/codex-delegation.md` | Cross-provider policy — when to invoke `/review`, three-turn rescue protocol, direct Codex invocation cheatsheet for non-review modes, capability routing, execution mechanics, plan-stage review. |
 
 If Codex CLI is not on `PATH`, the skill falls back to a single Claude-side evaluator (the cross-provider diversity is lost but the synthesis structure still applies).
@@ -83,7 +83,7 @@ The installer creates symlinks:
 
 - `rules/` → `~/.claude/rules/ai-roots` — Claude Code recursively loads all `.md` files here as always-on rules.
 - `skills/<name>/` → `~/.claude/skills/<name>` — each skill subfolder is linked individually so Claude Code's skill loader picks up its `SKILL.md`. Currently: `skills/review/` → `~/.claude/skills/review` (tagged `[ai-roots]` in its description).
-- `.claude/agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md` — registers the reviewer persona as an Agent tool `subagent_type`.
+- `agents/<name>.md` → `~/.claude/agents/<name>.md` — each agent file is linked individually so Claude Code registers it as an Agent tool `subagent_type`. Currently: `agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md`.
 
 If a previous version of the installer created `~/.claude/skills/ai-roots` (a single symlink to the whole `skills/` directory), the new installer removes it automatically — that layout was never recognized by Claude Code's skill loader.
 

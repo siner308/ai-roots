@@ -46,7 +46,7 @@ Do not pick a broader mode for convenience. Research does not need write access.
 
 **Three-turn cap on stuck problems.** Do not attempt a 4th inline turn on the same hypothesis. Delegate to a Codex rescue (read-only sandbox) with all ruled-out hypotheses included.
 
-**Adversarial review on security-sensitive changes.** After every behavioral change touching authentication, authorization, database writes, network boundaries, secret handling, or trust boundaries, invoke `/review`. Read-only reads or pure internal refactors do not trigger. The reviewer persona — skeptical, security-first, classifies findings P0–P3, returns `VERDICT: SAFE` only when no critical issues surface at high coverage — lives in `.claude/agents/adversarial-reviewer.md` and is piped via stdin to `codex review` by the skill.
+**Adversarial review on security-sensitive changes.** After every behavioral change touching authentication, authorization, database writes, network boundaries, secret handling, or trust boundaries, invoke `/review`. Read-only reads or pure internal refactors do not trigger. The reviewer persona — skeptical, security-first, classifies findings P0–P3, returns `VERDICT: SAFE` only when no critical issues surface at high coverage — lives in `agents/adversarial-reviewer.md` (installed to `~/.claude/agents/`) and is piped via stdin to `codex review` by the skill.
 
 **Capability routing fires on turn one.** Image generation, TTS, or other OpenAI-exclusive tool needs route to Codex immediately. Do not waste turns on text-based workarounds (ASCII art, hand-coded SVG) when the deliverable is an image or audio artifact.
 

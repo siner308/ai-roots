@@ -1,15 +1,14 @@
 #!/bin/bash
 # ai-roots installer
-# Symlinks rules into ~/.claude/rules/ai-roots/ and each skill subfolder into
-# ~/.claude/skills/<skill-name>. Also links the adversarial-reviewer agent into
-# ~/.claude/agents/.
+# Symlinks rules into ~/.claude/rules/ai-roots/, each skill subfolder into
+# ~/.claude/skills/<skill-name>, and each agent file into ~/.claude/agents/.
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 RULES_SRC="$SCRIPT_DIR/rules"
 SKILLS_SRC="$SCRIPT_DIR/skills"
-AGENT_SRC="$SCRIPT_DIR/.claude/agents/adversarial-reviewer.md"
+AGENTS_SRC="$SCRIPT_DIR/agents"
 
 RULES_DST="$HOME/.claude/rules"
 SKILLS_DST="$HOME/.claude/skills"
@@ -17,7 +16,6 @@ AGENTS_DST="$HOME/.claude/agents"
 
 RULES_TARGET="$RULES_DST/ai-roots"
 LEGACY_SKILLS_TARGET="$SKILLS_DST/ai-roots"
-AGENT_TARGET="$AGENTS_DST/adversarial-reviewer.md"
 
 if [ ! -d "$RULES_SRC" ]; then
   echo "error: rules source not found: $RULES_SRC"
@@ -27,8 +25,8 @@ if [ ! -d "$SKILLS_SRC" ]; then
   echo "error: skills source not found: $SKILLS_SRC"
   exit 1
 fi
-if [ ! -f "$AGENT_SRC" ]; then
-  echo "error: adversarial-reviewer agent not found: $AGENT_SRC"
+if [ ! -d "$AGENTS_SRC" ]; then
+  echo "error: agents source not found: $AGENTS_SRC"
   exit 1
 fi
 
@@ -85,14 +83,23 @@ for skill_dir in "$SKILLS_SRC"/*/; do
   echo "linked skill: ${skill_dir%/} -> $skill_target"
 done
 
-if [ -L "$AGENT_TARGET" ]; then
-  rm "$AGENT_TARGET"
-elif [ -e "$AGENT_TARGET" ]; then
-  BACKUP="$AGENT_TARGET.bak.$(date +%Y%m%d%H%M%S)"
-  echo "backing up: $AGENT_TARGET -> $BACKUP"
-  mv "$AGENT_TARGET" "$BACKUP"
-fi
-ln -s "$AGENT_SRC" "$AGENT_TARGET"
-echo "linked agent: $AGENT_SRC -> $AGENT_TARGET"
+# Link each agent file individually so Claude Code recognizes each
+# ~/.claude/agents/<agent-name>.md. The adversarial-reviewer agent previously
+# lived under .claude/agents/ in this repo; the legacy symlink target is the
+# same path, so the loop below transparently refreshes it.
+for agent_file in "$AGENTS_SRC"/*.md; do
+  [ -f "$agent_file" ] || continue
+  agent_name="$(basename "$agent_file")"
+  agent_target="$AGENTS_DST/$agent_name"
+  if [ -L "$agent_target" ]; then
+    rm "$agent_target"
+  elif [ -e "$agent_target" ]; then
+    BACKUP="$agent_target.bak.$(date +%Y%m%d%H%M%S)"
+    echo "backing up: $agent_target -> $BACKUP"
+    mv "$agent_target" "$BACKUP"
+  fi
+  ln -s "$agent_file" "$agent_target"
+  echo "linked agent: $agent_file -> $agent_target"
+done
 
 echo "done."
