@@ -17,13 +17,15 @@ Mode is chosen from the user's argument; default is branch-vs-base.
 
 | User argument | Mode | `DIFF_CMD` |
 |---------------|------|------------|
-| _(none)_ | branch vs base | `git diff $(git merge-base <BASE_REF> HEAD)` |
-| `--base <ref>` | branch vs explicit base | `git diff $(git merge-base <ref> HEAD)` |
+| _(none)_ | branch vs base | `git diff <merge-base SHA>` |
+| `--base <ref>` | branch vs explicit base | `git diff <merge-base SHA>` |
 | `--uncommitted` | working tree only | `git diff HEAD` (plus untracked) |
-| `--commit <sha>` | one commit | `git show <sha>` |
-| trailing `<paths…>` | narrows any mode | append ` -- <paths>` to `DIFF_CMD` |
+| `--commit <sha>` | one commit | `git show <commit SHA>` |
+| trailing `<paths…>` | narrows any mode | append ` -- '<path>'…` (single-quoted) |
 
-`git diff $(git merge-base <ref> HEAD)` diffs the fork point to the **working tree**, so it captures committed branch changes *and* uncommitted local edits in one diff — exactly "PR diff + local changes". This mirrors what `codex review --base` does internally; we embed the command directly instead so the persona (below) can travel with it.
+`git diff <merge-base SHA>` diffs the fork point to the **working tree**, so it captures committed branch changes *and* uncommitted local edits in one diff — exactly "PR diff + local changes". This is what `codex review --base` does internally; we resolve the merge-base ourselves and embed the resulting command so the persona (below) can travel with it.
+
+**Injection safety — STRICT.** `DIFF_CMD` is embedded into a prompt that BOTH evaluators are instructed to run in a shell. A git ref or branch name can legally contain shell metacharacters (`;`, `$( )`, backticks), so interpolating a raw ref into the command is a command-injection vector — especially for `--base <ref>` and PR base names from untrusted forks. Defuse it by resolving every ref to a **commit SHA in the main session** (where the ref is an ordinary quoted shell variable and cannot inject), then embedding only the hex SHA. SHAs contain no metacharacters. Never embed a raw ref, and single-quote any path filter (rejecting paths that contain a single quote).
 
 ### Base ref auto-detection (branch-vs-base mode)
 
@@ -37,13 +39,18 @@ else
   [ -z "$BASE" ] && BASE=main           # fall back to the repo default branch
 fi
 # Prefer the remote-tracking ref for an accurate fork point; fall back to local.
-if git rev-parse --verify --quiet "origin/$BASE" >/dev/null; then
+if git rev-parse --verify --quiet "origin/$BASE^{commit}" >/dev/null; then
   BASE_REF="origin/$BASE"
 else
   BASE_REF="$BASE"
 fi
-DIFF_CMD="git diff \$(git merge-base $BASE_REF HEAD)"
+# Resolve to a commit SHA HERE, where BASE_REF is a quoted variable and cannot
+# inject. The embedded DIFF_CMD then carries only a hex SHA — see Injection safety.
+MERGE_BASE="$(git merge-base "$BASE_REF" HEAD)" || { echo "no merge-base with $BASE_REF"; exit 1; }
+DIFF_CMD="git diff $MERGE_BASE"
 ```
+
+For `--commit <sha>`, resolve and validate first: `SHA="$(git rev-parse --verify "$ARG^{commit}")" || exit 1; DIFF_CMD="git show $SHA"`. `git rev-parse --verify` rejects a non-ref argument, which also blocks a metacharacter-laden string from reaching the embedded command.
 
 Edge cases:
 - **On the base branch with no commits ahead** (e.g. on `main`, no PR): the merge-base is `HEAD`, so `DIFF_CMD` reduces to the uncommitted diff. Sensible — review what's there.
@@ -66,16 +73,26 @@ If the `adversarial-reviewer` agent is not registered, fall back to `subagent_ty
 
 ```bash
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
+# Always wrap codex in a timeout: a hung codex never exits, so its
+# run_in_background completion notification never fires and the main session
+# waits forever. timeout guarantees the task ends (exit 124 on expiry).
+# macOS lacks coreutils `timeout` unless brew-installed (`gtimeout`); degrade
+# gracefully if neither exists.
+TIMEOUT_PREFIX=""
+if command -v timeout >/dev/null 2>&1; then TIMEOUT_PREFIX="timeout 900"
+elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_PREFIX="gtimeout 900"; fi
 {
   cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nObtain the review target by running exactly this command:\n\n    %s\n\nReview ONLY the diff that command produces. Apply the persona above (security-first, P0–P3).\n' "$DIFF_CMD"
-} | codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - \
+} | $TIMEOUT_PREFIX codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - \
   2>&1 | tee "$LOG"
+echo "codex exit: ${PIPESTATUS[1]:-?} (124 = timed out)"
 ```
 
 - Model is set via `-c model=…`; `codex review` does **not** accept `-m`.
 - No `--uncommitted` / `--base` flag — the scope lives in the embedded command, single-quoted so the local shell does not expand `$(…)` before codex runs it.
 - Use `run_in_background: true` so the main session is notified when Codex exits.
+- **Read the codex exit status** (`${PIPESTATUS[1]}`). `124` means the review timed out — treat it like Codex being unavailable: proceed with the Claude evaluator and note in the synthesis that only one reviewer ran (and that codex timed out). Do not silently drop a timeout as if codex returned a clean verdict.
 - If `codex` is not on `PATH`, skip this evaluator and note in the synthesis that only one reviewer ran.
 
 ### Parallelism

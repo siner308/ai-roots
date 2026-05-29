@@ -65,6 +65,7 @@ Two concerns to manage independently:
 
 1. **Claude must know when codex finishes.** Use `run_in_background: true` Bash; the harness's completion notification wakes Claude.
 2. **The user may want to see codex's reasoning live.** Give them the log path; let them `tail -f` in their own terminal. Do not script the live view from Claude's side.
+3. **Codex must be guaranteed to finish.** A hung codex never exits, so its completion notification never fires and the main session waits forever. Wrap every codex invocation in a timeout (`timeout <secs> codex …`, or `gtimeout` on macOS without coreutils; degrade gracefully if neither exists). On expiry codex exits 124 — read the exit status and treat a timeout as codex being unavailable, not as a clean result.
 
 ```bash
 LOG="/tmp/codex-$(date +%Y%m%d-%H%M%S).log"
