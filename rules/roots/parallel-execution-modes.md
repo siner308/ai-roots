@@ -36,6 +36,34 @@ Even when only one worker is needed, the choice between handling work inline (ma
 
 For model selection (Opus/Sonnet/Haiku) within the chosen executor, see `model-effort-delegation.md`.
 
+## Responsiveness Default
+
+Two independent axes, applied in order:
+
+1. Inline vs subagent (threshold above). Cost of getting this wrong = context
+   duplication / spawn overhead. Short, localized tasks stay INLINE — a foreground
+   subagent would duplicate context too, so "foreground" is never the fix for a
+   short task; "inline" is.
+2. Foreground vs background — decided ONLY for work already sent to a subagent.
+   Cost of getting this wrong = the main session is blocked. Prefer
+   `run_in_background: true` so the main session stays free to take new user
+   requests while the subagent runs.
+
+### Fan-out as a duration proxy
+
+Estimating wall-clock up front is unreliable; observable fan-out is a better trigger.
+A task that spans **≥3 files** or **≥2 independent sub-tasks** is a long-task
+candidate — default it to a backgrounded (and, if the items are independent,
+concurrent) subagent.
+
+Guard against count alone (Goodhart): it is count × per-item cost, not count.
+Three one-line edits, three trivial renames, three files read for a single answer —
+all stay inline. The proxy fires only when each item carries non-trivial work.
+
+- After dispatching in background, return control: continue unrelated work or await the user.
+- React to the completion event (Rung 1 of `lessons/background-task-monitoring.md`),
+  then optionally chain follow-up subagents — the main session orchestrates, it does not block.
+
 ## Subagents (Agent tool)
 
 Spawn via the `Agent` tool. Each subagent runs in its own context window and returns a single result to the caller. Workers are invisible to each other.
