@@ -6,25 +6,27 @@ This rule is the output-side counterweight: no matter how much terminology the t
 
 ## What to avoid
 
-- **Abstract-noun stacks** — chains of `-tion`/`-성`/`-화` nouns joined by particles. "관찰 가능성 확보를 통한 운영 부담의 최소화" is four abstract nouns pretending to be a sentence.
+- **Abstract-noun stacks** — chains of `-tion`/`-성`/`-화` nouns joined by particles or prepositions. EN: "the minimization of operational burden through the acquisition of observability". KO: "관찰 가능성 확보를 통한 운영 부담의 최소화". Both are four abstract nouns pretending to be a sentence.
 - **Translated-English rhythm** — "~을 통한", "~에 대한", "~의 관점에서" piled up where a verb would do. If it reads like a literal translation of English, rewrite it as something you'd actually say.
 - **Gratuitous concept citation** — naming a principle (Goodhart's Law, backpressure, idempotency) when a plain sentence carries the same point. Cite a concept only when the name itself earns its place for the reader, not as decoration.
 - **Density theater** — packing jargon to *look* informative. High word-density is not the same as high information.
 
 ## What to do instead
 
-- Use verbs over nominalizations. "로그를 잘 남겨두면 나중에 덜 고생해요" beats "로깅을 통한 운영 효율성 증대".
+- Use verbs over nominalizations. EN: "Cache it so requests come back faster" beats "utilization of caching for latency reduction". KO: "로그를 잘 남겨두면 나중에 덜 고생해요" beats "로깅을 통한 운영 효율성 증대".
 - Write the sentence you'd say out loud to a colleague, then keep that.
 - Keep technical terms when they are the precise word (`idempotent`, `deadlock`, `index`) — plainness is about rhythm and noun-stacking, not about dumbing down vocabulary.
 - Match the user's language and register.
 
 ## Examples
 
-These accumulate over time — add a ❌/✅ pair whenever a phrasing actually grated.
+These accumulate over time — add a ❌/✅ pair whenever a phrasing actually grated, tagged with the language it appeared in. Translationese is language-specific: `묵음 dedup` only reads as broken in Korean (a literal mistranslation of an English term), so examples are filed under the language where they bite, not translated across.
 
-| ❌ | ✅ |
-|----|----|
-| 관찰 가능성 확보를 통한 운영 부담의 최소화 | 로그를 잘 남겨두면 나중에 운영할 때 덜 고생해요 |
+| Lang | ❌ | ✅ |
+|------|----|----|
+| EN | utilization of caching for latency reduction | cache it so requests come back faster |
+| KO | 관찰 가능성 확보를 통한 운영 부담의 최소화 | 로그를 잘 남겨두면 나중에 운영할 때 덜 고생해요 |
+| KO | `Create`의 묵음 dedup | `Create`는 중복이 들어와도 에러 없이 조용히 무시해요 |
 
 ## Scope — two axes, applied separately
 
