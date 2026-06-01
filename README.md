@@ -6,67 +6,81 @@ A collection of thinking foundations and lessons learned that expand Claude Code
 
 Even non-experts can solve complex problems through casual conversation — Claude automatically applies architect-grade reasoning.
 
-## Roots — Thinking Foundations
+## Two surfaces: resident rules vs situational skills
+
+To keep the always-loaded context small, rules are split by how often they apply:
+
+- **Resident rules** (`rules/`) shape thinking or output on essentially every turn — how Claude reasons, writes, names, and comments. Claude Code loads them into context every session.
+- **Situational skills** (`skills/<name>/`) apply only when a specific task type comes up — CSS, PRs, Codex, parallelism, a debugging lesson. Only their one-line description stays in context; the full body loads via the Skill tool when the trigger fires. `rules/_situational-skills.md` is a resident index mapping each trigger to its skill so the trigger is never forgotten.
+
+This keeps the resident set near ~41KB instead of ~92KB while preserving effective behavior: a situational rule still applies in exactly the task where it matters.
+
+## Roots — always-resident rules
 
 ### Thinking Expansion
 | File | Description |
 |------|-------------|
-| `rules/roots/concept-priming.md` | Domain-spread concept priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
-| `rules/roots/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
-| `rules/roots/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
+| `rules/concept-priming.md` | Domain-spread concept priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
+| `rules/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
+| `rules/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
 
 ### Quality Assurance
 | File | Description |
 |------|-------------|
-| `rules/roots/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
-| `rules/roots/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
-
-### Problem-Solving Strategy
-| File | Description |
-|------|-------------|
-| `rules/roots/parallel-hypothesis-investigation.md` | Decompose complex problems into layered hypotheses and investigate with parallel agents simultaneously |
-| `rules/roots/parallel-execution-modes.md` | Choose between sequential, subagent, and team-based parallelism based on task independence and communication needs |
-| `rules/roots/model-effort-delegation.md` | Threshold-based model/effort/subagent selection — delegate specified implementation to weaker models, keep judgment on Opus |
+| `rules/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
+| `rules/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
 
 ### User Growth
 | File | Description |
 |------|-------------|
-| `rules/roots/user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
+| `rules/user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
 
 ### Knowledge Capture
 | File | Description |
 |------|-------------|
-| `rules/roots/guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
+| `rules/guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
+| `rules/memory-minimalism.md` | Prefer version-controlled rules/docs over the device-local memory system; memory only for strictly personal, non-shareable context |
 
-### Conventions
+### Output Conventions
 | File | Description |
 |------|-------------|
-| `rules/roots/github-pr-markdown.md` | Enforce GitHub-flavored Markdown conventions for PRs |
-| `rules/roots/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
-| `rules/roots/css-discipline.md` | Close four commonly abused CSS axes — cascade (`!important`), box model (margin for spacing, overflow: hidden without purpose), unit soup (literal pixels/colors), style location (utility / scoped / inline trichotomy) |
+| `rules/plain-language-output.md` | Keep output in plain spoken-rhythm language — no abstract-noun stacks, no translationese, verbs over nominalizations |
+| `rules/terminology-discipline.md` | Spell out domain terms; expand established abbreviations on first use; disambiguate collision-prone ones |
+| `rules/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
 
-## Lessons — Retrospective Learnings
-
-Lessons are concrete patterns learned from real mistakes. They describe what works better, not what to avoid.
-
+### Trigger index
 | File | Description |
 |------|-------------|
-| `rules/lessons/incremental-verification.md` | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
-| `rules/lessons/background-task-monitoring.md` | Pick the cheapest visibility mechanism for long background tasks — completion notification first, event streams second, interval polling only as fallback |
-| `rules/lessons/simulate-dont-just-scan.md` | Mentally execute code to predict outputs before acting — reading source files is not the same as understanding runtime behavior |
-| `rules/lessons/codex-tmux-monitoring.md` | Why the previous tmux split-pane + sentinel pattern for monitoring background Codex runs failed — decompose wake-up vs live-output into separate mechanisms |
+| `rules/_situational-skills.md` | Resident map of "when this holds → invoke this skill" for every situational skill below. Stays loaded so a lazy skill's trigger is never missed. |
+
+## Situational Skills — lazy-loaded
+
+Body enters context only when invoked via the Skill tool. The trigger column mirrors `_situational-skills.md`.
+
+| Skill | Trigger | Description |
+|-------|---------|-------------|
+| `skills/css-discipline/` | Editing/writing/reviewing CSS or framework styling | Close four commonly abused CSS axes — cascade (`!important`), box model, unit soup, style location |
+| `skills/github-pr-markdown/` | Composing or editing a PR body/title | Enforce GitHub-flavored Markdown conventions for PRs, plus the safe API-PATCH body delivery |
+| `skills/model-effort-delegation/` | Deciding executor/model/effort before delegating | Threshold-based model/effort/subagent selection — delegate specified work to weaker models, keep judgment on Opus |
+| `skills/parallel-execution-modes/` | Choosing sequential vs subagent vs team, inline vs background | Pick the parallelism mode by task independence and communication needs |
+| `skills/parallel-hypothesis-investigation/` | A problem has multiple plausible causes or criteria | Decompose into layered hypotheses or judgment criteria and investigate with parallel agents |
+| `skills/codex-delegation/` | Delegating to the OpenAI Codex CLI | Cross-provider policy — `/review` triggers, three-turn rescue protocol, mode/flag cheatsheet, capability routing |
+| `skills/incremental-verification/` | Task outcome uncertain (API, browser, shell, pipeline) | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
+| `skills/simulate-dont-just-scan/` | Porting/debugging code you read but did not run | Mentally execute code to predict actual runtime output before acting |
+| `skills/codex-tmux-monitoring/` | Tempted to monitor a subprocess via tmux/sentinel/tail | Why that pattern failed — use `run_in_background` Bash + harness completion notification instead |
+| `skills/background-task-monitoring/` | Long background task needs completion/progress visibility | Pick the cheapest visibility mechanism — completion notification first, event streams second, polling last |
 
 ## Skill — `/review` (ai-roots)
 
-A single skill is installed under `~/.claude/skills/review/` and is invoked as `/review`. Because the skill is not packaged as a Claude Code plugin, the call name carries no `ai-roots:` prefix; the ai-roots origin is signaled by the `[ai-roots]` tag at the start of the skill description, which lets you distinguish it from other `review`-named skills (e.g., Claude Code's built-in `/review`).
+A skill installed under `~/.claude/skills/review/` and invoked as `/review`. Because the skill is not packaged as a Claude Code plugin, the call name carries no `ai-roots:` prefix; the ai-roots origin is signaled by the `[ai-roots]` tag at the start of the skill description, which lets you distinguish it from other `review`-named skills (e.g., Claude Code's built-in `/review`).
 
-It performs a **two-evaluator code review** on a resolved target. By default the target is the current branch's changes against its base branch — the PR diff (when a PR exists) plus local uncommitted edits — but `--base <ref>`, `--commit <sha>`, `--uncommitted`, and trailing path filters override it. A Claude Code subagent (`adversarial-reviewer` persona) and a `codex review` invocation run in parallel on the same diff, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis.
+It performs a **two-evaluator code review** on a resolved target. By default the target is the current branch's changes against its base branch — the PR diff (when a PR exists) plus local uncommitted edits — but `--base <ref>`, `--commit <sha>`, `--uncommitted`, and trailing path filters override it. A Claude Code subagent (`adversarial-reviewer` persona) and a `codex review` invocation run in parallel on the same diff, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/evaluation-integrity.md` §Multi-advisor synthesis.
 
 | File | Description |
 |------|-------------|
 | `skills/review/SKILL.md` | The `/review` skill body. Spawns Claude subagent + `codex review` in parallel; synthesizes per `evaluation-integrity.md`. |
 | `agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Used both as the `subagent_type` for the Claude-side reviewer and piped via stdin to `codex review`. |
-| `rules/codex/codex-delegation.md` | Cross-provider policy — when to invoke `/review`, three-turn rescue protocol, direct Codex invocation cheatsheet for non-review modes, capability routing, execution mechanics, plan-stage review. |
+| `skills/codex-delegation/SKILL.md` | Cross-provider policy — when to invoke `/review`, three-turn rescue protocol, direct Codex invocation cheatsheet for non-review modes, capability routing, execution mechanics, plan-stage review. |
 
 If Codex CLI is not on `PATH`, the skill falls back to a single Claude-side evaluator (the cross-provider diversity is lost but the synthesis structure still applies).
 
@@ -82,7 +96,7 @@ chmod +x install.sh
 The installer creates symlinks:
 
 - `rules/` → `~/.claude/rules/ai-roots` — Claude Code recursively loads all `.md` files here as always-on rules.
-- `skills/<name>/` → `~/.claude/skills/<name>` — each skill subfolder is linked individually so Claude Code's skill loader picks up its `SKILL.md`. Currently: `skills/review/` → `~/.claude/skills/review` (tagged `[ai-roots]` in its description).
+- `skills/<name>/` → `~/.claude/skills/<name>` — each skill subfolder is linked individually so Claude Code's skill loader picks up its `SKILL.md`. The loop links `review` plus every situational skill above.
 - `agents/<name>.md` → `~/.claude/agents/<name>.md` — each agent file is linked individually so Claude Code registers it as an Agent tool `subagent_type`. Currently: `agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md`.
 
 If a previous version of the installer created `~/.claude/skills/ai-roots` (a single symlink to the whole `skills/` directory), the new installer removes it automatically — that layout was never recognized by Claude Code's skill loader.

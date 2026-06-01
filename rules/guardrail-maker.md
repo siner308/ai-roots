@@ -74,15 +74,15 @@ Wait for user confirmation before writing.
 
 | Signal | Location | Rationale |
 |--------|----------|-----------|
-| Universal principle (any project) | `ai-roots/rules/roots/` | Symlinked to `~/.claude/rules/ai-roots/`, loaded everywhere |
-| Lesson learned from a mistake | `ai-roots/rules/lessons/` | Concrete pattern from real failure — describes what works better |
+| Always-on principle (shapes essentially every turn) | `ai-roots/rules/` | Symlinked to `~/.claude/rules/ai-roots/`, resident in every session |
+| Situational principle or lesson (applies only in a specific task context) | `ai-roots/skills/<name>/SKILL.md` + a trigger row in `rules/_situational-skills.md` | Lazy-loaded skill — body enters context only when its trigger fires, keeping the resident set small |
 | Project-specific convention | Project `CLAUDE.md` | Loaded per-project |
 | Project-specific, standalone topic | Project `.claude/rules/` | Modular, avoids bloating CLAUDE.md |
 | Updates an existing rule | Same file as existing | Avoids fragmentation |
 
-**Rules vs Lessons:** Rules (`rules/roots/`) define principles and protocols — they say what to do. Lessons (`rules/lessons/`) capture concrete patterns learned from real mistakes — they show what works better with before/after examples. If the correction is "never do X" → rule. If the correction is "we tried X and Y works better because Z" → lesson.
+**Always-on rules vs situational skills:** A rule belongs in `rules/` only if it shapes thinking or output on essentially every turn (how you reason, write, name, comment). If it applies only when a specific task type comes up — CSS, PRs, Codex, parallelism, or a concrete debugging lesson — make it a skill under `skills/<name>/SKILL.md` and add a trigger row to `rules/_situational-skills.md`. The "we tried X and Y works better because Z" lessons are situational by nature, so they are skills now, not resident rules. Always-on → rule; situational → skill.
 
-**Writing location:** `~/.claude/rules/ai-roots` is a symlink to this repository's `rules/` directory. Resolve the actual repo path with `readlink -f ~/.claude/rules/ai-roots` and write into the real git-tracked tree (`rules/roots/...` or `rules/lessons/...`) — never into `~/.claude/rules/ai-roots/...` directly, since symlinks can be confusing to reason about and the canonical source is the git repo.
+**Writing location:** `~/.claude/rules/ai-roots` is a symlink to this repository's `rules/` directory. Resolve the actual repo path with `readlink -f ~/.claude/rules/ai-roots` and write resident rules into the real git-tracked tree (`rules/...`) — never into `~/.claude/rules/ai-roots/...` directly, since symlinks can be confusing to reason about and the canonical source is the git repo. Situational skills go in `skills/<name>/SKILL.md` in the same repo (each needs YAML frontmatter with `name` and a trigger-focused `description`), and re-running `install.sh` symlinks them into `~/.claude/skills/`.
 
 When unsure about scope, ask the user whether the rule applies to other projects too.
 

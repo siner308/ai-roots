@@ -41,7 +41,7 @@ The rule splits into two independent axes. Conflating them is what makes "plain 
 | Table cells, headings, bullet labels | ✅ | ❌ — terse phrases/fragments are fine |
 | Code, identifiers, commit messages, PR bodies, quoted errors/specs | own convention wins | ❌ |
 
-PR bodies are governed by `github-pr-markdown`; defer to it there rather than applying spoken rhythm.
+PR bodies are governed by the `github-pr-markdown` skill; defer to it there rather than applying spoken rhythm.
 
 ## Relationship to other rules
 

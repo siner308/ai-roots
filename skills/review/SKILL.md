@@ -1,6 +1,6 @@
 ---
 name: review
-description: "[ai-roots] Two-evaluator code review provided by the ai-roots skill set. Resolves the review target (by default the current branch's changes against its base — i.e. the PR diff plus local uncommitted edits — but also an explicit base, commit, or uncommitted-only scope), then spawns a Claude Code subagent and a Codex review in parallel on that same diff and synthesizes findings using the Agreed / Conflicting / Chosen-direction format from rules/roots/evaluation-integrity.md §Multi-advisor synthesis. Use whenever the user requests a review of pending or proposed changes and both Claude and Codex are available."
+description: "[ai-roots] Two-evaluator code review provided by the ai-roots skill set. Resolves the review target (by default the current branch's changes against its base — i.e. the PR diff plus local uncommitted edits — but also an explicit base, commit, or uncommitted-only scope), then spawns a Claude Code subagent and a Codex review in parallel on that same diff and synthesizes findings using the Agreed / Conflicting / Chosen-direction format from rules/evaluation-integrity.md §Multi-advisor synthesis. Use whenever the user requests a review of pending or proposed changes and both Claude and Codex are available."
 ---
 
 # /review (ai-roots)
@@ -101,7 +101,7 @@ Spawn the Agent call and the Bash invocation in the same response so they run co
 
 ## Synthesis
 
-Apply `rules/roots/evaluation-integrity.md` §Multi-advisor synthesis. The output MUST separate three buckets:
+Apply `rules/evaluation-integrity.md` §Multi-advisor synthesis. The output MUST separate three buckets:
 
 1. **Agreed** — findings that appeared in BOTH evaluators. Highest confidence.
 2. **Conflicting** — findings flagged by only one evaluator, or where evaluators disagree on severity / cause / fix. Single-evaluator findings belong here, not in Agreed. Silence is not agreement.
