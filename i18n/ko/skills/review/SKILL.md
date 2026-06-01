@@ -73,26 +73,39 @@ DIFF_CMD="git diff $MERGE_BASE"
 
 ```bash
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
-# Always wrap codex in a timeout: a hung codex never exits, so its
-# run_in_background completion notification never fires and the main session
-# waits forever. timeout guarantees the task ends (exit 124 on expiry).
-# macOS lacks coreutils `timeout` unless brew-installed (`gtimeout`); degrade
-# gracefully if neither exists.
-TIMEOUT_PREFIX=""
-if command -v timeout >/dev/null 2>&1; then TIMEOUT_PREFIX="timeout 900"
-elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_PREFIX="gtimeout 900"; fi
+PROMPT="$(mktemp)"
 {
   cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nObtain the review target by running exactly this command:\n\n    %s\n\nReview ONLY the diff that command produces. Apply the persona above (security-first, P0–P3).\n' "$DIFF_CMD"
-} | $TIMEOUT_PREFIX codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - \
-  2>&1 | tee "$LOG"
-echo "codex exit: ${PIPESTATUS[1]:-?} (124 = timed out)"
+} > "$PROMPT"
+
+# Always wrap codex in a timeout: a hung codex never exits, so its run_in_background
+# completion notification never fires and the main session waits forever. timeout
+# guarantees the task ends (exit 124 on expiry). macOS lacks coreutils `timeout`
+# unless brew-installed (`gtimeout`); degrade gracefully if neither exists.
+# Store ONLY the binary name (a single word). zsh does not word-split unquoted
+# variables, so a "timeout 900" string would be run as one command and fail with
+# `command not found: timeout 900`; keeping 900 a literal arg works in bash and zsh.
+TIMEOUT_BIN=""
+if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
+elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
+
+# Redirect (not pipe) codex output to the log so $? is codex's own exit status —
+# portable across bash and zsh (no PIPESTATUS/pipestatus array). cat shows it after.
+if [ -n "$TIMEOUT_BIN" ]; then
+  "$TIMEOUT_BIN" 900 codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+else
+  codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+fi
+CODEX_EXIT=$?
+cat "$LOG"
+echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
 - 모델은 `-c model=…`로 지정한다. `codex review`는 `-m`을 **받지 않는다**.
 - `--uncommitted` / `--base` 플래그는 안 쓴다 — 범위는 박힌 명령 안에 있고, codex가 돌리기 전에 로컬 셸이 `$(…)`를 먼저 펼치지 않도록 single-quote 한다.
 - `run_in_background: true`를 써서 Codex가 끝날 때 메인 세션이 알림을 받게 한다.
-- **codex exit status를 읽는다** (`${PIPESTATUS[1]}`). `124`는 리뷰가 타임아웃됐다는 뜻 — Codex가 없는 것처럼 취급한다: Claude 평가자만으로 진행하고, 평가자가 하나만 돌았다(그리고 codex가 타임아웃됐다)는 걸 종합에 적는다. 타임아웃을 codex가 깨끗한 판정을 낸 것처럼 조용히 버리지 않는다.
+- **codex exit status를 읽는다** (`$CODEX_EXIT`). `124`는 리뷰가 타임아웃됐다는 뜻 — Codex가 없는 것처럼 취급한다: Claude 평가자만으로 진행하고, 평가자가 하나만 돌았다(그리고 codex가 타임아웃됐다)는 걸 종합에 적는다. 타임아웃을 codex가 깨끗한 판정을 낸 것처럼 조용히 버리지 않는다.
 - `codex`가 `PATH`에 없으면 이 평가자를 건너뛰고, 평가자가 하나만 돌았다고 종합에 적는다.
 
 ### 병렬 실행
