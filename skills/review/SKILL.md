@@ -73,26 +73,39 @@ If the `adversarial-reviewer` agent is not registered, fall back to `subagent_ty
 
 ```bash
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
-# Always wrap codex in a timeout: a hung codex never exits, so its
-# run_in_background completion notification never fires and the main session
-# waits forever. timeout guarantees the task ends (exit 124 on expiry).
-# macOS lacks coreutils `timeout` unless brew-installed (`gtimeout`); degrade
-# gracefully if neither exists.
-TIMEOUT_PREFIX=""
-if command -v timeout >/dev/null 2>&1; then TIMEOUT_PREFIX="timeout 900"
-elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_PREFIX="gtimeout 900"; fi
+PROMPT="$(mktemp)"
 {
   cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nObtain the review target by running exactly this command:\n\n    %s\n\nReview ONLY the diff that command produces. Apply the persona above (security-first, P0–P3).\n' "$DIFF_CMD"
-} | $TIMEOUT_PREFIX codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - \
-  2>&1 | tee "$LOG"
-echo "codex exit: ${PIPESTATUS[1]:-?} (124 = timed out)"
+} > "$PROMPT"
+
+# Always wrap codex in a timeout: a hung codex never exits, so its run_in_background
+# completion notification never fires and the main session waits forever. timeout
+# guarantees the task ends (exit 124 on expiry). macOS lacks coreutils `timeout`
+# unless brew-installed (`gtimeout`); degrade gracefully if neither exists.
+# Store ONLY the binary name (a single word). zsh does not word-split unquoted
+# variables, so a "timeout 900" string would be run as one command and fail with
+# `command not found: timeout 900`; keeping 900 a literal arg works in bash and zsh.
+TIMEOUT_BIN=""
+if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
+elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
+
+# Redirect (not pipe) codex output to the log so $? is codex's own exit status —
+# portable across bash and zsh (no PIPESTATUS/pipestatus array). cat shows it after.
+if [ -n "$TIMEOUT_BIN" ]; then
+  "$TIMEOUT_BIN" 900 codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+else
+  codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+fi
+CODEX_EXIT=$?
+cat "$LOG"
+echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
 - Model is set via `-c model=…`; `codex review` does **not** accept `-m`.
 - No `--uncommitted` / `--base` flag — the scope lives in the embedded command, single-quoted so the local shell does not expand `$(…)` before codex runs it.
 - Use `run_in_background: true` so the main session is notified when Codex exits.
-- **Read the codex exit status** (`${PIPESTATUS[1]}`). `124` means the review timed out — treat it like Codex being unavailable: proceed with the Claude evaluator and note in the synthesis that only one reviewer ran (and that codex timed out). Do not silently drop a timeout as if codex returned a clean verdict.
+- **Read the codex exit status** (`$CODEX_EXIT`). `124` means the review timed out — treat it like Codex being unavailable: proceed with the Claude evaluator and note in the synthesis that only one reviewer ran (and that codex timed out). Do not silently drop a timeout as if codex returned a clean verdict.
 - If `codex` is not on `PATH`, skip this evaluator and note in the synthesis that only one reviewer ran.
 
 ### Parallelism
