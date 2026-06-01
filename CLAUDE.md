@@ -1,0 +1,32 @@
+# ai-roots
+
+This repo is the source of the Claude Code rules, skills, and agents that
+`install.sh` symlinks into `~/.claude`. Editing a file here changes Claude's
+behavior on the next session.
+
+## Keep the Korean mirror in sync — easy to miss
+
+`rules/`, `skills/`, `agents/` are the **English source of truth** — the only
+trees symlinked into `~/.claude` and loaded by Claude. `i18n/ko/` is a
+**read-only Korean mirror** for humans; Claude never loads it.
+
+Because the Korean copy lives in a separate tree, it is easy to forget when
+editing a rule. So:
+
+- When you **add, edit, rename, or delete** any file under `rules/`, `skills/`,
+  or `agents/`, make the matching change to `i18n/ko/<same path>` in the same
+  commit. (Skills mirror as `i18n/ko/skills/<name>/SKILL.md`; `rules/_x.md`
+  mirrors as `i18n/ko/rules/_x.md`.)
+- Run `./i18n/check-sync.sh` before committing — it reports any English file
+  missing a Korean mirror, or an orphan mirror whose source is gone.
+- Never change behavior by editing the Korean file. Fix the English source,
+  then update the mirror to match.
+
+## Docs site
+
+`site/` is a VitePress site published to GitHub Pages
+(https://siner308.github.io/ai-roots/) on every push to `main` that touches
+`rules/`, `skills/`, `agents/`, `i18n/`, or `site/`. It assembles both
+languages at build time via `site/scripts/sync-content.mjs`; you don't edit
+anything under `site/rules`, `site/skills`, etc. (those are generated and
+git-ignored).
