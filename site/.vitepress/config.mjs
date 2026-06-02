@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitepress'
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { join, resolve } from 'node:path'
+
+const REPO_ROOT = resolve(import.meta.dirname, '..', '..')
 
 const GH = 'https://github.com/siner308/ai-roots'
 const SITE = 'https://siner308.github.io/ai-roots/'
@@ -44,26 +46,73 @@ function firstParagraph(srcDir, relativePath) {
 
 const truncate = (s) => (s.length > 200 ? `${s.slice(0, 197).trimEnd()}…` : s)
 
+// Page basenames that actually exist on disk, so the sidebar can never silently
+// drop a newly added rule/skill/agent/hook. `rules`/`agents`/`hooks` are flat
+// .md dirs (leading `_` stripped to match sync-content.mjs); `skills` is one
+// dir per skill holding SKILL.md.
+function discover(kind) {
+  const dir = join(REPO_ROOT, kind)
+  if (kind === 'skills') {
+    return readdirSync(dir)
+      .filter((n) => {
+        try {
+          return statSync(join(dir, n, 'SKILL.md')).isFile()
+        } catch {
+          return false
+        }
+      })
+      .sort()
+  }
+  return readdirSync(dir)
+    .filter((f) => f.endsWith('.md'))
+    .map((f) => f.slice(0, -3).replace(/^_/, ''))
+    .sort()
+}
+
+const DISK_RULES = discover('rules')
+const DISK_SKILLS = discover('skills')
+
+// Curated grouping/ordering. Anything on disk but absent here still appears —
+// rules fall into an auto "Uncategorized" group, skills append after the
+// curated order — so the only cost of forgetting to register a page is that it
+// lands at the bottom, never that it vanishes. A build-time warning flags it.
 // [English group title, Korean group title, [rule file basenames]]
 const RULE_GROUPS = [
   ['Thinking Expansion', '사고 확장', ['concept-priming', 'progressive-deepening', 'capability-overhang']],
-  ['Quality Assurance', '품질 보증', ['evaluation-integrity', 'claude-architect-principles']],
+  ['Quality Assurance', '품질 보증', ['evaluation-integrity', 'claude-architect-principles', 'verify-each-instance']],
   ['User Growth', '사용자 성장', ['user-growth-coaching']],
   ['Knowledge Capture', '지식 포착', ['guardrail-maker', 'memory-minimalism']],
   ['Output Conventions', '출력 규약', ['plain-language-output', 'terminology-discipline', 'comment-discipline']],
   ['Trigger Index', '트리거 인덱스', ['situational-skills']],
 ]
 
-const SKILLS = [
+const SKILL_ORDER = [
   'css-discipline', 'github-pr-markdown', 'model-effort-delegation',
   'parallel-execution-modes', 'parallel-hypothesis-investigation', 'codex-delegation',
   'incremental-verification', 'simulate-dont-just-scan', 'codex-tmux-monitoring',
-  'background-task-monitoring', 'review',
+  'background-task-monitoring', 'web-research', 'web-fetch-block-then-search', 'review',
 ]
 
-const AGENTS = ['adversarial-reviewer']
+// curated order first, then any disk skill not yet listed (alphabetical)
+const SKILLS = [
+  ...SKILL_ORDER.filter((n) => DISK_SKILLS.includes(n)),
+  ...DISK_SKILLS.filter((n) => !SKILL_ORDER.includes(n)),
+]
 
-const HOOKS = ['comment-discipline']
+const GROUPED_RULES = new Set(RULE_GROUPS.flatMap(([, , items]) => items))
+const UNGROUPED_RULES = DISK_RULES.filter((n) => !GROUPED_RULES.has(n))
+const ORPHAN_SKILLS = SKILLS.filter((n) => !SKILL_ORDER.includes(n))
+
+if (UNGROUPED_RULES.length || ORPHAN_SKILLS.length) {
+  console.warn(
+    `[sidebar] unregistered pages (shown at bottom): ` +
+      `rules=[${UNGROUPED_RULES.join(', ')}] skills=[${ORPHAN_SKILLS.join(', ')}]`,
+  )
+}
+
+const AGENTS = discover('agents')
+
+const HOOKS = discover('hooks')
 
 function sidebar(ko) {
   const base = ko ? '/ko' : ''
@@ -72,6 +121,13 @@ function sidebar(ko) {
     collapsed: false,
     items: items.map((n) => ({ text: n, link: `${base}/rules/${n}` })),
   }))
+  if (UNGROUPED_RULES.length) {
+    groups.push({
+      text: ko ? '미분류' : 'Uncategorized',
+      collapsed: false,
+      items: UNGROUPED_RULES.map((n) => ({ text: n, link: `${base}/rules/${n}` })),
+    })
+  }
   return [
     ...groups,
     {
