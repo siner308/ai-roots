@@ -46,7 +46,7 @@ This keeps the resident set near ~41KB instead of ~92KB while preserving effecti
 |------|-------------|
 | `rules/plain-language-output.md` | Keep output in plain spoken-rhythm language — no abstract-noun stacks, no translationese, verbs over nominalizations |
 | `rules/terminology-discipline.md` | Spell out domain terms; expand established abbreviations on first use; disambiguate collision-prone ones |
-| `rules/comment-discipline.md` | Default to no comments — write only when WHY is non-obvious; forbid WHAT-restatements, task-context references, and removal traces |
+| `rules/comment-discipline.md` | Default to no comments; a comment or docstring is never mandatory. Write one only when it's on a closed allowlist (non-obvious WHY). Enforced by the `comment-discipline.py` `PostToolUse` hook |
 
 ### Trigger index
 | File | Description |
@@ -98,10 +98,17 @@ The installer creates symlinks:
 - `rules/` → `~/.claude/rules/ai-roots` — Claude Code recursively loads all `.md` files here as always-on rules.
 - `skills/<name>/` → `~/.claude/skills/<name>` — each skill subfolder is linked individually so Claude Code's skill loader picks up its `SKILL.md`. The loop links `review` plus every situational skill above.
 - `agents/<name>.md` → `~/.claude/agents/<name>.md` — each agent file is linked individually so Claude Code registers it as an Agent tool `subagent_type`. Currently: `agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md`.
+- `hooks/<name>` + registration → `~/.claude/hooks/<name>` and `~/.claude/settings.json` — `install.sh` runs `hooks/register.py`, which symlinks each hook declared in `hooks/manifest.json` and merges its `settings.json` entry. No manual editing needed.
 
 If a previous version of the installer created `~/.claude/skills/ai-roots` (a single symlink to the whole `skills/` directory), the new installer removes it automatically — that layout was never recognized by Claude Code's skill loader.
 
 README files, HUD scripts, and the `evals/` workspace (if any) are not symlinked, so they are not loaded as always-on rules.
+
+### Hooks
+
+`hooks/register.py` (run by `install.sh`) handles both symlinking and registration, driven by `hooks/manifest.json`. The merge is idempotent — re-running adds no duplicate hook — and backs up `settings.json` before writing, since that file holds live per-machine config. To add a hook: drop the script in `hooks/`, add a `manifest.json` entry (`event`, `matcher`, `script`, `run`), and re-run `install.sh`.
+
+Currently installed: `comment-discipline.py` — a `PostToolUse` hook on `Edit|Write|MultiEdit` that detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and re-surfaces the `comment-discipline` allowlist so the model re-checks each one. It hardens what a resident prose rule alone couldn't enforce.
 
 ## Inspiration
 

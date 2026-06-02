@@ -1,47 +1,35 @@
 # Comment Discipline
 
-Default to writing no comments. Well-named identifiers, clear control flow, and small functions already tell the reader WHAT the code does. Comments are for the one thing the code cannot express — WHY something non-obvious is true.
+Default: write no comment. Good names, small functions, and clear control flow already say WHAT the code does. A comment exists only to add what the code cannot — a non-obvious WHY.
 
-This applies everywhere: main session edits, subagent-generated code, refactors, and bug fixes. When delegating implementation to a subagent, include this rule in the briefing — weaker models regress to defensive commenting habits when the constraint isn't restated.
+Comments and docstrings are not required, and a function without one is not unfinished. Clean code that needs no comment is the goal, not a gap waiting to be filled. Never add a comment or docstring just because one is missing — absence is the correct default, presence is the exception that must earn itself.
 
-## When a comment earns its place
+This applies everywhere: main-session edits, subagent-generated code, refactors, bug fixes. When delegating implementation, restate this rule in the briefing — weaker models regress to defensive commenting when the constraint isn't repeated.
 
-A comment is worth writing when removing it would leave a future reader confused. Concretely:
+## The only comments worth writing
 
-- **Hidden constraint**: an invariant enforced elsewhere that isn't visible here (e.g., "caller holds the lock")
-- **Workaround for a specific bug**: with a link or issue reference so the comment can be retired when the upstream fix lands
-- **Surprising behavior**: code that looks wrong but is correct for a non-obvious reason
-- **Subtle invariant**: ordering, idempotency, or numerical precision assumption that a reader might accidentally break
+Write a comment ONLY when it is one of these. The list is closed: if what you're about to write isn't clearly on it, delete it.
 
-Self-check before writing: "If I delete this comment, would a careful reader be confused or surprised?" If no — don't write it.
+- **Hidden constraint / precondition** — an invariant this code assumes but can't show: `// caller holds the lock`, `// must run inside a transaction`.
+- **Workaround** — why this odd code exists, with a link or issue so it can be retired when the upstream fix lands.
+- **Surprising-but-correct** — code that looks wrong until you know the reason; state the reason.
+- **Subtle invariant** — an ordering, idempotency, or numerical-precision assumption a reader could accidentally break.
 
-## Forbidden comment patterns
+Self-check: "If I delete this, would a careful reader be *confused or surprised*?" If no, delete it. The bar is confusion — not a bare-looking block.
 
-These add noise without signal and should never be written:
+## Everything else: no comment
 
-- **WHAT restatements**: `// increment counter`, `// loop through users`, `// return the result`
-- **Signature echoes in docstrings**: repeating parameter names, types, and return values that are already in the signature
-- **Task-context references**: `// added for the X flow`, `// used by Y`, `// fixes issue #123`, `// as requested in review`, `// Claude suggested this`, `// per chat`. These belong in the PR description and git log, not the source.
-- **Scratchpad notes**: `// 일단 이렇게`, `// for now`, `// 임시로`, `// 확실하지 않음`, `// revisit later`. In-progress thinking is not a future reader's concern.
-- **Removal traces**: `// removed old logic`, `// no longer needed`, `// deprecated — use X instead`. If it's removed, delete it; don't leave a gravestone.
-- **Section dividers**: `// === Helpers ===`, `// --- Setup ---`. If the file needs signposting, it's too big — split it.
-- **TODO/FIXME without an owner or ticket**: an untracked TODO is a promise nobody will keep. Either file it as an issue or don't write it.
+Don't keep a catalog of forbidden comment types — that list never ends, and the next bad comment always slips between its entries. There is one rule: **not on the allowlist above → don't write it.**
 
-## Tension with other habits
+The familiar ways code gets over-commented are not separate rules to memorize — they are all the same failure (not on the list): restating WHAT the next lines do, echoing the signature, narrating the task or PR, describing what a *caller or another layer* does with the result, scratchpad notes, gravestones for deleted code, section dividers. Don't enumerate them; just apply the list.
 
-Defensive commenting often masquerades as thoroughness. Signals you're drifting into it:
-
-- You're adding a comment because the block "felt bare" without one
-- The comment paraphrases the next three lines
-- You're narrating the current task to a hypothetical reviewer instead of documenting the code
-- Every function has a docstring regardless of whether anything non-obvious happens inside
-
-When you catch any signal, delete the comment and trust the code.
+Signals you're drifting into defensive commenting: the block "felt bare," the comment paraphrases the next three lines, you're narrating to a hypothetical reviewer, or every function gets a docstring regardless. Notice it, delete it, trust the code.
 
 ## Rules
 
-- No comments is the default. Each comment requires justification; silence does not.
-- When comments are warranted, lead with WHY. A single precise sentence beats a paragraph.
-- Never reference the current task, PR, or caller in code comments — those contexts belong in the PR body or commit message, not the source.
-- When briefing a subagent for implementation work, restate this rule. The base instruction is not reliably preserved through delegation.
-- Apply the same discipline to docstrings — signature paraphrase is noise. Carve-out: when language tooling enforces public-API docs (Go `revive`, Rust `missing_docs`, Python `pydocstyle`), a one-line contract description on exported identifiers is fine. The body must describe the contract, not paraphrase the signature.
+- No comment is the default, and a comment or docstring is never mandatory. Clean uncommented code is the finished state, not an incomplete one — never add one only because it's absent.
+- A comment needs justification from the allowlist; silence needs none.
+- When a comment is warranted, lead with WHY in one precise sentence.
+- A comment documents THIS unit's own non-obvious facts — not a map of what callers or other layers do (that belongs in the PR body or commit message). A precondition the unit assumes is part of its own contract, so it stays.
+- When briefing a subagent for implementation, restate this rule — it is not reliably preserved through delegation.
+- Same discipline for docstrings; signature paraphrase is noise. Carve-out: when language tooling enforces public-API docs (Go `revive`, Rust `missing_docs`, Python `pydocstyle`), a one-line contract description on exported identifiers is fine — describe the contract, not the signature.

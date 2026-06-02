@@ -46,7 +46,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 |------|------|
 | `rules/plain-language-output.md` | 출력은 입으로 말하는 리듬의 평이한 언어로 — 추상명사 쌓기 금지, 번역투 금지, 명사화보다 동사 |
 | `rules/terminology-discipline.md` | 도메인 용어는 풀어쓰기; 정착된 약어는 첫 등장 시 확장; 충돌 가능한 약어는 한정어로 구분 |
-| `rules/comment-discipline.md` | 주석은 기본적으로 쓰지 않는다 — WHY가 비자명할 때만 작성, WHAT 설명/작업 맥락 언급/제거 흔적 금지 |
+| `rules/comment-discipline.md` | 주석은 기본적으로 쓰지 않는다 — 주석/docstring은 필수가 아니며, 닫힌 허용 목록(비자명한 WHY)에 해당할 때만 작성. `comment-discipline.py` `PostToolUse` hook으로 강제 |
 
 ### 트리거 인덱스
 | 파일 | 설명 |
@@ -98,10 +98,17 @@ chmod +x install.sh
 - `rules/` → `~/.claude/rules/ai-roots` — Claude Code가 이 아래의 모든 `.md` 파일을 상시 rules로 재귀 로딩합니다.
 - `skills/<name>/` → `~/.claude/skills/<name>` — 각 스킬 서브폴더를 개별 심링크로 걸어 Claude Code 스킬 로더가 `SKILL.md`를 인식하게 합니다. `review`와 위의 모든 상황별 skill을 루프로 링크합니다.
 - `agents/<name>.md` → `~/.claude/agents/<name>.md` — 각 agent 파일을 개별 심링크로 걸어 Claude Code가 Agent 도구의 `subagent_type`으로 등록하게 합니다. 현재: `agents/adversarial-reviewer.md` → `~/.claude/agents/adversarial-reviewer.md`.
+- `hooks/<name>` + 등록 → `~/.claude/hooks/<name>` 및 `~/.claude/settings.json` — `install.sh`가 `hooks/register.py`를 실행해, `hooks/manifest.json`에 선언된 각 hook을 심링크하고 `settings.json` 항목을 병합합니다. 수동 편집 불필요.
 
 이전 버전 설치 스크립트가 만든 `~/.claude/skills/ai-roots` (전체 `skills/` 디렉터리를 단일 심링크로 건 형태)는 새 설치 스크립트가 자동으로 제거합니다 — 그 레이아웃은 Claude Code 스킬 로더가 인식하지 못했습니다.
 
 README, HUD 스크립트, `evals/` 워크스페이스(있다면)는 심링크되지 않으므로 상시 rules로 로드되지 않습니다.
+
+### Hook
+
+`hooks/register.py`(install.sh가 실행)가 `hooks/manifest.json`에 따라 심링크와 등록을 모두 처리합니다. 병합은 멱등이라(재실행해도 중복 hook이 안 생김) 안전하고, 머신별 설정이 든 `settings.json`은 쓰기 전에 백업합니다. hook 추가 방법: 스크립트를 `hooks/`에 넣고, `manifest.json` 항목(`event`, `matcher`, `script`, `run`)을 추가한 뒤 `install.sh`를 다시 실행하면 됩니다.
+
+현재 설치됨: `comment-discipline.py` — `Edit|Write|MultiEdit`에 걸리는 `PostToolUse` hook. 코드 파일에 **새로 추가된** 주석 줄을 감지(기존 주석 제외)해 `comment-discipline` 허용 목록과 대조하도록 다시 띄웁니다. 상주 prose 규칙만으로는 강제할 수 없던 것을 보강합니다.
 
 ## 영감
 

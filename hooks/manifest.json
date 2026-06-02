@@ -1,0 +1,8 @@
+[
+  {
+    "event": "PostToolUse",
+    "matcher": "Edit|Write|MultiEdit",
+    "script": "comment-discipline.py",
+    "run": "python3"
+  }
+]

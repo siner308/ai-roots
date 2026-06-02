@@ -1,8 +1,23 @@
 # ai-roots
 
-This repo is the source of the Claude Code rules, skills, and agents that
+This repo is the source of the Claude Code rules, skills, agents, and hooks that
 `install.sh` symlinks into `~/.claude`. Editing a file here changes Claude's
 behavior on the next session.
+
+## Hooks
+
+`hooks/` holds hook scripts plus `manifest.json`, which declares how each one is
+registered (event, matcher, command). `install.sh` runs `hooks/register.py`,
+which symlinks every declared script into `~/.claude/hooks/` **and** merges its
+entry into `~/.claude/settings.json`. The merge is idempotent and backs
+settings.json up first, so re-running is safe. To add a hook: drop the script in
+`hooks/`, add a `manifest.json` entry, re-run `install.sh`. `hooks/` has no
+Korean mirror — only `rules/`, `skills/`, `agents/` do.
+
+`hooks/comment-discipline.py` is a `PostToolUse` hook on `Edit|Write|MultiEdit`:
+it detects comment lines an edit newly adds to a code file (pre-existing
+comments excluded) and re-surfaces the `comment-discipline` allowlist so the
+model re-checks each one. It enforces what a resident prose rule alone couldn't.
 
 ## Keep the Korean mirror in sync — easy to miss
 

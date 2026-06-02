@@ -1,7 +1,9 @@
 #!/bin/bash
 # ai-roots installer
 # Symlinks rules into ~/.claude/rules/ai-roots/, each skill subfolder into
-# ~/.claude/skills/<skill-name>, and each agent file into ~/.claude/agents/.
+# ~/.claude/skills/<skill-name>, each agent file into ~/.claude/agents/, and
+# each hook script into ~/.claude/hooks/. Hook *scripts* are linked here, but
+# their registration lives in ~/.claude/settings.json — see README.
 
 set -e
 
@@ -9,6 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 RULES_SRC="$SCRIPT_DIR/rules"
 SKILLS_SRC="$SCRIPT_DIR/skills"
 AGENTS_SRC="$SCRIPT_DIR/agents"
+HOOKS_SRC="$SCRIPT_DIR/hooks"
 
 RULES_DST="$HOME/.claude/rules"
 SKILLS_DST="$HOME/.claude/skills"
@@ -101,5 +104,12 @@ for agent_file in "$AGENTS_SRC"/*.md; do
   ln -s "$agent_file" "$agent_target"
   echo "linked agent: $agent_file -> $agent_target"
 done
+
+# Hooks need a JSON merge into settings.json, so register.py handles both the
+# symlinking and the registration (declared in hooks/manifest.json). It is
+# idempotent and backs settings.json up before writing.
+if [ -f "$HOOKS_SRC/manifest.json" ]; then
+  python3 "$HOOKS_SRC/register.py" "$HOOKS_SRC" "$HOME"
+fi
 
 echo "done."
