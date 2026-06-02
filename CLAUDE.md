@@ -4,6 +4,19 @@ This repo is the source of the Claude Code rules, skills, agents, and hooks that
 `install.sh` symlinks into `~/.claude`. Editing a file here changes Claude's
 behavior on the next session.
 
+## Authoring conventions
+
+When writing or editing any `.md` under `rules/`, `skills/`, `agents/`, or
+`hooks/` (and its Korean mirror):
+
+- Use generic placeholders, never real product/company names or real PR numbers.
+  Write `[Title of the spec or doc](url)` or `owner/repo#123`, not a concrete
+  product, tool, or PR. The motivating case can live in a commit message or PR
+  body, but the rule/skill text stays generic.
+- Write clean GitHub-flavored Markdown. No fixed-width padding (e.g. trailing
+  spaces to an 82-column box) and no mid-sentence hard line breaks — one bullet
+  is one line; let it soft-wrap. Use `-` bullets and fenced code blocks.
+
 ## Hooks
 
 `hooks/` holds hook scripts plus `manifest.json`, which declares how each one is
