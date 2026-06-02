@@ -1,0 +1,25 @@
+# Comment Discipline Hook
+
+[`comment-discipline`](../rules/comment-discipline) 규칙을 강제하는 `PostToolUse` hook.
+
+## 왜 있나
+
+`comment-discipline`은 상주 규칙이라 매 세션 context에 들어있다. 하지만 산문 규칙은 거기 함께 로딩된 다른 모든 것과 attention을 다투고, "문서는 친절하다"는 강한 prior에 밀려서 결국 주석이 계속 생겼다. 문구를 다듬는다고 달라지지 않는다 — 신뢰성 문제는 더 좋은 프롬프트가 아니라 결정론적 강제가 필요하다. 이 hook이 그 강제 장치다.
+
+## 무엇을 하나
+
+**코드 파일**에 대한 `Edit`, `Write`, `MultiEdit` 직후, 그 편집이 추가한 주석 줄을 diff한다. 새 주석 줄이 들어오면 규칙의 닫힌 허용 목록을 다시 띄워, 방금 쓴 주석을 그 자리에서 하나씩 재검토하게 만든다 — 숨은 제약, workaround, 틀려 보이지만 맞는 코드, 미묘한 불변 조건만 남기고 나머지는 삭제.
+
+**비차단**이다. 정당한 WHY 주석은 재검토를 거쳐 살아남고, 노이즈는 삭제된다. 주석을 실제로 추가하는 편집에서만 발동하므로, 습관이 들면 조용해진다 — 규율이 잡힐수록 덜 울린다.
+
+## 무엇을 건너뛰나
+
+- **기존 주석** — 편집이 새로 추가한 줄만 표시된다(기존 텍스트는 diff로 제외). 손대지 않은 주석은 발동하지 않는다.
+- **코드가 아닌 파일** — 마크다운, 텍스트, 설정 파일은 발동 안 함. 코드 파일 확장자(Go, TS/JS, Python, Rust, Java 등 C 계열)에만 반응한다.
+- **shebang**과 **문자열 안의 주석 기호**(예: `https://` URL) — false positive를 줄이려고, 트레일링 토큰이 아니라 줄 전체가 주석인 경우만 매칭하도록 설계했다.
+
+## 설치와 등록
+
+`install.sh`가 `hooks/register.py`를 실행한다. 이 스크립트는 `hooks/manifest.json`을 읽어 스크립트를 `~/.claude/hooks/`로 심링크하고, hook 항목을 `~/.claude/settings.json`에 병합한다. 병합은 멱등이고 `settings.json`을 먼저 백업하므로 재실행해도 안전하다. 수동 편집 불필요.
+
+hook을 추가하려면: 스크립트를 `hooks/`에 넣고, `manifest.json` 항목(`event`, `matcher`, `script`, `run`)을 추가한 뒤 `install.sh`를 다시 실행하면 된다.

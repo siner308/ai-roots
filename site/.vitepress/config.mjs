@@ -63,6 +63,8 @@ const SKILLS = [
 
 const AGENTS = ['adversarial-reviewer']
 
+const HOOKS = ['comment-discipline']
+
 function sidebar(ko) {
   const base = ko ? '/ko' : ''
   const groups = RULE_GROUPS.map(([en, kr, items]) => ({
@@ -82,6 +84,11 @@ function sidebar(ko) {
       collapsed: false,
       items: AGENTS.map((n) => ({ text: n, link: `${base}/agents/${n}` })),
     },
+    {
+      text: ko ? 'Hooks — 강제' : 'Hooks — enforcement',
+      collapsed: false,
+      items: HOOKS.map((n) => ({ text: n, link: `${base}/hooks/${n}` })),
+    },
   ]
 }
 
@@ -91,6 +98,7 @@ function nav(ko) {
     { text: 'Rules', link: `${base}/rules/concept-priming`, activeMatch: `${base}/rules/` },
     { text: 'Skills', link: `${base}/skills/css-discipline`, activeMatch: `${base}/skills/` },
     { text: 'Agents', link: `${base}/agents/adversarial-reviewer`, activeMatch: `${base}/agents/` },
+    { text: 'Hooks', link: `${base}/hooks/comment-discipline`, activeMatch: `${base}/hooks/` },
   ]
 }
 

@@ -11,8 +11,10 @@ registered (event, matcher, command). `install.sh` runs `hooks/register.py`,
 which symlinks every declared script into `~/.claude/hooks/` **and** merges its
 entry into `~/.claude/settings.json`. The merge is idempotent and backs
 settings.json up first, so re-running is safe. To add a hook: drop the script in
-`hooks/`, add a `manifest.json` entry, re-run `install.sh`. `hooks/` has no
-Korean mirror — only `rules/`, `skills/`, `agents/` do.
+`hooks/`, add a `manifest.json` entry, re-run `install.sh`. Hook **scripts**
+(`.py`/`.json`) have no Korean mirror — they are code. A hook's **doc** page
+(`hooks/<name>.md`) does: mirror it as `i18n/ko/hooks/<name>.md`, same as a rule,
+and `check-sync.sh` enforces it.
 
 `hooks/comment-discipline.py` is a `PostToolUse` hook on `Edit|Write|MultiEdit`:
 it detects comment lines an edit newly adds to a code file (pre-existing
@@ -28,10 +30,12 @@ trees symlinked into `~/.claude` and loaded by Claude. `i18n/ko/` is a
 Because the Korean copy lives in a separate tree, it is easy to forget when
 editing a rule. So:
 
-- When you **add, edit, rename, or delete** any file under `rules/`, `skills/`,
-  or `agents/`, make the matching change to `i18n/ko/<same path>` in the same
-  commit. (Skills mirror as `i18n/ko/skills/<name>/SKILL.md`; `rules/_x.md`
-  mirrors as `i18n/ko/rules/_x.md`.)
+- When you **add, edit, rename, or delete** any `.md` file under `rules/`,
+  `skills/`, `agents/`, or `hooks/`, make the matching change to
+  `i18n/ko/<same path>` in the same commit. (Skills mirror as
+  `i18n/ko/skills/<name>/SKILL.md`; `rules/_x.md` mirrors as
+  `i18n/ko/rules/_x.md`; `hooks/<name>.md` mirrors as `i18n/ko/hooks/<name>.md`.)
+  Hook scripts (`.py`/`.json`) are not mirrored.
 - Run `./i18n/check-sync.sh` before committing — it reports any English file
   missing a Korean mirror, or an orphan mirror whose source is gone.
 - Never change behavior by editing the Korean file. Fix the English source,
@@ -41,7 +45,7 @@ editing a rule. So:
 
 `site/` is a VitePress site published to GitHub Pages
 (https://siner308.github.io/ai-roots/) on every push to `main` that touches
-`rules/`, `skills/`, `agents/`, `i18n/`, or `site/`. It assembles both
+`rules/`, `skills/`, `agents/`, `hooks/`, `i18n/`, or `site/`. It assembles both
 languages at build time via `site/scripts/sync-content.mjs`; you don't edit
 anything under `site/rules`, `site/skills`, etc. (those are generated and
 git-ignored).

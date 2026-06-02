@@ -12,7 +12,7 @@ missing=0
 orphan=0
 
 # English source -> expected Korean mirror
-for f in "$ROOT"/rules/*.md "$ROOT"/skills/*/SKILL.md "$ROOT"/agents/*.md; do
+for f in "$ROOT"/rules/*.md "$ROOT"/skills/*/SKILL.md "$ROOT"/agents/*.md "$ROOT"/hooks/*.md; do
   [ -e "$f" ] || continue
   rel="${f#"$ROOT"/}"
   if [ ! -f "$KO/$rel" ]; then

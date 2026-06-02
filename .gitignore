@@ -7,10 +7,12 @@ site/node_modules/
 site/.vitepress/dist/
 site/.vitepress/cache/
 
-# Content mirrors assembled at build time from rules/ skills/ agents/ i18n/ko
+# Content mirrors assembled at build time from rules/ skills/ agents/ hooks/ i18n/ko
 site/rules/
 site/skills/
 site/agents/
+site/hooks/
 site/ko/rules/
 site/ko/skills/
 site/ko/agents/
+site/ko/hooks/
