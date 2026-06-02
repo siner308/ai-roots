@@ -16,6 +16,8 @@ This index is the resident half: it stays loaded so the *trigger* is never forgo
 | Porting, debugging, or implementing against code you have read but not run | `simulate-dont-just-scan` |
 | Tempted to monitor a long-running subprocess via tmux split panes, sentinel strings, or a foreground tail/grep loop | `codex-tmux-monitoring` |
 | A long-running task runs in the background and the user needs completion or progress visibility | `background-task-monitoring` |
+| Browsing the web, extracting page content, scraping data, or fetching figures from sites | `web-research` |
+| agent-browser returns blocked/empty/dynamic content and you are tempted to retry with another engine or guess sibling URLs | `web-fetch-block-then-search` |
 
 ## Rules
 

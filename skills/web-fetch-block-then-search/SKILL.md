@@ -1,3 +1,8 @@
+---
+name: web-fetch-block-then-search
+description: "Apply when agent-browser (lightpanda or chrome) returns blocked/empty/dynamic content and you are tempted to retry with a different engine or guess sibling URLs. A live browser renders the page and inherits every anti-bot defense; a search tool reads the indexed snippet and bypasses the block. Switch to WebSearch / Codex --search instead of escalating the browser."
+---
+
 # When agent-browser Is Blocked, Search Instead of Escalating the Engine
 
 A live browser fetch (`agent-browser`, either lightpanda or chrome) renders the actual page, so it inherits every anti-bot defense the site runs — Cloudflare challenges, lazy-loaded charts, SPA shells that never put the number into `body` text. A search tool (`WebSearch`, or Codex's `--search` web_search) does NOT render the page. It reads the search engine's already-indexed snippet. That is why search walks straight past blocks that no browser engine can defeat: the two tools fail for completely different reasons, so they are not a "try harder" ladder — they are different mechanisms.
@@ -11,7 +16,7 @@ Fact-checking an ARM/RISC-V analysis, two numbers had to be confirmed: ARM's Chi
 - **The failing approach (live rendering, repeated):** `agent-browser --engine lightpanda` on SHD Group and `riscv.org/exchange` returned empty bodies. Switched to chrome — still empty. Tried Google, Bing, and DuckDuckGo HTML search pages *through agent-browser* — they returned mangled/encoded garbage because the engine couldn't run the result JS. Guessed alternate article URLs — 404s. Four-plus attempts, both numbers logged as "research failed."
 - **The working approach (non-rendering search):** the same task handed to Codex `--search -a never exec --sandbox read-only` used its built-in `web_search` tool. Its log showed queries like `Arm Holdings annual report 2025 gross margin revenue ... 20-F` and `RISC-V chips forecasted by 2030`. The snippets carried the figures directly: **ARM China ≈16% of revenue (FY2026 20-F)** and **>16 billion RISC-V chips forecast by 2030 (RISC-V International / SHD Group)** — even surfacing the primary SEC filing URL.
 
-Codex had no secret crawling technique. It used a search tool instead of a browser. The same bypass was available to the main session via `WebSearch` the whole time; the existing protocol just buried `WebSearch` at priority 3 and told the agent not to "wait for WebSearch to fail first" — which got mis-read as "keep using the browser."
+Codex had no secret crawling technique. It used a search tool instead of a browser. The same bypass was available to the main session via `WebSearch` the whole time; the protocol just buried `WebSearch` low and emphasized "agent-browser is default," which got mis-read as "keep using the browser."
 
 ## The rule
 
@@ -25,4 +30,4 @@ Reserve the chrome engine for pages that are *renderable but heavy and need inte
 - You are about to retry the same blocked URL with a different browser engine, or guess sibling URLs on the same domain.
 - A needed number is "behind a chart" — present visually but absent from extracted `body` text.
 
-In all three: switch to search. See the protocol in `web-research.md` §"Block-signal → search fallback".
+In all three: switch to search. See the full protocol in the `web-research` skill, §"Block-signal → search fallback".

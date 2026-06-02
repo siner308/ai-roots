@@ -1,3 +1,8 @@
+---
+name: web-research
+description: "Apply when browsing the web, extracting page content, scraping data, or fetching figures from sites — choosing between agent-browser (lightpanda default, chrome for heavy/interactive pages) and search-based tools. Covers the critical block-signal → search fallback: when a page is bot-blocked or fully dynamic, stop escalating the browser engine and switch to WebSearch / Codex --search instead of retrying."
+---
+
 # Web Research Protocol
 
 **Default tool for web browsing is `agent-browser`, not WebSearch/WebFetch.** Use agent-browser proactively for any task that involves visiting websites, extracting data, or interacting with web pages. Don't wait for WebSearch to fail first.
@@ -33,7 +38,7 @@
 3. Still missing, and the source is an **official primary doc** (SEC/DART/regulator/issuer IR)? → chrome engine on that *primary* URL is worth it (the data exists nowhere else). For aggregator/secondary data, prefer another search query or another aggregator over chrome.
 4. If a cross-provider check is already warranted, Codex `--search -a never exec --sandbox read-only` runs the same web_search tool and is excellent at pulling figures out of primary filings — but it is heavier; reach for it for verification passes, not first-line lookups.
 
-This protocol applies to every research lane — news, filings, analyst data, market-research forecasts. The lesson behind it: `lessons-web-fetch-block-then-search.md`.
+This protocol applies to every research lane — news, filings, analyst data, market-research forecasts. The lesson behind it: `web-fetch-block-then-search`.
 
 ## Lightpanda First
 
