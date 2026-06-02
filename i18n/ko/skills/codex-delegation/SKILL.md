@@ -16,17 +16,17 @@ Cross-provider 위임은 세 가지 목적에 쓰인다:
 
 앞의 둘은 reliability routing을, 셋째는 capability routing을 동기 부여한다.
 
-## Entry Point
+## 진입점
 
 Codex를 감싸는 ai-roots 제공 표면은 `/review` **스킬**(skills/review.md)뿐이다. 이 스킬은 Claude Code subagent와 `codex review --uncommitted`를 병렬로 띄운 뒤, evaluation-integrity.md §Multi-advisor synthesis에 따라 종합한다. 리뷰 부류의 모든 위임에 쓴다: 일반 diff 리뷰, 보안 민감 리뷰, 둘 다.
 
 리뷰가 아닌 Codex 작업(rescue 디버깅, 리서치, 범위가 정해진 구현)은 Bash로 적절한 플래그를 붙여 `codex`를 직접 호출한다. 이 모드들을 위한 slash-command 래퍼는 더 이상 없다 — 아래 모드별 호출을 참고하라.
 
-## Reasoning effort
+## Reasoning effort 설정
 
 항상 xhigh. 모든 호출에 `-c model_reasoning_effort=xhigh`를 넘긴다.
 
-## Flag placement (codex-cli ≥ 0.125)
+## 플래그 배치 (codex-cli ≥ 0.125)
 
 `--search`, `-a`/`--ask-for-approval`, `--dangerously-bypass-approvals-and-sandbox`는 **top-level 플래그**이고 subcommand 앞에 온다. `--sandbox`, `--full-auto`, `-c key=value`는 **exec subcommand 플래그**이고 `exec` 뒤에 온다. 위치를 잘못 두면 `error: unexpected argument '--ask-for-approval' found`로 실패한다. `codex --help`와 `codex exec --help`로 확인하라.
 
@@ -35,7 +35,7 @@ codex [TOP-LEVEL FLAGS] exec [EXEC FLAGS] -- - < prompt
 codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 않음
 ```
 
-## Mode Cheatsheet
+## 모드 치트시트
 
 | Need | Invocation |
 |------|------------|
@@ -48,7 +48,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 편의를 위해 더 넓은 모드를 고르지 마라. 리서치에는 쓰기 권한이 필요 없다. 이미지 생성에는 ecosystem capability가 필요하지, no-sandbox 접근이 필요한 게 아니다. 의존성 설치, 외부 CLI, 사설 네트워크 호출은 별개의 요구사항이고 brief에 명시해야 한다.
 
-## Routing Rules
+## 라우팅 규칙
 
 **막힌 문제에는 three-turn 상한.** 같은 가설로 4번째 인라인 턴을 시도하지 마라. ruled-out 가설을 모두 포함해서 Codex rescue(read-only sandbox)에 위임하라.
 
@@ -56,7 +56,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 **Capability routing은 첫 턴에 발동한다.** 이미지 생성, TTS, 그 외 OpenAI 전용 도구 필요는 즉시 Codex로 라우팅한다. 결과물이 이미지나 오디오 산출물일 때 텍스트 기반 우회(ASCII 아트, 손으로 짠 SVG)에 턴을 낭비하지 마라.
 
-## Three-Turn Rescue Protocol
+## Three-Turn Rescue 프로토콜
 
 1. **Turn 1** — 원래 계획.
 2. **Turn 2** — 가설을 수정한다(근본 원인이 다른 계층에 있을 수 있다; parallel-hypothesis-investigation.md 참고).
@@ -65,7 +65,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 "turn"은 메시지 하나가 아니라 실질적 시도 하나다. 셋을 넘기면 한계 정보가 무너지고 anchoring bias가 굳어진다.
 
-## Codex Execution Mechanics
+## Codex 실행 메커니즘
 
 따로 관리할 관심사 두 가지:
 
@@ -94,7 +94,7 @@ EOF
 Bash(run_in_background: true, command: "codex exec ... -- - < '$PROMPT' 2>&1 | tee '$LOG'")
 ```
 
-## Plan-stage Review
+## Plan 단계 리뷰
 
 두 리뷰어 리뷰는 코드를 쓰기 *전에도* 가치 있다. 산출물이 diff가 아니라 **plan**일 때다. 구현이 시작되면 되돌리기 비싼 설계 결정을 잡아낸다.
 
@@ -108,7 +108,7 @@ Bash(run_in_background: true, command: "codex exec ... -- - < '$PROMPT' 2>&1 | t
 
 **Anti-patterns:** stale-revision 리뷰(아래 Cross-Provider Rules 참고); ~3을 넘는 라운드 부풀리기(plan 주인이 수렴 못한 것 — 대신 사용자와 목표를 명확히 하라); 권고를 차단으로 다루기.
 
-## Cross-Provider Rules
+## Cross-Provider 규칙
 
 - three-turn 상한은 forcing function이지 단단한 천장이 아니다. Turn 3에서 확실한 돌파가 나오면 끝내고, 아니면 escalate한다.
 - 토큰 아끼려고 보안 민감 경로에서 `/review`를 건너뛰지 마라.

@@ -61,13 +61,13 @@ DIFF_CMD="git diff $MERGE_BASE"
 
 ## 평가자
 
-### 1. Claude Code subagent
+### 1. Claude Code 서브에이전트
 
 `Agent` 도구를 `subagent_type: adversarial-reviewer`로 호출한다 (페르소나는 `~/.claude/agents/adversarial-reviewer.md`). `DIFF_CMD`를 실행해 diff를 얻고 그 출력만 리뷰하라고, 페르소나의 security-first P0–P3 분류를 적용하라고 브리핑한다. 결정된 `TARGET`과 사용자가 준 범위를 프롬프트에 넘긴다.
 
 `adversarial-reviewer` 에이전트가 등록돼 있지 않으면 `subagent_type: general-purpose`로 fallback하고 페르소나 본문을 프롬프트에 인라인한다.
 
-### 2. Codex review
+### 2. Codex 리뷰
 
 `codex review`의 `--uncommitted` / `--base` / `--commit` 플래그는 커스텀 프롬프트와 함께 못 쓴다(서로 배타적). 그래서 페르소나를 같이 태울 수 없다. 대신 **custom-prompt 모드**를 쓰고 `DIFF_CMD`를 박아, codex가 우리 페르소나로 정확히 같은 범위를 리뷰하게 한다:
 

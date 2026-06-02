@@ -16,8 +16,10 @@
 | 읽었지만 실행해 보지 않은 코드를 포팅·디버깅·구현 | `simulate-dont-just-scan` |
 | 장시간 도는 서브프로세스를 tmux split pane, sentinel 문자열, foreground tail/grep 루프로 감시하고 싶은 충동 | `codex-tmux-monitoring` |
 | 장시간 작업이 백그라운드로 돌고 사용자가 완료나 진행 상황을 봐야 할 때 | `background-task-monitoring` |
+| 웹을 둘러보거나, 페이지 내용을 추출하거나, 데이터를 긁거나, 사이트에서 수치를 가져올 때 | `web-research` |
+| agent-browser가 차단된/빈/동적 내용을 돌려줘서 다른 엔진으로 재시도하거나 형제 URL을 추측하고 싶은 충동 | `web-fetch-block-then-search` |
 
-## Rules
+## 규칙
 
 - 트리거가 걸리면, 매칭되는 skill을 호출하는 것은 선택이 아니라 의무다.
 - lazy skill도 상주 rule과 같은 권위를 가진다 — 본문이 항상이 아니라 필요할 때 로드될 뿐이다.

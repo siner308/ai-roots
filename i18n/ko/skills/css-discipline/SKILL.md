@@ -12,7 +12,7 @@ description: "CSS를 편집·작성·리뷰할 때 적용 — 스타일시트, s
 
 **언제 규범인가.** R1–R9는 스타일시트, scoped 스타일, 인라인 `style=""`, CSS에 인접한 JS를 편집할 때 지켜야 할 작성 제약이다. 스타일을 건드리지 않는 작업에서는 배경 지식으로만 다루고 — 규칙을 어긴다는 이유만으로 손대지 않은 CSS를 리팩터링하지 마라.
 
-## Core axes
+## 핵심 축
 
 - **Cascade** — specificity를 지루하게 유지하고 override 제어권을 온전히 보존한다.
 - **Box model** — spacing은 단일 메커니즘으로; overflow는 clipping이나 scroll이 의도일 때만 선언한다.
@@ -110,7 +110,7 @@ CSS 기본값(`visible`)이 대부분의 레이아웃에 맞는다. clipping이 
 
 토큰 레이어가 아직 없으면 먼저 선언하라: 기존 리터럴을 조사하고, 의도된 scale로 묶고, 별도 commit으로 올린다. 그때까지 R1–R9는 지향점으로 다룬다.
 
-## Enforcement signals (리뷰 휴리스틱)
+## 강제 신호 (리뷰 휴리스틱)
 
 조사의 출발점이지 자동 거부가 아니다. 위의 예외(R3 서드파티, R6 non-CSS consumer)는 여전히 정당하다.
 
@@ -123,6 +123,6 @@ CSS 기본값(`visible`)이 대부분의 레이아웃에 맞는다. clipping이 
 
 프레임워크별 grep(Tailwind 접두사, Svelte 파일 타기팅, `.module.css` 패턴)은 프로젝트 supplement에 둔다.
 
-## Project supplement
+## 프로젝트 supplement
 
 이 규칙들은 보편적 형태를 기술한다. 각 프로젝트는 구체적 바인딩을 고정한다: 어떤 utility 프레임워크인지, spacing/color/motion 집합, 토큰 레이어 파일, base 리셋 파일, 로컬 grep. 프로젝트 편의가 이 규칙과 충돌하면 프로젝트가 진다 — 프레임워크 편의가 근본 규율을 덮어쓰지 못한다.
