@@ -129,17 +129,17 @@ TIMEOUT_BIN=""
 if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
 elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 
-# Stream to the log AND this task's stdout via process substitution so progress is
-# visible live. A plain `> "$LOG"` then `cat` leaves the background task's stdout
-# empty until codex finishes — which reads as "hung" and tempts killing a healthy
-# run (xhigh review legitimately takes many minutes). `> >(tee …)` keeps $? as
-# codex's own exit (124 on timeout), unlike a `| tee` pipe, and works in bash + zsh.
+# codex review at xhigh writes NOTHING to a non-TTY until it finishes (often
+# several minutes); an empty log mid-run is normal, NOT a hang — do not kill it,
+# wait for the completion notification or the timeout (the only hang guard). gpt-5.5
+# is the default model, so no -m / model override is needed.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > >(tee "$LOG") 2>&1
+  "$TIMEOUT_BIN" 1200 codex review -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > >(tee "$LOG") 2>&1
+  codex review -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
+cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
@@ -159,19 +159,21 @@ TIMEOUT_BIN=""
 if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
 elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 
-# read-only sandbox: review must not modify the workspace. codex exec's default
-# model is gpt-5.5; -m is optional. Same tee + exit handling as above.
+# read-only sandbox: review must not modify the workspace. gpt-5.5 is the default
+# model. Same silence-is-not-a-hang rule and plain redirect as the review block.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > >(tee "$LOG") 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > >(tee "$LOG") 2>&1
+  codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
+cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
 둘 다 공통:
 - `run_in_background: true`로 Codex가 끝날 때 메인 세션이 알림을 받게 한다.
+- **침묵은 hang이 아니다.** xhigh에서 codex는 끝날 때까지 non-TTY(백그라운드 로그)에 아무것도 안 쓴다 — 몇 분간 빈 로그는 정상이다. 침묵에 죽이지 말고 완료 알림이나 `timeout`을 기다린다. (실측: background `codex review`·`codex exec` 둘 다 정상 완주하며, `timeout`이 진짜 hang의 backstop이다.)
 - **`$CODEX_EXIT`를 읽는다.** `124` = 타임아웃: Codex가 없는 것으로 취급하고 Claude 평가자만으로 진행하며, 평가자가 하나만 돌았다(그리고 codex가 타임아웃됐다)고 종합에 적는다. 타임아웃을 깨끗한 판정처럼 버리지 않는다.
 - `codex`가 `PATH`에 없으면 건너뛰고 평가자가 하나만 돌았다고 적는다.
 
