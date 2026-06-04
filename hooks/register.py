@@ -11,6 +11,7 @@ Usage: register.py <hooks_src_dir> <home_dir>
 import fcntl
 import json
 import os
+import shlex
 import shutil
 import sys
 import time
@@ -74,7 +75,11 @@ def main():
                 kept = []
                 for h in g.get("hooks", []):
                     cmd = h.get("command", "")
-                    path = cmd.split(" ", 1)[1] if " " in cmd else ""
+                    try:
+                        tokens = shlex.split(cmd)
+                    except ValueError:
+                        tokens = []
+                    path = tokens[1] if len(tokens) > 1 else ""
                     if os.path.dirname(path) == hooks_dst and os.path.basename(path) in pruned_scripts:
                         print(f"pruned stale registration: {event} {g.get('matcher')} -> {cmd}")
                         changed = True
@@ -86,7 +91,10 @@ def main():
                 del hooks_cfg[event]
 
         for e in manifest:
-            command = f"{e['run']} {os.path.join(hooks_dst, e['script'])}"
+            # Claude Code runs a no-args hook command through `sh -c`, so a space
+            # in the path would word-split; quote it. quote() is a no-op for plain
+            # paths, keeping existing registrations byte-identical.
+            command = f"{e['run']} {shlex.quote(os.path.join(hooks_dst, e['script']))}"
             groups = hooks_cfg.setdefault(e["event"], [])
             group = next((g for g in groups if g.get("matcher") == e["matcher"]), None)
             # Identical commands across matchers (SessionStart startup/resume/clear)
