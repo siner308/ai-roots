@@ -30,7 +30,7 @@ which symlinks every declared script into `~/.claude/hooks/` **and** merges its
 entry into `~/.claude/settings.json`. The merge is idempotent and backs
 settings.json up first, so re-running is safe. To add a hook: drop the script in
 `hooks/`, add a `manifest.json` entry, re-run `install.sh`. Hook **scripts**
-(`.py`/`.json`) have no Korean mirror — they are code. A hook's **doc** page
+(`.py`/`.json`/`.sh`) have no Korean mirror — they are code. A hook's **doc** page
 (`hooks/<name>.md`) does: mirror it as `i18n/ko/hooks/<name>.md`, same as a rule,
 and `check-sync.sh` enforces it.
 
@@ -38,6 +38,13 @@ and `check-sync.sh` enforces it.
 it detects comment lines an edit newly adds to a code file (pre-existing
 comments excluded) and re-surfaces the `comment-discipline` allowlist so the
 model re-checks each one. It enforces what a resident prose rule alone couldn't.
+
+`hooks/auto-update.sh` is a `SessionStart` hook (registered for `startup`,
+`resume`, and `clear`): it runs a throttled `git pull --ff-only` on the clone and
+re-runs `install.sh` when `HEAD` moves, so users receive updates without a manual
+pull. It is fail-open — every error path exits 0 and logs to
+`~/.claude/.ai-roots/update.log` — and on by default; opt out with
+`AI_ROOTS_AUTO_UPDATE=0` or `~/.claude/.ai-roots/disabled`.
 
 ## Keep the Korean mirror in sync — easy to miss
 

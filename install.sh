@@ -20,6 +20,21 @@ AGENTS_DST="$HOME/.claude/agents"
 RULES_TARGET="$RULES_DST/ai-roots"
 LEGACY_SKILLS_TARGET="$SKILLS_DST/ai-roots"
 
+# Only dangling links resolving into $SCRIPT_DIR are removed, so a user's own or
+# another tool's links are never touched.
+prune_orphans() {
+  dir="$1"
+  [ -d "$dir" ] || return 0
+  for link in "$dir"/*; do
+    [ -L "$link" ] || continue
+    case "$(readlink "$link")" in
+      "$SCRIPT_DIR"/*)
+        [ -e "$link" ] || { rm "$link" && echo "pruned orphaned link: $link"; }
+        ;;
+    esac
+  done
+}
+
 if [ ! -d "$RULES_SRC" ]; then
   echo "error: rules source not found: $RULES_SRC"
   exit 1
@@ -85,6 +100,7 @@ for skill_dir in "$SKILLS_SRC"/*/; do
   ln -s "${skill_dir%/}" "$skill_target"
   echo "linked skill: ${skill_dir%/} -> $skill_target"
 done
+prune_orphans "$SKILLS_DST"
 
 # Link each agent file individually so Claude Code recognizes each
 # ~/.claude/agents/<agent-name>.md. The adversarial-reviewer agent previously
@@ -104,6 +120,7 @@ for agent_file in "$AGENTS_SRC"/*.md; do
   ln -s "$agent_file" "$agent_target"
   echo "linked agent: $agent_file -> $agent_target"
 done
+prune_orphans "$AGENTS_DST"
 
 # Hooks need a JSON merge into settings.json, so register.py handles both the
 # symlinking and the registration (declared in hooks/manifest.json). It is

@@ -108,7 +108,10 @@ README, HUD 스크립트, `evals/` 워크스페이스(있다면)는 심링크되
 
 `hooks/register.py`(install.sh가 실행)가 `hooks/manifest.json`에 따라 심링크와 등록을 모두 처리합니다. 병합은 멱등이라(재실행해도 중복 hook이 안 생김) 안전하고, 머신별 설정이 든 `settings.json`은 쓰기 전에 백업합니다. hook 추가 방법: 스크립트를 `hooks/`에 넣고, `manifest.json` 항목(`event`, `matcher`, `script`, `run`)을 추가한 뒤 `install.sh`를 다시 실행하면 됩니다.
 
-현재 설치됨: `comment-discipline.py` — `Edit|Write|MultiEdit`에 걸리는 `PostToolUse` hook. 코드 파일에 **새로 추가된** 주석 줄을 감지(기존 주석 제외)해 `comment-discipline` 허용 목록과 대조하도록 다시 띄웁니다. 상주 prose 규칙만으로는 강제할 수 없던 것을 보강합니다.
+현재 설치됨:
+
+- `comment-discipline.py` — `Edit|Write|MultiEdit`에 걸리는 `PostToolUse` hook. 코드 파일에 **새로 추가된** 주석 줄을 감지(기존 주석 제외)해 `comment-discipline` 허용 목록과 대조하도록 다시 띄웁니다. 상주 prose 규칙만으로는 강제할 수 없던 것을 보강합니다.
+- `auto-update.sh` — 클론을 최신으로 유지하는 `SessionStart` hook. throttle 걸린 `git pull --ff-only`(기본 24시간에 한 번)와, `HEAD`가 움직이면 `install.sh` 재실행을 더해, 수동 pull 없이 업데이트가 반영됩니다. fail-open이고 기본 켜짐 — `AI_ROOTS_AUTO_UPDATE=0` 또는 `~/.claude/.ai-roots/disabled`로 끕니다. [`hooks/auto-update.md`](hooks/auto-update.md) 참고.
 
 ## 영감
 

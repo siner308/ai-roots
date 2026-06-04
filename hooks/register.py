@@ -35,17 +35,54 @@ def main():
         relink(src, dst)
         print(f"linked hook: {src} -> {dst}")
 
+    # Only links resolving into the repo are removed — never a user's own.
+    repo = os.path.dirname(os.path.abspath(hooks_src))
+    managed = {e["script"] for e in manifest}
+    for name in sorted(os.listdir(hooks_dst)):
+        link = os.path.join(hooks_dst, name)
+        if not os.path.islink(link) or name in managed:
+            continue
+        target = os.readlink(link)
+        if not os.path.isabs(target):
+            target = os.path.normpath(os.path.join(hooks_dst, target))
+        if target == repo or target.startswith(repo + os.sep):
+            os.remove(link)
+            print(f"pruned orphaned hook: {link}")
+
     settings_path = os.path.join(home, ".claude", "settings.json")
     settings = json.load(open(settings_path)) if os.path.exists(settings_path) else {}
     hooks_cfg = settings.setdefault("hooks", {})
 
     changed = False
+
+    # Remove only our own dead entries (gone from manifest and disk); never a
+    # user's entry or a still-present script.
+    for event in list(hooks_cfg):
+        groups = hooks_cfg[event]
+        for g in groups:
+            kept = []
+            for h in g.get("hooks", []):
+                cmd = h.get("command", "")
+                path = cmd.split(" ", 1)[1] if " " in cmd else ""
+                ours = os.path.dirname(path) == hooks_dst
+                if ours and os.path.basename(path) not in managed and not os.path.exists(path):
+                    print(f"pruned stale registration: {event} {g.get('matcher')} -> {cmd}")
+                    changed = True
+                    continue
+                kept.append(h)
+            g["hooks"] = kept
+        hooks_cfg[event] = [g for g in groups if g.get("hooks")]
+        if not hooks_cfg[event]:
+            del hooks_cfg[event]
+
     for e in manifest:
         command = f"{e['run']} {os.path.join(hooks_dst, e['script'])}"
         groups = hooks_cfg.setdefault(e["event"], [])
-        if any(h.get("command") == command for g in groups for h in g.get("hooks", [])):
-            continue
         group = next((g for g in groups if g.get("matcher") == e["matcher"]), None)
+        # Identical commands across matchers (SessionStart startup/resume/clear)
+        # force dedup to key on the matcher too, not the command alone.
+        if group is not None and any(h.get("command") == command for h in group.get("hooks", [])):
+            continue
         if group is None:
             group = {"matcher": e["matcher"], "hooks": []}
             groups.append(group)

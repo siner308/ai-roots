@@ -108,7 +108,10 @@ README files, HUD scripts, and the `evals/` workspace (if any) are not symlinked
 
 `hooks/register.py` (run by `install.sh`) handles both symlinking and registration, driven by `hooks/manifest.json`. The merge is idempotent — re-running adds no duplicate hook — and backs up `settings.json` before writing, since that file holds live per-machine config. To add a hook: drop the script in `hooks/`, add a `manifest.json` entry (`event`, `matcher`, `script`, `run`), and re-run `install.sh`.
 
-Currently installed: `comment-discipline.py` — a `PostToolUse` hook on `Edit|Write|MultiEdit` that detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and re-surfaces the `comment-discipline` allowlist so the model re-checks each one. It hardens what a resident prose rule alone couldn't enforce.
+Currently installed:
+
+- `comment-discipline.py` — a `PostToolUse` hook on `Edit|Write|MultiEdit` that detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and re-surfaces the `comment-discipline` allowlist so the model re-checks each one. It hardens what a resident prose rule alone couldn't enforce.
+- `auto-update.sh` — a `SessionStart` hook that keeps your clone current: a throttled `git pull --ff-only` (default once per 24h) plus a re-run of `install.sh` when `HEAD` moves, so updates land without a manual pull. Fail-open and on by default; opt out with `AI_ROOTS_AUTO_UPDATE=0` or `~/.claude/.ai-roots/disabled`. See [`hooks/auto-update.md`](hooks/auto-update.md).
 
 ## Inspiration
 
