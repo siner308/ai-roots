@@ -39,12 +39,18 @@ it detects comment lines an edit newly adds to a code file (pre-existing
 comments excluded) and re-surfaces the `comment-discipline` allowlist so the
 model re-checks each one. It enforces what a resident prose rule alone couldn't.
 
-`hooks/auto-update.sh` is a `SessionStart` hook (registered for `startup`,
-`resume`, and `clear`): it runs a throttled `git pull --ff-only` on the clone and
-re-runs `install.sh` when `HEAD` moves, so users receive updates without a manual
-pull. It is fail-open — every error path exits 0 and logs to
-`~/.claude/.ai-roots/update.log` — and on by default; opt out with
-`AI_ROOTS_AUTO_UPDATE=0` or `~/.claude/.ai-roots/disabled`.
+## Staying up to date
+
+`shell/ai-roots-update.sh` is sourced from the user's interactive shell rc
+(`install.sh` adds an idempotent marker block to `~/.zshrc`/`~/.bashrc`, backed up
+first). Like oh-my-zsh, a new terminal does a throttled, read-only `git fetch`
+(default 24h, via `~/.claude/.ai-roots/last-check`) and, if the clone is behind,
+prompts before doing anything; on `yes` it runs `git pull --ff-only` then
+`install.sh`. Nothing is pulled or executed without confirmation, and a
+dirty/diverged clone is skipped. Opt out with `AI_ROOTS_AUTO_UPDATE=0`; tune the
+cadence with `AI_ROOTS_UPDATE_INTERVAL` (seconds). The script lives in `shell/`
+(not `hooks/`) because it is a shell-rc snippet, not a Claude Code hook, so it has
+no Korean mirror.
 
 ## Keep the Korean mirror in sync — easy to miss
 

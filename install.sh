@@ -129,4 +129,26 @@ if [ -f "$HOOKS_SRC/manifest.json" ]; then
   python3 "$HOOKS_SRC/register.py" "$HOOKS_SRC" "$HOME"
 fi
 
+# Source the update checker from the user's interactive shell rc so a new terminal
+# offers updates (oh-my-zsh style). Idempotent via a marker block; rc is backed up.
+UPDATE_SRC="$SCRIPT_DIR/shell/ai-roots-update.sh"
+if [ -f "$UPDATE_SRC" ]; then
+  case "${SHELL##*/}" in
+    bash) RC="$HOME/.bashrc" ;;
+    *) RC="$HOME/.zshrc" ;;
+  esac
+  MARKER="# >>> ai-roots update check >>>"
+  if [ -f "$RC" ] && grep -qF "$MARKER" "$RC"; then
+    echo "shell update check already present in $RC"
+  else
+    [ -f "$RC" ] && cp "$RC" "$RC.bak.$(date +%Y%m%d%H%M%S)"
+    {
+      printf '\n%s\n' "$MARKER"
+      printf '[ -f "%s" ] && AI_ROOTS_DIR="%s" . "%s"\n' "$UPDATE_SRC" "$SCRIPT_DIR" "$UPDATE_SRC"
+      printf '# <<< ai-roots update check <<<\n'
+    } >>"$RC"
+    echo "added ai-roots update check to $RC"
+  fi
+fi
+
 echo "done."

@@ -108,10 +108,17 @@ README, HUD 스크립트, `evals/` 워크스페이스(있다면)는 심링크되
 
 `hooks/register.py`(install.sh가 실행)가 `hooks/manifest.json`에 따라 심링크와 등록을 모두 처리합니다. 병합은 멱등이라(재실행해도 중복 hook이 안 생김) 안전하고, 머신별 설정이 든 `settings.json`은 쓰기 전에 백업합니다. hook 추가 방법: 스크립트를 `hooks/`에 넣고, `manifest.json` 항목(`event`, `matcher`, `script`, `run`)을 추가한 뒤 `install.sh`를 다시 실행하면 됩니다.
 
-현재 설치됨:
+현재 설치됨: `comment-discipline.py` — `Edit|Write|MultiEdit`에 걸리는 `PostToolUse` hook. 코드 파일에 **새로 추가된** 주석 줄을 감지(기존 주석 제외)해 `comment-discipline` 허용 목록과 대조하도록 다시 띄웁니다. 상주 prose 규칙만으로는 강제할 수 없던 것을 보강합니다.
 
-- `comment-discipline.py` — `Edit|Write|MultiEdit`에 걸리는 `PostToolUse` hook. 코드 파일에 **새로 추가된** 주석 줄을 감지(기존 주석 제외)해 `comment-discipline` 허용 목록과 대조하도록 다시 띄웁니다. 상주 prose 규칙만으로는 강제할 수 없던 것을 보강합니다.
-- `auto-update.sh` — 클론을 최신으로 유지하는 `SessionStart` hook. throttle 걸린 `git pull --ff-only`(기본 24시간에 한 번)와, `HEAD`가 움직이면 `install.sh` 재실행을 더해, 수동 pull 없이 업데이트가 반영됩니다. fail-open이고 기본 켜짐 — `AI_ROOTS_AUTO_UPDATE=0` 또는 `~/.claude/.ai-roots/disabled`로 끕니다. [`hooks/auto-update.md`](hooks/auto-update.md) 참고.
+### 최신 상태 유지
+
+`install.sh`가 셸 rc(`~/.zshrc` 또는 `~/.bashrc`, 먼저 백업)에 marker 블록을 추가해 `shell/ai-roots-update.sh`를 source합니다. oh-my-zsh처럼, 새 터미널이 throttle 걸린 읽기 전용 `git fetch`(기본 24시간에 한 번)를 하고, 클론이 뒤처졌으면 **무엇을 하기 전에 먼저 묻습니다**:
+
+```
+[ai-roots] 3 update(s) available. Apply now? [Y/n]
+```
+
+yes면 `git pull --ff-only` 후 `install.sh`를 실행합니다. 이 확인 없이는 pull도 실행도 없고, dirty/diverged 클론은 건드리지 않습니다. 끄기: `AI_ROOTS_AUTO_UPDATE=0`, 주기 조정: `AI_ROOTS_UPDATE_INTERVAL`(초).
 
 ## 영감
 

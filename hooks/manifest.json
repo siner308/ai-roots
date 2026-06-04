@@ -4,23 +4,5 @@
     "matcher": "Edit|Write|MultiEdit",
     "script": "comment-discipline.py",
     "run": "python3"
-  },
-  {
-    "event": "SessionStart",
-    "matcher": "startup",
-    "script": "auto-update.sh",
-    "run": "bash"
-  },
-  {
-    "event": "SessionStart",
-    "matcher": "resume",
-    "script": "auto-update.sh",
-    "run": "bash"
-  },
-  {
-    "event": "SessionStart",
-    "matcher": "clear",
-    "script": "auto-update.sh",
-    "run": "bash"
   }
 ]
