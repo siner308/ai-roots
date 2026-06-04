@@ -18,7 +18,7 @@ Cross-provider 위임은 세 가지 목적에 쓰인다:
 
 ## 진입점
 
-Codex를 감싸는 ai-roots 제공 표면은 `/review` **스킬**(skills/review.md)뿐이다. 이 스킬은 Claude Code subagent와 `codex review --uncommitted`를 병렬로 띄운 뒤, evaluation-integrity.md §Multi-advisor synthesis에 따라 종합한다. 리뷰 부류의 모든 위임에 쓴다: 일반 diff 리뷰, 보안 민감 리뷰, 둘 다.
+Codex를 감싸는 ai-roots 제공 표면은 **/review 스킬**(`skills/review/SKILL.md`)뿐이다. 이 스킬은 하나의 공유 산출물 — 코드 변경, plan, 문서, 그 외 리뷰 가능한 무엇이든 — 을 결정한 뒤, Claude Code subagent와 Codex 실행을 병렬로 띄우고 evaluation-integrity.md §Multi-advisor synthesis에 따라 종합한다. 리뷰 부류의 모든 위임에 쓴다: 코드 diff, plan/설계 리뷰, 문서, 보안 민감 리뷰.
 
 리뷰가 아닌 Codex 작업(rescue 디버깅, 리서치, 범위가 정해진 구현)은 Bash로 적절한 플래그를 붙여 `codex`를 직접 호출한다. 이 모드들을 위한 slash-command 래퍼는 더 이상 없다 — 아래 모드별 호출을 참고하라.
 
@@ -67,7 +67,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 ## Codex 실행 메커니즘
 
-따로 관리할 관심사 두 가지:
+따로 관리할 관심사 세 가지:
 
 1. **Claude는 codex가 언제 끝나는지 알아야 한다.** `run_in_background: true` Bash를 쓴다; 하네스의 완료 알림이 Claude를 깨운다.
 2. **사용자는 codex의 추론을 실시간으로 보고 싶을 수 있다.** 로그 경로를 주고, 자기 터미널에서 `tail -f` 하게 둔다. 실시간 뷰를 Claude 쪽에서 스크립트로 짜지 마라.
