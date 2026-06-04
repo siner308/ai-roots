@@ -16,6 +16,11 @@ When writing or editing any `.md` under `rules/`, `skills/`, `agents/`, or
 - Write clean GitHub-flavored Markdown. No fixed-width padding (e.g. trailing
   spaces to an 82-column box) and no mid-sentence hard line breaks — one bullet
   is one line; let it soft-wrap. Use `-` bullets and fenced code blocks.
+- English source files (`rules/`, `skills/`, `agents/`, `hooks/`) are written in
+  English. Use another language only for content that is inherently
+  language-specific — translationese examples, a Korean `~는/은` grammar
+  illustration — never for explanatory prose that English can carry. The Korean
+  mirror under `i18n/ko/` is where the full translation lives.
 
 ## Hooks
 

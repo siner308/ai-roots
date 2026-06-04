@@ -44,7 +44,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 ### 출력 컨벤션
 | 파일 | 설명 |
 |------|------|
-| `rules/plain-language-output.md` | 출력은 입으로 말하는 리듬의 평이한 언어로 — 추상명사 쌓기 금지, 번역투 금지, 명사화보다 동사 |
+| `rules/prose-style.md` | 평이한 구어체 언어(명사 쌓기 금지, 번역투 금지, 명사화보다 동사)와, 컬럼 한계가 아니라 의미 경계에서 끊는 줄넘김 |
 | `rules/terminology-discipline.md` | 도메인 용어는 풀어쓰기; 정착된 약어는 첫 등장 시 확장; 충돌 가능한 약어는 한정어로 구분 |
 | `rules/comment-discipline.md` | 주석은 기본적으로 쓰지 않는다 — 주석/docstring은 필수가 아니며, 닫힌 허용 목록(비자명한 WHY)에 해당할 때만 작성. `comment-discipline.py` `PostToolUse` hook으로 강제 |
 

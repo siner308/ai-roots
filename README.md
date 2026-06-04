@@ -44,7 +44,7 @@ This keeps the resident set near ~41KB instead of ~92KB while preserving effecti
 ### Output Conventions
 | File | Description |
 |------|-------------|
-| `rules/plain-language-output.md` | Keep output in plain spoken-rhythm language — no abstract-noun stacks, no translationese, verbs over nominalizations |
+| `rules/prose-style.md` | Plain spoken-rhythm language (no noun-stacks, no translationese, verbs over nominalizations) and line breaks that fall at meaning boundaries, not the column limit |
 | `rules/terminology-discipline.md` | Spell out domain terms; expand established abbreviations on first use; disambiguate collision-prone ones |
 | `rules/comment-discipline.md` | Default to no comments; a comment or docstring is never mandatory. Write one only when it's on a closed allowlist (non-obvious WHY). Enforced by the `comment-discipline.py` `PostToolUse` hook |
 

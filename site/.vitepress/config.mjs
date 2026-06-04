@@ -82,7 +82,7 @@ const RULE_GROUPS = [
   ['Quality Assurance', '품질 보증', ['evaluation-integrity', 'claude-architect-principles', 'verify-each-instance']],
   ['User Growth', '사용자 성장', ['user-growth-coaching']],
   ['Knowledge Capture', '지식 포착', ['guardrail-maker', 'memory-minimalism']],
-  ['Output Conventions', '출력 규약', ['plain-language-output', 'terminology-discipline', 'comment-discipline']],
+  ['Output Conventions', '출력 규약', ['prose-style', 'terminology-discipline', 'comment-discipline']],
   ['Trigger Index', '트리거 인덱스', ['situational-skills']],
 ]
 
