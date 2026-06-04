@@ -8,6 +8,7 @@ settings.json is backed up before any write because it holds live machine config
 
 Usage: register.py <hooks_src_dir> <home_dir>
 """
+import fcntl
 import json
 import os
 import shutil
@@ -35,9 +36,12 @@ def main():
         relink(src, dst)
         print(f"linked hook: {src} -> {dst}")
 
-    # Only links resolving into the repo are removed — never a user's own.
+    # Only links resolving into the repo are removed — never a user's own. Record
+    # what we pruned so the settings cleanup can key on provenance, not on a bare
+    # missing-file test that would also reap a user's own dead registration.
     repo = os.path.dirname(os.path.abspath(hooks_src))
     managed = {e["script"] for e in manifest}
+    pruned_scripts = set()
     for name in sorted(os.listdir(hooks_dst)):
         link = os.path.join(hooks_dst, name)
         if not os.path.islink(link) or name in managed:
@@ -47,58 +51,66 @@ def main():
             target = os.path.normpath(os.path.join(hooks_dst, target))
         if target == repo or target.startswith(repo + os.sep):
             os.remove(link)
+            pruned_scripts.add(name)
             print(f"pruned orphaned hook: {link}")
 
     settings_path = os.path.join(home, ".claude", "settings.json")
-    settings = json.load(open(settings_path)) if os.path.exists(settings_path) else {}
-    hooks_cfg = settings.setdefault("hooks", {})
+    state_dir = os.path.join(home, ".claude", ".ai-roots")
+    os.makedirs(state_dir, exist_ok=True)
 
-    changed = False
+    # Serialize the read-modify-write so a manual install.sh and a shell-update
+    # one can't clobber each other's edits; write via temp + atomic rename so an
+    # interrupted run can never leave a half-written settings.json.
+    with open(os.path.join(state_dir, "settings.lock"), "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
 
-    # Remove only our own dead entries (gone from manifest and disk); never a
-    # user's entry or a still-present script.
-    for event in list(hooks_cfg):
-        groups = hooks_cfg[event]
-        for g in groups:
-            kept = []
-            for h in g.get("hooks", []):
-                cmd = h.get("command", "")
-                path = cmd.split(" ", 1)[1] if " " in cmd else ""
-                ours = os.path.dirname(path) == hooks_dst
-                if ours and os.path.basename(path) not in managed and not os.path.exists(path):
-                    print(f"pruned stale registration: {event} {g.get('matcher')} -> {cmd}")
-                    changed = True
-                    continue
-                kept.append(h)
-            g["hooks"] = kept
-        hooks_cfg[event] = [g for g in groups if g.get("hooks")]
-        if not hooks_cfg[event]:
-            del hooks_cfg[event]
+        settings = json.load(open(settings_path)) if os.path.exists(settings_path) else {}
+        hooks_cfg = settings.setdefault("hooks", {})
+        changed = False
 
-    for e in manifest:
-        command = f"{e['run']} {os.path.join(hooks_dst, e['script'])}"
-        groups = hooks_cfg.setdefault(e["event"], [])
-        group = next((g for g in groups if g.get("matcher") == e["matcher"]), None)
-        # Identical commands across matchers (SessionStart startup/resume/clear)
-        # force dedup to key on the matcher too, not the command alone.
-        if group is not None and any(h.get("command") == command for h in group.get("hooks", [])):
-            continue
-        if group is None:
-            group = {"matcher": e["matcher"], "hooks": []}
-            groups.append(group)
-        group["hooks"].append({"type": "command", "command": command})
-        changed = True
-        print(f"registered hook: {e['event']} {e['matcher']} -> {command}")
+        for event in list(hooks_cfg):
+            groups = hooks_cfg[event]
+            for g in groups:
+                kept = []
+                for h in g.get("hooks", []):
+                    cmd = h.get("command", "")
+                    path = cmd.split(" ", 1)[1] if " " in cmd else ""
+                    if os.path.dirname(path) == hooks_dst and os.path.basename(path) in pruned_scripts:
+                        print(f"pruned stale registration: {event} {g.get('matcher')} -> {cmd}")
+                        changed = True
+                        continue
+                    kept.append(h)
+                g["hooks"] = kept
+            hooks_cfg[event] = [g for g in groups if g.get("hooks")]
+            if not hooks_cfg[event]:
+                del hooks_cfg[event]
 
-    if not changed:
-        print("hooks already registered; settings.json unchanged")
-        return 0
+        for e in manifest:
+            command = f"{e['run']} {os.path.join(hooks_dst, e['script'])}"
+            groups = hooks_cfg.setdefault(e["event"], [])
+            group = next((g for g in groups if g.get("matcher") == e["matcher"]), None)
+            # Identical commands across matchers (SessionStart startup/resume/clear)
+            # force dedup to key on the matcher too, not the command alone.
+            if group is not None and any(h.get("command") == command for h in group.get("hooks", [])):
+                continue
+            if group is None:
+                group = {"matcher": e["matcher"], "hooks": []}
+                groups.append(group)
+            group["hooks"].append({"type": "command", "command": command})
+            changed = True
+            print(f"registered hook: {e['event']} {e['matcher']} -> {command}")
 
-    if os.path.exists(settings_path):
-        shutil.copy2(settings_path, f"{settings_path}.bak.{time.strftime('%Y%m%d%H%M%S')}")
-    with open(settings_path, "w") as f:
-        json.dump(settings, f, indent=2, ensure_ascii=False)
-        f.write("\n")
+        if not changed:
+            print("hooks already registered; settings.json unchanged")
+            return 0
+
+        if os.path.exists(settings_path):
+            shutil.copy2(settings_path, f"{settings_path}.bak.{time.strftime('%Y%m%d%H%M%S')}")
+        tmp_path = f"{settings_path}.tmp.{os.getpid()}"
+        with open(tmp_path, "w") as f:
+            json.dump(settings, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+        os.replace(tmp_path, settings_path)
     return 0
 
 
