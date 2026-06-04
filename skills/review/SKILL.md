@@ -1,33 +1,51 @@
 ---
 name: review
-description: "[ai-roots] Two-evaluator code review provided by the ai-roots skill set. Resolves the review target (by default the current branch's changes against its base — i.e. the PR diff plus local uncommitted edits — but also an explicit base, commit, or uncommitted-only scope), then spawns a Claude Code subagent and a Codex review in parallel on that same diff and synthesizes findings using the Agreed / Conflicting / Chosen-direction format from rules/evaluation-integrity.md §Multi-advisor synthesis. Use whenever the user requests a review of pending or proposed changes and both Claude and Codex are available."
+description: "[ai-roots] Two-evaluator review of any artifact — code changes, a plan or design Claude just produced, a document, a config, or anything reviewable. From a natural-language request it determines the artifact kind, resolves ONE concrete shared artifact (a git diff, a file, or inline text captured to a temp file), then spawns a Claude Code subagent and a Codex run in parallel on that same artifact with kind-appropriate criteria, and synthesizes findings using the Agreed / Conflicting / Chosen-direction format from rules/evaluation-integrity.md §Multi-advisor synthesis. Use whenever the user asks to review pending code, a plan, a document, or any other artifact and both Claude and Codex are available."
 ---
 
 # /review (ai-roots)
 
-Independent two-evaluator review. Both evaluators review the **same resolved target** and do not see each other's output until synthesis.
+Independent two-evaluator review of **any artifact**. Both evaluators judge the **same resolved artifact** and do not see each other's output until synthesis.
 
-The target is NOT hardcoded to the uncommitted diff. By default it is the whole set of changes this branch proposes — committed branch changes plus local uncommitted edits, measured against the base branch (the PR base when a PR exists). The user can override the scope.
+Not just diffs. The artifact can be code changes, a plan or design Claude just produced, a document, a config, a dataset — anything reviewable. The machinery is constant — two independent evaluators → Agreed / Conflicting / Chosen synthesis. Only two things vary by artifact: **how it is acquired** and **what "good" means** for it.
 
-## Scope resolution
+## 1. Resolve the artifact
 
-Resolve the target in the main session **before** spawning the evaluators. Produce two values: `DIFF_CMD` (a git command that emits exactly the diff to review) and a human-readable `TARGET` description. Pass the *same* `DIFF_CMD` to both evaluators so their scopes match.
+From the user's natural-language request, determine the **KIND** and produce ONE concrete artifact that both evaluators access **identically**, plus a human-readable `TARGET`. The main session resolves it once; the evaluators never re-interpret the request — that is what keeps the two reviews comparable.
 
-Mode is chosen from the user's argument; default is branch-vs-base.
+KIND — pick the best fit:
 
-| User argument | Mode | `DIFF_CMD` |
-|---------------|------|------------|
-| _(none)_ | branch vs base | `git diff <merge-base SHA>` |
-| `--base <ref>` | branch vs explicit base | `git diff <merge-base SHA>` |
-| `--uncommitted` | working tree only | `git diff HEAD` (plus untracked) |
-| `--commit <sha>` | one commit | `git show <commit SHA>` |
-| trailing `<paths…>` | narrows any mode | append ` -- '<path>'…` (single-quoted) |
+- **code** — "review my changes / PR / this branch / that commit", or the request is about code in a repo. Default when in a repo and the subject is code.
+- **plan** — "review this plan / the plan you just wrote / this approach / this design". The artifact is often text Claude produced in *this conversation*.
+- **doc** — a prose document, README, spec, PRD, proposal.
+- **generic** — anything else: a config, a dataset, a decision, a checklist. Catch-all.
 
-`git diff <merge-base SHA>` diffs the fork point to the **working tree**, so it captures committed branch changes *and* uncommitted local edits in one diff — exactly "PR diff + local changes". This is what `codex review --base` does internally; we resolve the merge-base ourselves and embed the resulting command so the persona (below) can travel with it.
+Make the artifact concrete and **shared** (identical bytes for both evaluators):
 
-**Injection safety — STRICT.** `DIFF_CMD` is embedded into a prompt that BOTH evaluators are instructed to run in a shell. A git ref or branch name can legally contain shell metacharacters (`;`, `$( )`, backticks), so interpolating a raw ref into the command is a command-injection vector — especially for `--base <ref>` and PR base names from untrusted forks. Defuse it by resolving every ref to a **commit SHA in the main session** (where the ref is an ordinary quoted shell variable and cannot inject), then embedding only the hex SHA. SHAs contain no metacharacters. Never embed a raw ref, and single-quote any path filter (rejecting paths that contain a single quote).
+- **code** → resolve a `DIFF_CMD` (see Code scope resolution). Both evaluators run it.
+- **inline plan/doc/generic** that lives only in this conversation (no file) → capture it verbatim to a temp file: `ARTIFACT="$(mktemp)"; cat > "$ARTIFACT" <<'EOF' … EOF`. Both read that file. This is critical: re-describing an inline plan to each evaluator would give them different text — capture once.
+- **file-backed plan/doc/generic** → the path(s). Both read them.
 
-### Base ref auto-detection (branch-vs-base mode)
+State the resolved `TARGET` to the user before reviewing (e.g. "Reviewing the migration plan (inline, 42 lines)", "Reviewing `feature` vs `origin/main` (PR #123) + local changes", "Reviewing `docs/rfc-007.md`"). Ambiguous request → pick the most likely KIND and let `TARGET` be the correction point; truly unresolvable → ask one clarifying question.
+
+### Code scope resolution (KIND=code)
+
+The user names the scope in natural language; map it to an intent, then resolve to a SHA-based command:
+
+| User says (examples) | Intent | `DIFF_CMD` |
+|----------------------|--------|------------|
+| _(nothing)_, "review my changes", "this branch" | branch vs base | `git diff <merge-base SHA>` |
+| "vs main", "against develop", "compared to <ref>" | branch vs named base | `git diff <merge-base SHA>` |
+| "uncommitted", "working tree", "what I haven't committed" | working tree only | `git diff HEAD` (plus untracked) |
+| "the last commit", "HEAD", "commit <sha>" | one commit | `git show <SHA>` |
+| "last 3 commits", "since <ref>" | a commit range | `git diff <range-start SHA>` |
+| "just the X files", "only <path>" | narrows any of the above | append ` -- '<path>'…` |
+
+Default when scope is empty or vague is **branch-vs-base**. `git diff <merge-base SHA>` diffs the fork point to the working tree, so it captures committed branch changes *and* uncommitted local edits in one diff — "PR diff + local changes".
+
+**Injection safety — STRICT.** `DIFF_CMD` is embedded into a prompt the evaluators run in a shell. A git ref or branch name can legally contain shell metacharacters (`;`, `$( )`, backticks), so interpolating a raw ref is a command-injection vector — especially a named base or a PR base from an untrusted fork. Resolve every ref to a **commit SHA in the main session** (where it is a quoted variable and cannot inject) and embed only the hex SHA. Never embed a raw ref, and single-quote any path filter (reject paths containing a single quote).
+
+Base ref auto-detection (default / named-base). For a named base ("vs <ref>"), set `BASE` to that ref and skip detection:
 
 ```bash
 PR_BASE="$(gh pr view --json baseRefName -q .baseRefName 2>/dev/null)"
@@ -38,7 +56,6 @@ else
           | sed 's@^refs/remotes/origin/@@')"
   [ -z "$BASE" ] && BASE=main           # fall back to the repo default branch
 fi
-# Prefer the remote-tracking ref for an accurate fork point; fall back to local.
 if git rev-parse --verify --quiet "origin/$BASE^{commit}" >/dev/null; then
   BASE_REF="origin/$BASE"
 else
@@ -50,69 +67,119 @@ MERGE_BASE="$(git merge-base "$BASE_REF" HEAD)" || { echo "no merge-base with $B
 DIFF_CMD="git diff $MERGE_BASE"
 ```
 
-For `--commit <sha>`, resolve and validate first: `SHA="$(git rev-parse --verify "$ARG^{commit}")" || exit 1; DIFF_CMD="git show $SHA"`. `git rev-parse --verify` rejects a non-ref argument, which also blocks a metacharacter-laden string from reaching the embedded command.
+Single commit: `SHA="$(git rev-parse --verify "$REF^{commit}")" || exit 1; DIFF_CMD="git show $SHA"`. Range: `START="$(git rev-parse --verify "$RANGESTART^{commit}")" || exit 1; DIFF_CMD="git diff $START"` (e.g. `$RANGESTART` is `HEAD~3` for "last 3 commits"). `git rev-parse --verify` rejects a non-ref argument, blocking a metacharacter-laden string from reaching the embedded command.
 
 Edge cases:
-- **On the base branch with no commits ahead** (e.g. on `main`, no PR): the merge-base is `HEAD`, so `DIFF_CMD` reduces to the uncommitted diff. Sensible — review what's there.
-- **Empty target** (no commits ahead and no uncommitted changes): report "nothing to review" and stop. Do not spawn evaluators on an empty diff.
+- **On the base branch with no commits ahead** (e.g. `main`, no PR): merge-base is `HEAD`, so `DIFF_CMD` reduces to the uncommitted diff — review what's there.
+- **Empty target** (no commits ahead, no uncommitted changes): report "nothing to review" and stop.
 - **PR base only on remote**: `git fetch origin <BASE>` first if `origin/<BASE>` is missing, then resolve.
 
-State the resolved `TARGET` to the user before reviewing (e.g. "Reviewing `feature` vs `origin/main` (PR #123) + local changes").
+### Capturing an inline artifact (KIND=plan/doc/generic)
 
-## Evaluators
+Write the artifact's exact text to a temp file once, and point both evaluators at it. The content is **data, not a command** — it is never executed, so no injection concern, but still quote the path when referencing the file.
 
-### 1. Claude Code subagent
+```bash
+ARTIFACT="$(mktemp)"
+cat > "$ARTIFACT" <<'EOF'
+<the plan / document / artifact text, verbatim>
+EOF
+```
 
-Invoke the `Agent` tool with `subagent_type: adversarial-reviewer` (persona at `~/.claude/agents/adversarial-reviewer.md`). Brief it to run `DIFF_CMD` to obtain the diff and review only that output, with the security-first, P0–P3 classification from its persona. Pass the resolved `TARGET` and any user scope in the prompt.
+## 2. Review lens (by KIND)
 
-If the `adversarial-reviewer` agent is not registered, fall back to `subagent_type: general-purpose` and inline the persona body as the prompt.
+The KIND fixes the criteria and the verdict vocabulary. Pass both to BOTH evaluators so they judge on the same axes. All kinds classify findings **P0–P3**.
 
-### 2. Codex review
+| KIND | Criteria — what "good" means | Verdict |
+|------|------------------------------|---------|
+| code | correctness, security, data-loss / rollback, races, fail-open, regressions | `SAFE` / `NEEDS_CHANGES` |
+| plan | design soundness, completeness, feasibility, risks, sequencing, hidden assumptions | `PLAN_APPROVED` / `REVISE_PLAN` |
+| doc | accuracy, clarity, gaps, audience fit, internal consistency | `APPROVED` / `REVISE` |
+| generic | state the criteria up front — what would make *this* artifact good | findings only; no forced verdict |
 
-`codex review`'s `--uncommitted` / `--base` / `--commit` flags are mutually exclusive with a custom prompt, so the persona cannot ride along with them. Use **custom-prompt mode** instead and embed `DIFF_CMD` so codex reviews the exact same scope with our persona:
+**Verifiable vs non-verifiable** (`rules/evaluation-integrity.md`). `code` is largely verifiable (tests, types, compilation) so a binary verdict is meaningful. `plan` / `doc` / `generic` are partly or non-verifiable: do **not** converge on one "right" answer — surface trade-offs and 2–3 options where the evaluators differ, and prefer `REVISE` / findings over a confident pass when the call is a matter of judgment.
+
+## 3. Evaluators
+
+Both review the SAME artifact, briefed with the KIND's criteria + verdict vocabulary. Spawn in parallel (one response) and wait for both before synthesizing.
+
+### Claude subagent
+
+- **code** → `Agent` with `subagent_type: adversarial-reviewer` (persona at `~/.claude/agents/adversarial-reviewer.md`). Brief it to run `DIFF_CMD` and review only that output.
+- **plan / doc / generic** → same skeptical stance, briefed as a general critical reviewer: give it the artifact (the temp-file path to read, or the file paths), the KIND's criteria and verdict vocabulary, and P0–P3. Reuse the `adversarial-reviewer` persona but override its code-specific criteria/verdict in the brief, or fall back to `subagent_type: general-purpose`.
+
+Always pass the resolved `TARGET` and any extra review focus from the user.
+
+### Codex
+
+- **code (diff)** → `codex review` custom-prompt mode with the embedded `DIFF_CMD` (its flags `--uncommitted`/`--base`/`--commit` are mutually exclusive with a custom prompt, so the persona could not ride along with them):
 
 ```bash
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
 PROMPT="$(mktemp)"
 {
   cat "$HOME/.claude/agents/adversarial-reviewer.md"
-  printf '\n\n---\nObtain the review target by running exactly this command:\n\n    %s\n\nReview ONLY the diff that command produces. Apply the persona above (security-first, P0–P3).\n' "$DIFF_CMD"
+  printf '\n\n---\nObtain the review target by running exactly this command:\n\n    %s\n\nReview ONLY the diff that command produces. Apply the persona above (security-first, P0–P3). End with VERDICT: SAFE | NEEDS_CHANGES.\n' "$DIFF_CMD"
 } > "$PROMPT"
 
-# Always wrap codex in a timeout: a hung codex never exits, so its run_in_background
-# completion notification never fires and the main session waits forever. timeout
-# guarantees the task ends (exit 124 on expiry). macOS lacks coreutils `timeout`
-# unless brew-installed (`gtimeout`); degrade gracefully if neither exists.
-# Store ONLY the binary name (a single word). zsh does not word-split unquoted
-# variables, so a "timeout 900" string would be run as one command and fail with
-# `command not found: timeout 900`; keeping 900 a literal arg works in bash and zsh.
+# A hung codex never exits, so its run_in_background completion notification never
+# fires and the main session waits forever (124 on expiry). macOS lacks coreutils
+# `timeout` unless brew-installed (`gtimeout`). Store ONLY the binary name — a
+# "timeout 1200" string would run as one command (zsh does not word-split it).
 TIMEOUT_BIN=""
 if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
 elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 
-# Redirect (not pipe) codex output to the log so $? is codex's own exit status —
-# portable across bash and zsh (no PIPESTATUS/pipestatus array). cat shows it after.
+# Stream to the log AND this task's stdout via process substitution so progress is
+# visible live. A plain `> "$LOG"` then `cat` leaves the background task's stdout
+# empty until codex finishes — which reads as "hung" and tempts killing a healthy
+# run (xhigh review legitimately takes many minutes). `> >(tee …)` keeps $? as
+# codex's own exit (124 on timeout), unlike a `| tee` pipe, and works in bash + zsh.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 900 codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > >(tee "$LOG") 2>&1
 else
-  codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex review -c model="gpt-5.5" -c model_reasoning_effort=xhigh - < "$PROMPT" > >(tee "$LOG") 2>&1
 fi
 CODEX_EXIT=$?
-cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
-- Model is set via `-c model=…`; `codex review` does **not** accept `-m`.
-- No `--uncommitted` / `--base` flag — the scope lives in the embedded command, single-quoted so the local shell does not expand `$(…)` before codex runs it.
-- Use `run_in_background: true` so the main session is notified when Codex exits.
-- **Read the codex exit status** (`$CODEX_EXIT`). `124` means the review timed out — treat it like Codex being unavailable: proceed with the Claude evaluator and note in the synthesis that only one reviewer ran (and that codex timed out). Do not silently drop a timeout as if codex returned a clean verdict.
-- If `codex` is not on `PATH`, skip this evaluator and note in the synthesis that only one reviewer ran.
+- **plan / doc / generic** → `codex exec` (the general non-interactive path; `codex review` is git-diff-only). Embed the artifact's contents and the KIND's lens:
+
+```bash
+LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
+PROMPT="$(mktemp)"
+{
+  cat "$HOME/.claude/agents/adversarial-reviewer.md"
+  printf '\n\n---\nYou are reviewing a %s, not code. Apply the persona above (skeptical, adversarial), but judge on these criteria: %s. Classify findings P0–P3 and end with VERDICT: %s.\nReview ONLY the artifact between the markers below.\n\n===== BEGIN ARTIFACT: %s =====\n' "$KIND" "$CRITERIA" "$VERDICT_VOCAB" "$TARGET"
+  cat "$ARTIFACT"   # or: for f in $FILES; do echo "--- $f ---"; cat "$f"; done
+  printf '\n===== END ARTIFACT =====\n'
+} > "$PROMPT"
+
+TIMEOUT_BIN=""
+if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
+elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
+
+# read-only sandbox: review must not modify the workspace. codex exec's default
+# model is gpt-5.5; -m is optional. Same tee + exit handling as above.
+if [ -n "$TIMEOUT_BIN" ]; then
+  "$TIMEOUT_BIN" 1200 codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > >(tee "$LOG") 2>&1
+else
+  codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > >(tee "$LOG") 2>&1
+fi
+CODEX_EXIT=$?
+echo "codex exit: $CODEX_EXIT (124 = timed out)"
+```
+
+Common to both:
+- `run_in_background: true` so the main session is notified when Codex exits.
+- **Read `$CODEX_EXIT`.** `124` = timed out: treat Codex as unavailable, proceed with the Claude evaluator, and note in the synthesis that only one reviewer ran (and that codex timed out). Never drop a timeout as if codex returned a clean verdict.
+- If `codex` is not on `PATH`, skip it and note only one reviewer ran.
 
 ### Parallelism
 
-Spawn the Agent call and the Bash invocation in the same response so they run concurrently. Wait for both to complete before producing the synthesis.
+Spawn the Agent call and the Bash invocation in the same response so they run concurrently. Wait for both before producing the synthesis.
 
-## Synthesis
+## 4. Synthesis
 
 Apply `rules/evaluation-integrity.md` §Multi-advisor synthesis. The output MUST separate three buckets:
 
@@ -120,17 +187,19 @@ Apply `rules/evaluation-integrity.md` §Multi-advisor synthesis. The output MUST
 2. **Conflicting** — findings flagged by only one evaluator, or where evaluators disagree on severity / cause / fix. Single-evaluator findings belong here, not in Agreed. Silence is not agreement.
 3. **Chosen direction + rationale** — the decision given the conflicts, and why. If a conflict is unresolved, say so and escalate to the user rather than picking silently.
 
-For each finding, preserve the originating evaluator's severity classification (P0–P3). Do not re-rank findings to look consistent across evaluators — disagreement on severity is itself signal.
+Preserve each evaluator's severity (P0–P3) and verdict; do not re-rank to look consistent — disagreement is itself signal. For non-verifiable kinds (plan/doc/generic), prefer presenting trade-offs and options over a single confident verdict.
 
-## Scope (user overrides)
+## Extra instructions
 
-Pass the user's additional scope (if any) to BOTH evaluators verbatim. Do not paraphrase or trim. A trailing path filter narrows `DIFF_CMD` for both via the ` -- <paths>` suffix.
+The user's *scope* is resolved once into the artifact (see step 1) — not passed around as words. Any additional *review focus* ("watch the auth path", "is the rollback safe?") is passed to BOTH evaluators verbatim, alongside the same artifact. Do not paraphrase or trim it.
 
 ## Anti-patterns
 
-- Defaulting to uncommitted-only when the user is on a feature branch with committed work — the default target is branch-vs-base, which includes both.
-- Running only one evaluator and labeling the result a "review" — that defeats the cross-provider purpose. If Codex is unavailable, say so explicitly.
-- Passing different scopes to the two evaluators — both must review the diff from the same `DIFF_CMD`.
-- Smoothing over disagreements in synthesis. The Conflicting bucket exists precisely because the synthesizer is biased toward making the output sound confident.
+- Assuming "review" means a code diff. Detect the KIND first; a plan or document is a first-class target.
+- Re-describing an inline plan/artifact separately to each evaluator — they then review different text. Capture it to one shared file first.
+- Running only one evaluator and calling it a "review" — that defeats the cross-provider purpose. If Codex is unavailable, say so explicitly.
+- Giving the two evaluators different artifacts or different criteria — both must judge the same artifact on the same axes.
+- Forcing a binary verdict on a non-verifiable artifact (plan/doc/generic) instead of surfacing trade-offs and options.
+- Smoothing over disagreements in synthesis. The Conflicting bucket exists precisely because the synthesizer is biased toward sounding confident.
 - Promoting a single-evaluator finding to "Agreed" because nothing contradicted it.
 - Auto-applying fixes from either evaluator. Report findings; the main session decides what to apply.
