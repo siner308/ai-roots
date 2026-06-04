@@ -85,6 +85,8 @@ cat > "$ARTIFACT" <<'EOF'
 EOF
 ```
 
+**빈 산출물.** 고정한 파일이 비었거나(인라인 텍스트가 공백) 파일 기반 산출물이 읽을 파일로 풀리지 않으면, "nothing to review"라 보고하고 멈춘다 — 빈 code 타겟과 동일. 아무것도 없는데 평가자를 띄우지 않는다.
+
 ## 2. 리뷰 렌즈 (KIND별)
 
 KIND가 기준과 verdict 어휘를 고정한다. 둘을 두 평가자 모두에게 넘겨 같은 축에서 판단하게 한다. 모든 종류는 발견을 **P0–P3**로 분류한다.
@@ -143,7 +145,7 @@ cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
-- **plan / doc / generic** → `codex exec`(범용 비대화형 경로; `codex review`는 git-diff 전용). 산출물 내용과 KIND의 렌즈를 박는다:
+- **plan / doc / generic** → `codex exec`(범용 비대화형 경로; `codex review`는 git-diff 전용). 산출물 내용과 KIND의 렌즈를 박는다. 실행 전에 블록이 쓰는 셸 변수를 설정한다: `KIND`, `CRITERIA`, `VERDICT_VOCAB`은 §2 표에서, 그리고 `ARTIFACT`(1단계의 인라인 temp 파일) 또는 `FILES`(파일 기반 경로들의 bash 배열):
 
 ```bash
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
@@ -151,7 +153,7 @@ PROMPT="$(mktemp)"
 {
   cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nYou are reviewing a %s, not code. Apply the persona above (skeptical, adversarial), but judge on these criteria: %s. Classify findings P0–P3 and end with VERDICT: %s.\nReview ONLY the artifact between the markers below.\n\n===== BEGIN ARTIFACT: %s =====\n' "$KIND" "$CRITERIA" "$VERDICT_VOCAB" "$TARGET"
-  cat "$ARTIFACT"   # or: for f in $FILES; do echo "--- $f ---"; cat "$f"; done
+  cat "$ARTIFACT"   # inline; for file-backed use an array: for f in "${FILES[@]}"; do printf '\n--- %s ---\n' "$f"; cat "$f"; done
   printf '\n===== END ARTIFACT =====\n'
 } > "$PROMPT"
 

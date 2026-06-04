@@ -75,12 +75,10 @@ def main():
                 kept = []
                 for h in g.get("hooks", []):
                     cmd = h.get("command", "")
-                    try:
-                        tokens = shlex.split(cmd)
-                    except ValueError:
-                        tokens = []
-                    path = tokens[1] if len(tokens) > 1 else ""
-                    if os.path.dirname(path) == hooks_dst and os.path.basename(path) in pruned_scripts:
+                    # Match against the path we'd have written for each pruned hook
+                    # as a substring — robust to quoted, unquoted, and space-bearing
+                    # paths alike (shlex.split mis-splits a legacy unquoted spaced path).
+                    if any(os.path.join(hooks_dst, base) in cmd for base in pruned_scripts):
                         print(f"pruned stale registration: {event} {g.get('matcher')} -> {cmd}")
                         changed = True
                         continue

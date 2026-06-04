@@ -85,6 +85,8 @@ cat > "$ARTIFACT" <<'EOF'
 EOF
 ```
 
+**Empty artifact.** If the captured file is empty (the inline text was blank) or a file-backed artifact resolves to no readable file, report "nothing to review" and stop — same as an empty code target. Never spawn evaluators on nothing.
+
 ## 2. Review lens (by KIND)
 
 The KIND fixes the criteria and the verdict vocabulary. Pass both to BOTH evaluators so they judge on the same axes. All kinds classify findings **P0–P3**.
@@ -143,7 +145,7 @@ cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
-- **plan / doc / generic** → `codex exec` (the general non-interactive path; `codex review` is git-diff-only). Embed the artifact's contents and the KIND's lens:
+- **plan / doc / generic** → `codex exec` (the general non-interactive path; `codex review` is git-diff-only). Embed the artifact's contents and the KIND's lens. Before running, set the shell vars the block uses: `KIND`, `CRITERIA`, and `VERDICT_VOCAB` from the §2 table, plus `ARTIFACT` (the inline temp file from step 1) or `FILES` (a bash array of file-backed paths):
 
 ```bash
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
@@ -151,7 +153,7 @@ PROMPT="$(mktemp)"
 {
   cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nYou are reviewing a %s, not code. Apply the persona above (skeptical, adversarial), but judge on these criteria: %s. Classify findings P0–P3 and end with VERDICT: %s.\nReview ONLY the artifact between the markers below.\n\n===== BEGIN ARTIFACT: %s =====\n' "$KIND" "$CRITERIA" "$VERDICT_VOCAB" "$TARGET"
-  cat "$ARTIFACT"   # or: for f in $FILES; do echo "--- $f ---"; cat "$f"; done
+  cat "$ARTIFACT"   # inline; for file-backed use an array: for f in "${FILES[@]}"; do printf '\n--- %s ---\n' "$f"; cat "$f"; done
   printf '\n===== END ARTIFACT =====\n'
 } > "$PROMPT"
 
