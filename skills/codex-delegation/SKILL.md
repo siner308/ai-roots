@@ -98,7 +98,7 @@ No sentinel, no `tail -f` from Claude, no split pane. See lessons/codex-tmux-mon
 
 ```
 PROMPT="$(mktemp)"
-cat > "$PROMPT" <<'EOF'
+command cat > "$PROMPT" <<'EOF'
 <reviewer prompt or task brief>
 EOF
 Bash(run_in_background: true, command: "codex exec ... -- - < '$PROMPT' 2>&1 | tee '$LOG'")

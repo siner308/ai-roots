@@ -23,7 +23,7 @@ KIND — 가장 잘 맞는 것을 고른다:
 산출물을 구체적이고 **공유된** 형태로 만든다(두 평가자에게 동일 바이트):
 
 - **code** → `DIFF_CMD`를 결정한다(코드 범위 결정 참고). 두 평가자가 실행한다.
-- 이 대화에만 있는 **인라인 plan/doc/generic**(파일 없음) → 그 텍스트를 그대로 temp 파일에 고정한다: `ARTIFACT="$(mktemp)"; cat > "$ARTIFACT" <<'EOF' … EOF`. 둘 다 그 파일을 읽는다. 핵심이다: 인라인 plan을 각 평가자에게 다시 설명하면 서로 다른 텍스트가 된다 — 한 번 고정한다.
+- 이 대화에만 있는 **인라인 plan/doc/generic**(파일 없음) → 그 텍스트를 그대로 temp 파일에 고정한다: `ARTIFACT="$(mktemp)"; command cat > "$ARTIFACT" <<'EOF' … EOF`. 둘 다 그 파일을 읽는다. 핵심이다: 인라인 plan을 각 평가자에게 다시 설명하면 서로 다른 텍스트가 된다 — 한 번 고정한다.
 - **파일로 된 plan/doc/generic** → 경로(들). 둘 다 읽는다.
 
 리뷰 전에 결정된 `TARGET`을 사용자에게 알려준다(예: "migration plan 리뷰 (인라인, 42줄)", "`feature` vs `origin/main` (PR #123) + 로컬 변경 리뷰", "`docs/rfc-007.md` 리뷰"). 모호하면 가장 그럴듯한 KIND를 고르고 `TARGET`을 교정 지점으로 삼는다. 정말 풀 수 없으면 한 가지 확인 질문을 한다.
@@ -80,7 +80,7 @@ DIFF_CMD="git diff $MERGE_BASE"
 
 ```bash
 ARTIFACT="$(mktemp)"
-cat > "$ARTIFACT" <<'EOF'
+command cat > "$ARTIFACT" <<'EOF'
 <the plan / document / artifact text, verbatim>
 EOF
 ```
@@ -119,7 +119,7 @@ KIND가 기준과 verdict 어휘를 고정한다. 둘을 두 평가자 모두에
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
 PROMPT="$(mktemp)"
 {
-  cat "$HOME/.claude/agents/adversarial-reviewer.md"
+  command cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nObtain the review target by running exactly this command:\n\n    %s\n\nReview ONLY the diff that command produces. Apply the persona above (security-first, P0–P3). End with VERDICT: SAFE | NEEDS_CHANGES.\n' "$DIFF_CMD"
 } > "$PROMPT"
 
@@ -141,7 +141,7 @@ else
   codex review -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
-cat "$LOG"
+command cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
@@ -151,9 +151,9 @@ echo "codex exit: $CODEX_EXIT (124 = timed out)"
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
 PROMPT="$(mktemp)"
 {
-  cat "$HOME/.claude/agents/adversarial-reviewer.md"
+  command cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nYou are reviewing a %s, not code. Apply the persona above (skeptical, adversarial), but judge on these criteria: %s. Classify findings P0–P3 and end with VERDICT: %s.\nReview ONLY the artifact between the markers below.\n\n===== BEGIN ARTIFACT: %s =====\n' "$KIND" "$CRITERIA" "$VERDICT_VOCAB" "$TARGET"
-  cat "$ARTIFACT"   # inline; for file-backed use an array: for f in "${FILES[@]}"; do printf '\n--- %s ---\n' "$f"; cat "$f"; done
+  command cat "$ARTIFACT"   # inline; for file-backed use an array: for f in "${FILES[@]}"; do printf '\n--- %s ---\n' "$f"; command cat "$f"; done
   printf '\n===== END ARTIFACT =====\n'
 } > "$PROMPT"
 
@@ -169,7 +169,7 @@ else
   codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
-cat "$LOG"
+command cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 

@@ -23,7 +23,7 @@ KIND — pick the best fit:
 Make the artifact concrete and **shared** (identical bytes for both evaluators):
 
 - **code** → resolve a `DIFF_CMD` (see Code scope resolution). Both evaluators run it.
-- **inline plan/doc/generic** that lives only in this conversation (no file) → capture it verbatim to a temp file: `ARTIFACT="$(mktemp)"; cat > "$ARTIFACT" <<'EOF' … EOF`. Both read that file. This is critical: re-describing an inline plan to each evaluator would give them different text — capture once.
+- **inline plan/doc/generic** that lives only in this conversation (no file) → capture it verbatim to a temp file: `ARTIFACT="$(mktemp)"; command cat > "$ARTIFACT" <<'EOF' … EOF`. Both read that file. This is critical: re-describing an inline plan to each evaluator would give them different text — capture once.
 - **file-backed plan/doc/generic** → the path(s). Both read them.
 
 State the resolved `TARGET` to the user before reviewing (e.g. "Reviewing the migration plan (inline, 42 lines)", "Reviewing `feature` vs `origin/main` (PR #123) + local changes", "Reviewing `docs/rfc-007.md`"). Ambiguous request → pick the most likely KIND and let `TARGET` be the correction point; truly unresolvable → ask one clarifying question.
@@ -80,7 +80,7 @@ Write the artifact's exact text to a temp file once, and point both evaluators a
 
 ```bash
 ARTIFACT="$(mktemp)"
-cat > "$ARTIFACT" <<'EOF'
+command cat > "$ARTIFACT" <<'EOF'
 <the plan / document / artifact text, verbatim>
 EOF
 ```
@@ -119,7 +119,7 @@ Always pass the resolved `TARGET` and any extra review focus from the user.
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
 PROMPT="$(mktemp)"
 {
-  cat "$HOME/.claude/agents/adversarial-reviewer.md"
+  command cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nObtain the review target by running exactly this command:\n\n    %s\n\nReview ONLY the diff that command produces. Apply the persona above (security-first, P0–P3). End with VERDICT: SAFE | NEEDS_CHANGES.\n' "$DIFF_CMD"
 } > "$PROMPT"
 
@@ -141,7 +141,7 @@ else
   codex review -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
-cat "$LOG"
+command cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
@@ -151,9 +151,9 @@ echo "codex exit: $CODEX_EXIT (124 = timed out)"
 LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
 PROMPT="$(mktemp)"
 {
-  cat "$HOME/.claude/agents/adversarial-reviewer.md"
+  command cat "$HOME/.claude/agents/adversarial-reviewer.md"
   printf '\n\n---\nYou are reviewing a %s, not code. Apply the persona above (skeptical, adversarial), but judge on these criteria: %s. Classify findings P0–P3 and end with VERDICT: %s.\nReview ONLY the artifact between the markers below.\n\n===== BEGIN ARTIFACT: %s =====\n' "$KIND" "$CRITERIA" "$VERDICT_VOCAB" "$TARGET"
-  cat "$ARTIFACT"   # inline; for file-backed use an array: for f in "${FILES[@]}"; do printf '\n--- %s ---\n' "$f"; cat "$f"; done
+  command cat "$ARTIFACT"   # inline; for file-backed use an array: for f in "${FILES[@]}"; do printf '\n--- %s ---\n' "$f"; command cat "$f"; done
   printf '\n===== END ARTIFACT =====\n'
 } > "$PROMPT"
 
@@ -169,7 +169,7 @@ else
   codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
-cat "$LOG"
+command cat "$LOG"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 

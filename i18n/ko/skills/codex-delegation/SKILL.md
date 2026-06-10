@@ -99,7 +99,7 @@ sentinel 없이, Claude 쪽 `tail -f` 없이, split pane 없이. 이전 래퍼�
 
 ```
 PROMPT="$(mktemp)"
-cat > "$PROMPT" <<'EOF'
+command cat > "$PROMPT" <<'EOF'
 <reviewer prompt or task brief>
 EOF
 Bash(run_in_background: true, command: "codex exec ... -- - < '$PROMPT' 2>&1 | tee '$LOG'")
