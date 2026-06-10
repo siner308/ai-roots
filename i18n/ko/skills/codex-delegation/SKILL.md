@@ -59,7 +59,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 ## 라우팅 규칙
 
-**막힌 문제에는 three-turn 상한.** 같은 가설로 4번째 인라인 턴을 시도하지 마라. ruled-out 가설을 모두 포함해서 Codex rescue(read-only sandbox)에 위임하라.
+**막힌 문제에는 three-turn 상한.** 같은 가설로 4번째 인라인 턴을 시도하지 마라. ruled-out 가설을 모두 포함해서 `/codex:rescue`(read-only)에 위임하라 — Three-Turn Rescue 프로토콜 참고.
 
 **보안 민감 변경에는 adversarial 리뷰.** authentication, authorization, 데이터베이스 쓰기, 네트워크 경계, secret 처리, trust 경계를 건드리는 모든 동작 변경 뒤에는 `/review`를 호출한다. read-only 읽기나 순수 내부 리팩터링은 트리거하지 않는다. 리뷰어 페르소나 — 회의적, 보안 우선, 발견을 P0–P3로 분류, 높은 커버리지에서 critical 이슈가 없을 때만 `VERDICT: SAFE`를 반환 — 는 agents/adversarial-reviewer.md(`~/.claude/agents/`에 설치됨)에 있고, 스킬이 stdin으로 `codex review`에 파이프한다.
 
@@ -70,7 +70,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 1. **Turn 1** — 원래 계획.
 2. **Turn 2** — 가설을 수정한다(근본 원인이 다른 계층에 있을 수 있다; parallel-hypothesis-investigation.md 참고).
 3. **Turn 3** — 가설 하나 더.
-4. **After Turn 3** — `codex exec --sandbox read-only ...`에 원래 작업, 시도한 각 가설과 실패 이유, 최소 재현 케이스, ruled-out 파일을 stdin으로 넘긴다.
+4. **After Turn 3** — `/codex:rescue`(또는 Agent 도구의 `subagent_type: "codex:codex-rescue"`)에 넘긴다: 원래 작업, 시도한 각 가설과 실패 이유, 최소 재현 케이스, ruled-out 파일. companion 플러그인이 없으면 같은 내용을 stdin으로 넣어 `codex exec --sandbox read-only ...`로 fallback한다.
 
 "turn"은 메시지 하나가 아니라 실질적 시도 하나다. 셋을 넘기면 한계 정보가 무너지고 anchoring bias가 굳어진다.
 

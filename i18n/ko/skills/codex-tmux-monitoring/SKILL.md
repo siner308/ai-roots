@@ -14,7 +14,7 @@ description: "장시간 도는 서브프로세스(특히 Codex)를 tmux split pa
 
   ## 실제로 무슨 일이 있었나
 
-  전형적인 cc tmux 하네스 아래에서 /codex:diff-review를 돌렸더니 이런 상태가 됐습니다:
+  전형적인 cc tmux 하네스 아래에서 /codex:review를 돌렸더니 이런 상태가 됐습니다:
 
   • Codex가 끝나고 자기 pane에 === CODEX DONE ===을 출력했다.
   • 나중에 grep해보니 로그 파일에 sentinel 문자열이 있었다.

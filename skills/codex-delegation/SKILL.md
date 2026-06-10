@@ -58,7 +58,7 @@ Do not pick a broader mode for convenience. Research does not need write access.
 
 ## Routing Rules
 
-**Three-turn cap on stuck problems.** Do not attempt a 4th inline turn on the same hypothesis. Delegate to a Codex rescue (read-only sandbox) with all ruled-out hypotheses included.
+**Three-turn cap on stuck problems.** Do not attempt a 4th inline turn on the same hypothesis. Delegate to `/codex:rescue` (read-only) with all ruled-out hypotheses included — see the Three-Turn Rescue Protocol.
 
 **Adversarial review on security-sensitive changes.** After every behavioral change touching authentication, authorization, database writes, network boundaries, secret handling, or trust boundaries, invoke `/review`. Read-only reads or pure internal refactors do not trigger. The reviewer persona — skeptical, security-first, classifies findings P0–P3, returns `VERDICT: SAFE` only when no critical issues surface at high coverage — lives in agents/adversarial-reviewer.md (installed to `~/.claude/agents/`) and is piped via stdin to `codex review` by the skill.
 
@@ -69,7 +69,7 @@ Do not pick a broader mode for convenience. Research does not need write access.
 1. **Turn 1** — original plan.
 2. **Turn 2** — revise the hypothesis (root cause may be in a different layer; see parallel-hypothesis-investigation.md).
 3. **Turn 3** — one more hypothesis.
-4. **After Turn 3** — `codex exec --sandbox read-only ...` with the original task, each hypothesis attempted and why it failed, a minimal reproducer, and ruled-out files on stdin.
+4. **After Turn 3** — hand it to `/codex:rescue` (or the Agent tool with `subagent_type: "codex:codex-rescue"`): the original task, each hypothesis attempted and why it failed, a minimal reproducer, and ruled-out files. Without the companion plugin, fall back to `codex exec --sandbox read-only ...` with the same content on stdin.
 
 A "turn" is one substantive attempt, not one message. Past three, marginal information collapses and anchoring bias hardens.
 

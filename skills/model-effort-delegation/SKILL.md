@@ -81,7 +81,7 @@ description: "Apply when deciding which executor (main session vs subagent vs te
                                                                                   
   ## Cross-Provider Delegation (Codex)                                            
                                                                                   
-  If Codex CLI is available on PATH, see codex/codex-delegation.md for mode       
+  If Codex CLI is available on PATH, see the codex-delegation skill for mode       
   selection, three-turn rescue protocol, security-sensitive review triggers       
   (/review), capability routing, execution mechanics, and plan-stage review. Codex
   delegation is orthogonal to the Opus/Sonnet/Haiku selection above — in-platform
@@ -144,7 +144,7 @@ description: "Apply when deciding which executor (main session vs subagent vs te
   • Escalate to Opus after 3 failures or when a design decision surfaces         
   • Briefings must include file paths, signatures, verification, and a request for
   decision reasoning                                                              
-  • If Codex CLI is available, see codex/codex-delegation.md for cross-provider  
+  • If Codex CLI is available, see the codex-delegation skill for cross-provider  
   rules (three-turn cap, adversarial review via /review, capability routing, plan-
   stage review).                                                                  
   • **Project CLAUDE.md can strengthen these defaults** — e.g., per-PR two-     

@@ -14,7 +14,7 @@ description: "Apply when tempted to monitor a long-running subprocess (especiall
                                                                                   
   ## What actually happened                                                       
                                                                                   
-  A /codex:diff-review run under the typical cc tmux harness produced this state: 
+  A /codex:review run under the typical cc tmux harness produced this state: 
                                                                                   
   • Codex finished and printed === CODEX DONE === to its pane.                   
   • The sentinel string was present in the log file when grepped after the fact. 

@@ -79,7 +79,7 @@ description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Ha
 
   Codex CLI가 PATH에 있으면 모드 선택, 3-턴 rescue protocol, 보안 민감 리뷰
   트리거(/review), capability routing, 실행 메커니즘, plan-stage review는
-  codex/codex-delegation.md를 보라. Codex 위임은 위의 Opus/Sonnet/Haiku 선택과
+  codex-delegation 스킬을 보라. Codex 위임은 위의 Opus/Sonnet/Haiku 선택과
   직교한다 — Claude 쪽 작업에는 플랫폼 내 모델 티어가 여전히 적용된다.
 
   ## Subagent Briefing Standard
@@ -137,7 +137,7 @@ description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Ha
   • 실패가 3번 쌓이거나 설계 판단이 떠오르면 Opus로 에스컬레이션
   • 브리핑에는 file path, 시그니처, 검증, 그리고 판단 근거 보고 요청이 들어가야 한다
   • Codex CLI가 있으면 cross-provider 규칙(3-턴 상한, /review를 통한 어드버서리얼
-  리뷰, capability routing, plan-stage review)은 codex/codex-delegation.md를 보라.
+  리뷰, capability routing, plan-stage review)은 codex-delegation 스킬을 보라.
   • **프로젝트 CLAUDE.md가 이 기본값을 더 강하게 만들 수 있다** — 예를 들어 PR당
   리뷰어 2명 규칙. 프로젝트 규칙은 더 엄격한 쪽에서 최소 기준을 덮어쓴다. 프로젝트가
   말이 없는 곳에는 최소 기준이 적용된다.
