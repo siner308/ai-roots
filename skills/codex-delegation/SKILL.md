@@ -17,9 +17,16 @@ The first two motivate reliability routing; the third motivates capability routi
 
 ## Entry Point
 
-The only ai-roots-provided surface that wraps Codex is the **/review skill** (`skills/review/SKILL.md`). It resolves one shared artifact — code changes, a plan, a doc, or anything reviewable — then spawns a Claude Code subagent and a Codex run in parallel and synthesizes per evaluation-integrity.md §Multi-advisor synthesis. Use it for any review-class delegation: code diffs, plan/design review, documents, security-sensitive review.
+Codex work arrives two ways. Match the entry point to how it was requested.
 
-For non-review Codex work (rescue debugging, research, bounded implementation), invoke `codex` directly via Bash with the appropriate flags. There is no longer a slash-command wrapper for those modes — see the per-mode invocations below.
+**Review → the `/review` skill, always.** For any review-class work use `/review` (`skills/review/SKILL.md`): it resolves one shared artifact, runs a Claude subagent and a Codex run in parallel on it, and synthesizes per evaluation-integrity.md §Multi-advisor synthesis. This is the single review entry point — do not reach for `codex review` or `/codex:review` directly.
+
+**Anything else → a natural-language "delegate this to Codex" request.** Map it to a reliable invocation by intent. All three paths are verified on codex-cli 0.128:
+
+- **Diagnosis / stuck debugging** → `/codex:rescue`, or the Agent tool with `subagent_type: "codex:codex-rescue"`. Read-only, runs on the companion runtime with completion wired to the harness.
+- **Write / research / bounded implementation** → manual `codex exec` with the flags and mechanics below. Clean exit when the timeout is hardened (see Codex Execution Mechanics).
+
+**Footgun — never `Skill(codex:rescue)`.** Calling it as a skill re-enters the slash command and hangs the session. Invoke rescue only through the `/codex:rescue` command or the Agent tool with `subagent_type: "codex:codex-rescue"`. A wrong entry point — not a broken runtime — is the usual cause of "Codex delegation hung."
 
 ## Reasoning effort
 
@@ -35,6 +42,8 @@ codex review [REVIEW FLAGS]    # read-only by design; does not accept --sandbox 
 ```
 
 ## Mode Cheatsheet
+
+`/review` (review) and `/codex:rescue` (diagnosis) supersede the matching rows below. The remaining rows — write, research, bounded/unattended implementation — are the normal manual `codex exec` invocations for those intents.
 
 | Need | Invocation |
 |------|------------|
@@ -66,11 +75,13 @@ A "turn" is one substantive attempt, not one message. Past three, marginal infor
 
 ## Codex Execution Mechanics
 
+These mechanics apply to the manual `codex exec` path (write / research / bounded implementation, and any run when the companion plugin is absent). `/codex:rescue` and `/review` handle these concerns themselves.
+
 Three concerns to manage independently:
 
 1. **Claude must know when codex finishes.** Use `run_in_background: true` Bash; the harness's completion notification wakes Claude.
 2. **The user may want to see codex's reasoning live.** Give them the log path; let them `tail -f` in their own terminal. Do not script the live view from Claude's side.
-3. **Codex must be guaranteed to finish.** A hung codex never exits, so its completion notification never fires and the main session waits forever. Wrap every codex invocation in a timeout (`timeout <secs> codex …`, or `gtimeout` on macOS without coreutils; degrade gracefully if neither exists). On expiry codex exits 124 — read the exit status and treat a timeout as codex being unavailable, not as a clean result.
+3. **Codex must be guaranteed to finish.** A hung codex never exits, so its completion notification never fires and the main session waits forever. Wrap every codex invocation in a timeout (`timeout <secs> codex …`, or `gtimeout` on macOS without coreutils; degrade gracefully if neither exists). On expiry codex exits 124 — read the exit status and treat a timeout as codex being unavailable, not as a clean result. Plain `timeout` signals only the direct child; codex (node) can leave grandchildren that hold the pipe open, so `| tee` never sees EOF and the background job hangs even after codex is killed. Use the kill-after grace (`gtimeout -k 10 <secs> …`) and redirect to a file (`> "$LOG" 2>&1`) rather than `| tee` when a run hangs at completion.
 
 ```
 LOG="/tmp/codex-$(date +%Y%m%d-%H%M%S).log"

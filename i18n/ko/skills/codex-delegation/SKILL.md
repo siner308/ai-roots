@@ -18,9 +18,16 @@ Cross-provider 위임은 세 가지 목적에 쓰인다:
 
 ## 진입점
 
-Codex를 감싸는 ai-roots 제공 표면은 **/review 스킬**(`skills/review/SKILL.md`)뿐이다. 이 스킬은 하나의 공유 산출물 — 코드 변경, plan, 문서, 그 외 리뷰 가능한 무엇이든 — 을 결정한 뒤, Claude Code subagent와 Codex 실행을 병렬로 띄우고 evaluation-integrity.md §Multi-advisor synthesis에 따라 종합한다. 리뷰 부류의 모든 위임에 쓴다: 코드 diff, plan/설계 리뷰, 문서, 보안 민감 리뷰.
+Codex 작업은 두 갈래로 들어온다. 요청된 방식에 맞춰 진입점을 고른다.
 
-리뷰가 아닌 Codex 작업(rescue 디버깅, 리서치, 범위가 정해진 구현)은 Bash로 적절한 플래그를 붙여 `codex`를 직접 호출한다. 이 모드들을 위한 slash-command 래퍼는 더 이상 없다 — 아래 모드별 호출을 참고하라.
+**리뷰 → 항상 `/review` 스킬.** 리뷰 부류 작업은 모두 `/review`(`skills/review/SKILL.md`)를 쓴다: 하나의 공유 산출물을 결정한 뒤 Claude subagent와 Codex 실행을 그 산출물에 병렬로 띄우고 evaluation-integrity.md §Multi-advisor synthesis에 따라 종합한다. 리뷰의 단일 진입점이다 — `codex review`나 `/codex:review`를 직접 부르지 마라.
+
+**그 외 → "이거 codex로 해줘" 자연어 위임.** intent에 맞춰 신뢰 가능한 호출로 매핑한다. 세 경로 모두 codex-cli 0.128에서 검증됨:
+
+- **진단 / 막힌 디버깅** → `/codex:rescue`, 또는 Agent 도구의 `subagent_type: "codex:codex-rescue"`. read-only, companion 런타임에서 돌고 완료 신호가 하네스에 배선되어 있다.
+- **쓰기 / 리서치 / 범위가 정해진 구현** → 아래 플래그·메커니즘으로 수동 `codex exec`. timeout을 하드닝하면 깨끗하게 exit한다(Codex 실행 메커니즘 참고).
+
+**Footgun — `Skill(codex:rescue)`로 절대 부르지 마라.** 스킬로 부르면 slash 커맨드가 재진입해서 세션이 hang된다. rescue는 `/codex:rescue` 커맨드 또는 Agent 도구의 `subagent_type: "codex:codex-rescue"`로만 호출한다. "Codex 위임이 멈췄다"의 통상적 원인은 망가진 런타임이 아니라 잘못된 진입점이다.
 
 ## Reasoning effort 설정
 
@@ -36,6 +43,8 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 ```
 
 ## 모드 치트시트
+
+`/review`(리뷰)와 `/codex:rescue`(진단)가 아래 해당 행을 대체한다. 나머지 행 — 쓰기, 리서치, 범위가 정해진/무인 구현 — 은 그 intent의 정상 수동 `codex exec` 호출이다.
 
 | Need | Invocation |
 |------|------------|
@@ -67,11 +76,13 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 ## Codex 실행 메커니즘
 
+이 메커니즘은 수동 `codex exec` 경로(쓰기 / 리서치 / 범위가 정해진 구현, 그리고 companion 플러그인이 없을 때의 모든 실행)에 적용된다. `/codex:rescue`와 `/review`는 아래 관심사를 자체적으로 처리한다.
+
 따로 관리할 관심사 세 가지:
 
 1. **Claude는 codex가 언제 끝나는지 알아야 한다.** `run_in_background: true` Bash를 쓴다; 하네스의 완료 알림이 Claude를 깨운다.
 2. **사용자는 codex의 추론을 실시간으로 보고 싶을 수 있다.** 로그 경로를 주고, 자기 터미널에서 `tail -f` 하게 둔다. 실시간 뷰를 Claude 쪽에서 스크립트로 짜지 마라.
-3. **codex는 반드시 끝나야 한다.** 멈춘 codex는 절대 exit하지 않으므로 완료 알림이 안 뜨고 메인 세션이 영원히 기다린다. 모든 codex 호출을 timeout으로 감싼다(`timeout <secs> codex …`, 또는 coreutils 없는 macOS에서는 `gtimeout`; 둘 다 없으면 우아하게 degrade). 만료되면 codex는 124로 exit한다 — exit status를 읽고 timeout을 깨끗한 결과가 아니라 codex 사용 불가로 다룬다.
+3. **codex는 반드시 끝나야 한다.** 멈춘 codex는 절대 exit하지 않으므로 완료 알림이 안 뜨고 메인 세션이 영원히 기다린다. 모든 codex 호출을 timeout으로 감싼다(`timeout <secs> codex …`, 또는 coreutils 없는 macOS에서는 `gtimeout`; 둘 다 없으면 우아하게 degrade). 만료되면 codex는 124로 exit한다 — exit status를 읽고 timeout을 깨끗한 결과가 아니라 codex 사용 불가로 다룬다. 그냥 `timeout`은 직계 자식에게만 신호를 보낸다; codex(node)가 pipe를 쥔 손자 프로세스를 남기면 `| tee`가 EOF를 못 받아, codex가 죽은 뒤에도 백그라운드 작업이 hang된다. 완료 시점에 멈추면 kill-after grace(`gtimeout -k 10 <secs> …`)를 쓰고 `| tee` 대신 파일로 리다이렉트(`> "$LOG" 2>&1`)하라.
 
 ```
 LOG="/tmp/codex-$(date +%Y%m%d-%H%M%S).log"
