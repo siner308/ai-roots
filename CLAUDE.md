@@ -21,6 +21,13 @@ When writing or editing any `.md` under `rules/`, `skills/`, `agents/`, or
   language-specific — translationese examples, a Korean `~는/은` grammar
   illustration — never for explanatory prose that English can carry. The Korean
   mirror under `i18n/ko/` is where the full translation lives.
+- In shell snippets a skill tells Claude to execute, prefix `command` on stock
+  text/file utilities whose output is piped, redirected, or read back: `cat`,
+  `ls`, `grep`, `find`, `diff`, `head`, `tail`, `less`, `tree`. These get
+  aliased to renderers/colorizers (`glow`, `bat`, `eza`, `rg`, `delta`) that
+  silently corrupt the consumed bytes. Don't blanket-prefix: `command` can't
+  precede shell keywords (`if`/`for`/`{`) and is noise where there's no alias.
+  Executed snippets only — not prose examples or commit messages.
 
 ## Hooks
 
