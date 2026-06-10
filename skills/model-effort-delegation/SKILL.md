@@ -7,7 +7,7 @@ description: "Apply when deciding which executor (main session vs subagent vs te
   # Model, Effort, and Subagent Delegation                                        
                                                                                   
   For every task, deliberately choose the **executor** (main session vs subagent),
-  **model** (Opus/Sonnet/Haiku), and **effort level**. Concentrate expensive      
+  **model** (Fable / Opus / Sonnet / Haiku), and **effort level**. Concentrate expensive      
   models on architectural judgment; delegate well-specified implementation to     
   cheaper models.                                                                 
                                                                                   
@@ -16,7 +16,7 @@ description: "Apply when deciding which executor (main session vs subagent vs te
   Keep the main session on Opus — for planning, review, conversation, and        
   localized edits. Delegate large, independent work to Sonnet/Haiku subagents.    
   **The more specific the plan, the better weaker models preserve quality** — so 
-  the prerequisite for delegation is a precise plan.                              
+  the prerequisite for delegation is a precise plan. One tier above Opus, **Fable 5** is the most capable model available — reserve it for exceptional reasoning the everyday Opus tier cannot crack (see Top tier below), not routine work.                              
                                                                                   
   ## Executor Selection                                                           
                                                                                   
@@ -44,6 +44,17 @@ description: "Apply when deciding which executor (main session vs subagent vs te
   Format conversion, comment adds, …│Haiku │Mechanical work                       
   Log inspection, status checks     │Haiku │Read-only, no judgment                
                                                                                   
+  ### Top tier — Fable 5 (most demanding work)
+
+  **Fable 5** (`claude-fable-5`; Agent tool selector `model: "fable"`) is Anthropic's most capable widely released model — one tier above Opus 4.8 — for the most demanding reasoning and long-horizon agentic work. Adaptive thinking is always on; 1M-token context.
+
+  Reach for it only when the everyday Opus tier is genuinely insufficient:
+
+  - **Exceptionally hard reasoning** — architecture or root-cause debugging where Opus has stalled on the reasoning itself, not where the spec was merely unclear.
+  - **Long-horizon agentic work** that must hold a very large context coherently and whose blast radius justifies the top model.
+
+  **Not the default.** Fable 5 costs roughly 2× Opus 4.8 ($10 / $50 vs $5 / $25 per MTok, input / output), so Opus stays the ceiling for everyday architectural work and you escalate to Fable 5 deliberately, for the exceptional case.
+
   ### Downgrade Conditions — STRICT                                              
                                                                                   
   To downgrade to Sonnet/Haiku, BOTH must be true:                                
@@ -77,14 +88,14 @@ description: "Apply when deciding which executor (main session vs subagent vs te
   • Verification loop fails repeatedly with unclear cause                        
                                                                                   
   Escalation is part of the rule, not a failure. Stubbornly pushing a weak model  
-  leads to hysteresis — the wrong direction gets locked in.                      
+  leads to hysteresis — the wrong direction gets locked in. The ladder has one rung above Opus: when Opus itself stalls on genuinely hard reasoning (not spec ambiguity), escalate to **Fable 5** — reserved for that exceptional case, given its cost.                      
                                                                                   
   ## Cross-Provider Delegation (Codex)                                            
                                                                                   
   If Codex CLI is available on PATH, see the codex-delegation skill for mode       
   selection, three-turn rescue protocol, security-sensitive review triggers       
   (/review), capability routing, execution mechanics, and plan-stage review. Codex
-  delegation is orthogonal to the Opus/Sonnet/Haiku selection above — in-platform
+  delegation is orthogonal to the in-platform model tiers above — those
   model tiers still apply to Claude-side work.                                    
                                                                                   
   ## Subagent Briefing Standard                                                   
@@ -138,10 +149,11 @@ description: "Apply when deciding which executor (main session vs subagent vs te
                                                                                   
   • Main session stays on Opus — focus on planning, review, conversation,       
   localized edits                                                                 
+  • **Fable 5** is the ceiling above Opus — reserve it for exceptional reasoning or long-horizon agentic work Opus cannot crack; ~2× Opus cost, so never the default
   • Delegate to a subagent when: ≥5 min + independent + verifiable              
   • Downgrade only when BOTH plan precision and a verification loop exist        
   • Never downgrade model or effort when blast radius is high                    
-  • Escalate to Opus after 3 failures or when a design decision surfaces         
+  • Escalate to Opus after 3 failures or when a design decision surfaces; escalate Opus → Fable 5 only when Opus itself stalls on genuinely hard reasoning         
   • Briefings must include file paths, signatures, verification, and a request for
   decision reasoning                                                              
   • If Codex CLI is available, see the codex-delegation skill for cross-provider  

@@ -6,7 +6,7 @@ description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Ha
 
   # Model, Effort, and Subagent Delegation
 
-  작업마다 **executor**(메인 세션 vs subagent), **모델**(Opus/Sonnet/Haiku),
+  작업마다 **executor**(메인 세션 vs subagent), **모델**(Fable / Opus / Sonnet / Haiku),
   **effort 레벨**을 의식적으로 고른다. 비싼 모델은 아키텍처 판단에 몰아 쓰고,
   명세가 잘 된 구현은 더 싼 모델에 위임한다.
 
@@ -14,7 +14,7 @@ description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Ha
 
   메인 세션은 Opus에 둔다 — 계획, 리뷰, 대화, 국소적 편집을 맡긴다. 크고 독립적인
   작업은 Sonnet/Haiku subagent로 위임한다. **plan이 구체적일수록 약한 모델이 품질을
-  더 잘 보존한다** — 그래서 위임의 전제 조건은 정밀한 plan이다.
+  더 잘 보존한다** — 그래서 위임의 전제 조건은 정밀한 plan이다. Opus 한 단계 위에는 **Fable 5**가 있다 — 지금 나온 모델 중 가장 강력하지만, 평소 Opus 티어로 안 풀리는 예외적 추론에만 쓴다(아래 Top tier 참고). 일상 작업용이 아니다.
 
   ## Executor Selection
 
@@ -39,6 +39,17 @@ description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Ha
   Bulk exploration, grep summaries  │Haiku…│Path + summary is enough
   Format conversion, comment adds, …│Haiku │Mechanical work
   Log inspection, status checks     │Haiku │Read-only, no judgment
+
+  ### Top tier — Fable 5 (가장 까다로운 작업)
+
+  **Fable 5**(`claude-fable-5`; Agent 도구 selector `model: "fable"`)는 Anthropic이 널리 출시한 모델 중 가장 강력하다 — Opus 4.8 한 단계 위로, 가장 까다로운 추론과 긴 호흡의 agentic 작업용이다. adaptive thinking 상시 on, 1M 토큰 context.
+
+  평소 Opus 티어로 정말 부족할 때만 꺼낸다:
+
+  - **예외적으로 어려운 추론** — spec이 모호한 게 아니라 추론 자체에서 Opus가 막힌 아키텍처나 근본 원인 디버깅.
+  - **긴 호흡의 agentic 작업** — 아주 큰 context를 일관되게 유지해야 하고 blast radius가 최상위 모델을 정당화하는 경우.
+
+  **기본값이 아니다.** Fable 5는 Opus 4.8의 약 2배 비용($10 / $50 vs $5 / $25 per MTok, 입력 / 출력)이라, 일상 아키텍처 작업의 천장은 Opus로 두고 Fable 5는 예외적 경우에 의식적으로 에스컬레이션한다.
 
   ### Downgrade Conditions — STRICT
 
@@ -73,13 +84,13 @@ description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Ha
   • 검증 루프가 원인 불명으로 계속 실패함
 
   에스컬레이션은 실패가 아니라 규칙의 일부다. 약한 모델을 고집스럽게 밀어붙이면
-  hysteresis로 이어진다 — 틀린 방향이 그대로 굳어 버린다.
+  hysteresis로 이어진다 — 틀린 방향이 그대로 굳어 버린다. 사다리에는 Opus 위 한 칸이 있다: Opus 자체가 (spec 모호함이 아니라) 정말 어려운 추론에서 막히면 **Fable 5**로 에스컬레이션한다 — 비용 때문에 그 예외적 경우에만.
 
   ## Cross-Provider Delegation (Codex)
 
   Codex CLI가 PATH에 있으면 모드 선택, 3-턴 rescue protocol, 보안 민감 리뷰
   트리거(/review), capability routing, 실행 메커니즘, plan-stage review는
-  codex-delegation 스킬을 보라. Codex 위임은 위의 Opus/Sonnet/Haiku 선택과
+  codex-delegation 스킬을 보라. Codex 위임은 위의 모델 티어 선택과
   직교한다 — Claude 쪽 작업에는 플랫폼 내 모델 티어가 여전히 적용된다.
 
   ## Subagent Briefing Standard
@@ -131,10 +142,11 @@ description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Ha
   ## Rule Summary
 
   • 메인 세션은 Opus에 머문다 — 계획, 리뷰, 대화, 국소적 편집에 집중
+  • **Fable 5**는 Opus 위 천장 — Opus로 안 풀리는 예외적 추론이나 긴 호흡의 agentic 작업에만 쓴다; Opus의 약 2배 비용이라 기본값이 아니다
   • subagent에 위임하는 조건: 5분 이상 + 독립적 + 검증 가능
   • plan 정밀도와 검증 루프가 둘 다 있을 때만 다운그레이드
   • blast radius가 클 때는 절대 모델이나 effort를 다운그레이드하지 않는다
-  • 실패가 3번 쌓이거나 설계 판단이 떠오르면 Opus로 에스컬레이션
+  • 실패가 3번 쌓이거나 설계 판단이 떠오르면 Opus로 에스컬레이션; Opus 자체가 정말 어려운 추론에서 막힐 때만 Opus → Fable 5
   • 브리핑에는 file path, 시그니처, 검증, 그리고 판단 근거 보고 요청이 들어가야 한다
   • Codex CLI가 있으면 cross-provider 규칙(3-턴 상한, /review를 통한 어드버서리얼
   리뷰, capability routing, plan-stage review)은 codex-delegation 스킬을 보라.
