@@ -46,7 +46,7 @@ description: "작업을 병렬화할 수 있을 때 적용 — sequential, subag
   • 중간 판단이 필요하거나 긴 스트리밍 출력을 내는 작업
   • 브리핑 비용이 작업 자체를 넘어설 때
 
-  고른 executor 안에서의 모델 선택(Opus/Sonnet/Haiku)은
+  고른 executor 안에서의 모델 선택(Fable/Opus/Sonnet/Haiku)은
   model-effort-delegation.md를 보라.
 
   ## Responsiveness Default

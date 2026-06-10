@@ -124,6 +124,6 @@ Two-reviewer review is also valuable *before* code is written, when the artifact
 - Never skip `/review` on security-sensitive paths to save tokens.
 - When invoking a Codex rescue, include ruled-out hypotheses so Codex does not redo the same work.
 - Treat Codex findings as **independent evidence**: investigate disagreements with Claude's conclusion; do not resolve them by asking Claude alone to reconsider.
-- Codex delegation is orthogonal to the Opus/Sonnet/Haiku tiers in model-effort-delegation.md — those still apply to Claude-side work.
+- Codex delegation is orthogonal to the in-platform model tiers in model-effort-delegation.md — those still apply to Claude-side work.
 - **Stale-revision verification on every Codex round.** Codex sometimes outputs analysis from a previous invocation when called repeatedly on the same file. In every round-N prompt, ask Codex to first echo the current revision identifier (`file head -1`, `git HEAD` short SHA, or a unique header line). Verdicts that reproduce stale line numbers from a since-changed file are untrusted; retry with a fresh session (not `codex resume`).
 - **Project CLAUDE.md may strengthen these defaults** — e.g., per-PR two-reviewer rule. Project-specific strengthening overrides the minimum; the minimum applies where the project is silent.

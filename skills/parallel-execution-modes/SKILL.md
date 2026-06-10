@@ -48,7 +48,7 @@ description: "Apply when work can be parallelized — choosing between sequentia
   • Tasks needing mid-stream judgment or producing long streaming output         
   • Briefing cost would exceed the work itself                                   
                                                                                   
-  For model selection (Opus/Sonnet/Haiku) within the chosen executor, see model-  
+  For model selection (Fable/Opus/Sonnet/Haiku) within the chosen executor, see model-  
   effort-delegation.md.                                                           
                                                                                   
   ## Responsiveness Default                                                       

@@ -1,6 +1,6 @@
 ---
 name: model-effort-delegation
-description: "Apply when deciding which executor (main session vs subagent vs team), which model (Opus/Sonnet/Haiku), and what effort level fits a task — i.e. before delegating non-trivial work. Covers strict downgrade conditions (plan precision + verification loop), escalation triggers, blast-radius override, and the subagent briefing standard."
+description: "Apply when deciding which executor (main session vs subagent vs team), which model (Fable/Opus/Sonnet/Haiku), and what effort level fits a task — i.e. before delegating non-trivial work. Covers strict downgrade conditions (plan precision + verification loop), escalation triggers, blast-radius override, and the subagent briefing standard."
 ---
 
 

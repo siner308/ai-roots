@@ -8,7 +8,7 @@ This index is the resident half: it stays loaded so the *trigger* is never forgo
 |-----------------|--------------|
 | Editing, writing, or reviewing CSS or any framework styling (Tailwind, CSS Modules, scoped styles, inline `style`, CSS-in-JS) | `css-discipline` |
 | Composing or editing a PR body or title (`gh pr create`, `gh pr edit`, `gh api` PR updates) | `github-pr-markdown` |
-| Deciding executor (main vs subagent vs team), model (Opus/Sonnet/Haiku), or effort before delegating non-trivial work | `model-effort-delegation` |
+| Deciding executor (main vs subagent vs team), model (Fable/Opus/Sonnet/Haiku), or effort before delegating non-trivial work | `model-effort-delegation` |
 | Choosing sequential vs subagent vs team, or inline vs subagent, or foreground vs background | `parallel-execution-modes` |
 | A problem has multiple plausible causes across layers, or output must pass multiple independent judgment criteria | `parallel-hypothesis-investigation` |
 | Delegating to the OpenAI Codex CLI — rescue debugging, cross-provider review, current-docs research, or bounded implementation (Codex on `PATH`) | `codex-delegation` |

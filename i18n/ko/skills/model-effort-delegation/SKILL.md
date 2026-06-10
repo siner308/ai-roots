@@ -1,6 +1,6 @@
 ---
 name: model-effort-delegation
-description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Haiku), effort 레벨 중 무엇이 작업에 맞는지 정할 때 적용 — 즉 사소하지 않은 작업을 위임하기 전에. 다운그레이드 엄격 조건(plan 정밀도 + 검증 루프), 에스컬레이션 트리거, blast-radius 오버라이드, subagent 브리핑 기준을 다룬다."
+description: "executor(메인 세션 vs subagent vs team), 모델(Fable/Opus/Sonnet/Haiku), effort 레벨 중 무엇이 작업에 맞는지 정할 때 적용 — 즉 사소하지 않은 작업을 위임하기 전에. 다운그레이드 엄격 조건(plan 정밀도 + 검증 루프), 에스컬레이션 트리거, blast-radius 오버라이드, subagent 브리핑 기준을 다룬다."
 ---
 
 

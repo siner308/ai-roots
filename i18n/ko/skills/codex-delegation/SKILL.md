@@ -125,6 +125,6 @@ Bash(run_in_background: true, command: "codex exec ... -- - < '$PROMPT' 2>&1 | t
 - 토큰 아끼려고 보안 민감 경로에서 `/review`를 건너뛰지 마라.
 - Codex rescue를 호출할 때 ruled-out 가설을 포함해서 Codex가 같은 작업을 다시 하지 않게 하라.
 - Codex 발견을 **독립적 증거**로 다뤄라: Claude 결론과의 불일치는 조사하고, Claude 혼자에게 재고하라고 물어 해소하지 마라.
-- Codex 위임은 model-effort-delegation.md의 Opus/Sonnet/Haiku 티어와 직교한다 — 그 티어는 Claude 측 작업에 여전히 적용된다.
+- Codex 위임은 model-effort-delegation.md의 플랫폼 내 모델 티어와 직교한다 — 그 티어는 Claude 측 작업에 여전히 적용된다.
 - **매 Codex 라운드마다 stale-revision 검증.** Codex는 같은 파일로 반복 호출되면 이전 호출의 분석을 출력할 때가 있다. 매 round-N 프롬프트에서 Codex가 먼저 현재 revision 식별자(`file head -1`, `git HEAD` short SHA, 또는 고유한 헤더 줄)를 echo하게 하라. 이미 바뀐 파일의 stale 줄 번호를 재현하는 verdict는 신뢰하지 않는다; fresh 세션으로 재시도하라(`codex resume` 아님).
 - **프로젝트 CLAUDE.md가 이 기본값을 강화할 수 있다** — 예: PR당 두 리뷰어 규칙. 프로젝트별 강화가 최소치를 덮어쓴다; 최소치는 프로젝트가 침묵하는 곳에 적용된다.
