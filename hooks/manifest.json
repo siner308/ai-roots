@@ -4,5 +4,11 @@
     "matcher": "Edit|Write|MultiEdit",
     "script": "comment-discipline.py",
     "run": "python3"
+  },
+  {
+    "event": "PreToolUse",
+    "matcher": "Bash",
+    "script": "gh-markdown-style.py",
+    "run": "python3"
   }
 ]
