@@ -23,6 +23,7 @@ Before starting any iterative work, classify the domain.
 1. **Generate-then-evaluate, never simultaneously.** After producing output, switch modes. Re-read as if encountering it for the first time. Ask: "If someone else wrote this, what would I critique?"
 2. **Name specific defects, not vibes.** Self-evaluation must produce concrete, falsifiable criticism. "This could be better" is not evaluation. "This function silently drops errors on lines 12-15" is.
 3. **Zero defects found = bias signal.** When self-review catches nothing, explicitly state: "Self-review found no issues; independent verification recommended."
+4. **Rationale before verdict, not after.** When you emit a recommendation — a "(recommended)" tag, a "best option", a ranked choice — autoregressive generation makes whatever you write next a justification of a verdict already committed. Reverse the order: write the reasons specific to *this* case first, then let the verdict fall out of them. The failure mode is copying a verdict from a template, prior turn, or default ("the skill says option 1 is recommended") and back-filling reasons. Before the label is on the page, the case-specific rationale must already be. If you cannot state why *this* option wins *here*, you do not yet have a recommendation — you have a habit.
 
 ## Multi-advisor Synthesis
 
@@ -59,5 +60,6 @@ When any signal fires: stop iterating, surface the decision to the human.
 - In verifiable domains, self-iteration is encouraged — the bias is corrected by the verification step.
 - In non-verifiable domains, prefer presenting 2-3 distinct options over converging on one polished answer.
 - Never claim "I reviewed my work and it looks correct" without naming specific things you checked.
+- Never attach a "(recommended)" / "best" / ranked verdict before the case-specific rationale for it exists in the output. A verdict copied from a template or default, with reasons back-filled, is not a judgment. If the same choice flips between turns, that is the tell.
 - When consolidating 2+ independent evaluators, always produce the Agreed / Conflicting / Chosen+rationale structure. Silent smoothing of disagreement is a drift signal.
 - Model-dependent scaffolding (context resets, sprint chunking, step-by-step prompts) is valid but temporal. It belongs in project-level CLAUDE.md managed by humans — not here. A model cannot reliably assess whether it still needs its own guardrails.
