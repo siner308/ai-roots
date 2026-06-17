@@ -113,10 +113,11 @@ Always pass the resolved `TARGET` and any extra review focus from the user.
 
 ### Codex
 
-- **code (diff)** → `codex review` custom-prompt mode with the embedded `DIFF_CMD` (its flags `--uncommitted`/`--base`/`--commit` are mutually exclusive with a custom prompt, so the persona could not ride along with them):
+- **code (diff)** → `codex exec --json` in a read-only sandbox, with the embedded `DIFF_CMD` in the prompt. (`codex review` is the diff-native subcommand, but it emits no event stream and buffers all output until it finishes — no live progress. So the skill drives diff review through `codex exec --json` like the other kinds, passing the diff command in the prompt.)
 
 ```bash
-LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
+LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"   # JSONL event stream — Monitor watches this
+FINAL="$(mktemp)"                                             # clean final report — synthesis reads this
 PROMPT="$(mktemp)"
 {
   command cat "$HOME/.claude/agents/adversarial-reviewer.md"
@@ -131,24 +132,29 @@ TIMEOUT_BIN=""
 if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
 elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 
-# codex review at xhigh writes NOTHING to a non-TTY until it finishes (often
-# several minutes); an empty log mid-run is normal, NOT a hang — do not kill it,
-# wait for the completion notification or the timeout (the only hang guard). gpt-5.5
-# is the default model, so no -m / model override is needed.
+# --json streams JSONL events (thread.started, item.started/completed for each
+# command_execution and reasoning step, turn.completed) as they happen — Monitor
+# keys on this for live progress, so an empty log is normal only in the first
+# second or two before thread.started. --sandbox read-only is the ENFORCED
+# boundary: codex may read files and run `git diff`, but CANNOT modify the
+# workspace — codex exec is a general agent that could otherwise write, so review
+# ALWAYS passes this flag. -o writes the final report to $FINAL as clean text so
+# synthesis does not parse the event log. gpt-5.5 is the default model.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex review -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex review -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
-command cat "$LOG"
+command cat "$FINAL"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
 - **plan / doc / generic** → `codex exec` (the general non-interactive path; `codex review` is git-diff-only). Embed the artifact's contents and the KIND's lens. Before running, set the shell vars the block uses: `KIND`, `CRITERIA`, and `VERDICT_VOCAB` from the §2 table, plus `ARTIFACT` (the inline temp file from step 1) or `FILES` (a bash array of file-backed paths):
 
 ```bash
-LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
+LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"   # JSONL event stream — Monitor watches this
+FINAL="$(mktemp)"                                             # clean final report — synthesis reads this
 PROMPT="$(mktemp)"
 {
   command cat "$HOME/.claude/agents/adversarial-reviewer.md"
@@ -161,27 +167,29 @@ TIMEOUT_BIN=""
 if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
 elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 
-# read-only sandbox: review must not modify the workspace. gpt-5.5 is the default
-# model. Same silence-is-not-a-hang rule and plain redirect as the review block.
+# Same flags and rationale as the code block: --json for the live event stream
+# Monitor keys on, --sandbox read-only as the enforced no-write boundary, -o for
+# the clean final report. gpt-5.5 is the default model.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
-command cat "$LOG"
+command cat "$FINAL"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
 Common to both:
 - `run_in_background: true` so the main session is notified when Codex exits.
-- **Silence is not a hang.** At xhigh, codex streams nothing to a non-TTY (the background log) until it finishes — minutes of an empty log is normal. Do NOT kill it on silence; wait for the completion notification or the `timeout`. (Verified: background `codex review` and `codex exec` both complete fine; the `timeout` is the backstop for a genuinely hung run.)
+- **Watch progress live with `Monitor`.** Right after launching, subscribe to the event stream with `Monitor(path: "$LOG")`. `--json` emits a JSONL line per event as codex works, so each line is a real-time signal of what codex is doing. Summarize only the meaningful items as they arrive — `command_execution` (which file or command codex is inspecting = what it is looking at), reasoning, and the final `agent_message`. Do NOT echo raw JSONL back; that just reproduces the log (see `background-task-monitoring` Rung 2). This replaces the old "wait blindly until it finishes" model — an empty log is normal only in the first second or two before `thread.started`.
+- **Read the verdict from `$FINAL`, not `$LOG`.** `-o` writes codex's final report to `$FINAL` as clean text; `$LOG` is the JSONL event stream. Synthesis reads `$FINAL`.
 - **Read `$CODEX_EXIT`.** `124` = timed out: treat Codex as unavailable, proceed with the Claude evaluator, and note in the synthesis that only one reviewer ran (and that codex timed out). Never drop a timeout as if codex returned a clean verdict.
 - If `codex` is not on `PATH`, skip it and note only one reviewer ran.
 
 ### Parallelism
 
-Spawn the Agent call and the Bash invocation in the same response so they run concurrently. Wait for both before producing the synthesis.
+Spawn the Agent call and the background Bash invocation in the same response so they run concurrently. Then subscribe to the codex `$LOG` with `Monitor` to narrate codex's progress while the Claude subagent works. Wait for both evaluators to finish before producing the synthesis.
 
 ## 4. Synthesis
 

@@ -113,10 +113,11 @@ KIND가 기준과 verdict 어휘를 고정한다. 둘을 두 평가자 모두에
 
 ### Codex
 
-- **code (diff)** → `codex review` custom-prompt 모드에 `DIFF_CMD`를 박는다(`--uncommitted`/`--base`/`--commit`은 커스텀 프롬프트와 배타적이라 페르소나를 같이 못 태운다):
+- **code (diff)** → read-only 샌드박스의 `codex exec --json`에 `DIFF_CMD`를 프롬프트로 박는다. (`codex review`가 diff 전용 서브커맨드지만 이벤트 스트림이 없고 끝날 때까지 출력을 버퍼링한다 — 실시간 진행이 안 보인다. 그래서 다른 KIND와 동일하게 `codex exec --json`으로 diff 리뷰를 돌리고 diff 명령을 프롬프트에 담는다.)
 
 ```bash
-LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
+LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"   # JSONL event stream — Monitor watches this
+FINAL="$(mktemp)"                                             # clean final report — synthesis reads this
 PROMPT="$(mktemp)"
 {
   command cat "$HOME/.claude/agents/adversarial-reviewer.md"
@@ -131,24 +132,29 @@ TIMEOUT_BIN=""
 if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
 elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 
-# codex review at xhigh writes NOTHING to a non-TTY until it finishes (often
-# several minutes); an empty log mid-run is normal, NOT a hang — do not kill it,
-# wait for the completion notification or the timeout (the only hang guard). gpt-5.5
-# is the default model, so no -m / model override is needed.
+# --json streams JSONL events (thread.started, item.started/completed for each
+# command_execution and reasoning step, turn.completed) as they happen — Monitor
+# keys on this for live progress, so an empty log is normal only in the first
+# second or two before thread.started. --sandbox read-only is the ENFORCED
+# boundary: codex may read files and run `git diff`, but CANNOT modify the
+# workspace — codex exec is a general agent that could otherwise write, so review
+# ALWAYS passes this flag. -o writes the final report to $FINAL as clean text so
+# synthesis does not parse the event log. gpt-5.5 is the default model.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex review -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex review -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
-command cat "$LOG"
+command cat "$FINAL"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
 - **plan / doc / generic** → `codex exec`(범용 비대화형 경로; `codex review`는 git-diff 전용). 산출물 내용과 KIND의 렌즈를 박는다. 실행 전에 블록이 쓰는 셸 변수를 설정한다: `KIND`, `CRITERIA`, `VERDICT_VOCAB`은 §2 표에서, 그리고 `ARTIFACT`(1단계의 인라인 temp 파일) 또는 `FILES`(파일 기반 경로들의 bash 배열):
 
 ```bash
-LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"
+LOG="/tmp/ai-roots-review-codex-$(date +%Y%m%d-%H%M%S).log"   # JSONL event stream — Monitor watches this
+FINAL="$(mktemp)"                                             # clean final report — synthesis reads this
 PROMPT="$(mktemp)"
 {
   command cat "$HOME/.claude/agents/adversarial-reviewer.md"
@@ -161,27 +167,29 @@ TIMEOUT_BIN=""
 if command -v timeout >/dev/null 2>&1; then TIMEOUT_BIN=timeout
 elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 
-# read-only sandbox: review must not modify the workspace. gpt-5.5 is the default
-# model. Same silence-is-not-a-hang rule and plain redirect as the review block.
+# Same flags and rationale as the code block: --json for the live event stream
+# Monitor keys on, --sandbox read-only as the enforced no-write boundary, -o for
+# the clean final report. gpt-5.5 is the default model.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex exec --sandbox read-only -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
-command cat "$LOG"
+command cat "$FINAL"
 echo "codex exit: $CODEX_EXIT (124 = timed out)"
 ```
 
 둘 다 공통:
 - `run_in_background: true`로 Codex가 끝날 때 메인 세션이 알림을 받게 한다.
-- **침묵은 hang이 아니다.** xhigh에서 codex는 끝날 때까지 non-TTY(백그라운드 로그)에 아무것도 안 쓴다 — 몇 분간 빈 로그는 정상이다. 침묵에 죽이지 말고 완료 알림이나 `timeout`을 기다린다. (실측: background `codex review`·`codex exec` 둘 다 정상 완주하며, `timeout`이 진짜 hang의 backstop이다.)
+- **`Monitor`로 진행을 실시간으로 본다.** 띄운 직후 `Monitor(path: "$LOG")`로 이벤트 스트림을 구독한다. `--json`이 codex가 일하는 동안 이벤트마다 JSONL 한 줄을 흘리므로, 각 줄이 codex가 지금 뭘 하는지 실시간 신호다. 도착하는 의미 있는 item만 요약한다 — `command_execution`(codex가 들여다보는 파일/명령 = 뭘 보고 있는지), reasoning, 마지막 `agent_message`. raw JSONL을 그대로 토하지 않는다 — 로그 재생산일 뿐이다(`background-task-monitoring` Rung 2 참조). 이게 "끝날 때까지 깜깜이로 기다리던" 옛 모델을 대체한다 — 빈 로그는 `thread.started` 직전 1~2초만 정상이다.
+- **판정은 `$LOG`가 아니라 `$FINAL`에서 읽는다.** `-o`가 codex의 최종 리포트를 `$FINAL`에 깨끗한 텍스트로 쓴다; `$LOG`는 JSONL 이벤트 스트림이다. 종합은 `$FINAL`을 읽는다.
 - **`$CODEX_EXIT`를 읽는다.** `124` = 타임아웃: Codex가 없는 것으로 취급하고 Claude 평가자만으로 진행하며, 평가자가 하나만 돌았다(그리고 codex가 타임아웃됐다)고 종합에 적는다. 타임아웃을 깨끗한 판정처럼 버리지 않는다.
 - `codex`가 `PATH`에 없으면 건너뛰고 평가자가 하나만 돌았다고 적는다.
 
 ### 병렬 실행
 
-Agent 호출과 Bash 호출을 같은 응답에서 띄워 동시에 돌린다. 둘 다 끝난 뒤 종합한다.
+Agent 호출과 백그라운드 Bash 호출을 같은 응답에서 띄워 동시에 돌린다. 그다음 codex `$LOG`를 `Monitor`로 구독해 Claude 서브에이전트가 일하는 동안 codex 진행을 중계한다. 두 평가자가 모두 끝난 뒤 종합한다.
 
 ## 4. 종합
 

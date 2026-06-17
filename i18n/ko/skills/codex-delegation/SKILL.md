@@ -61,7 +61,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 **막힌 문제에는 three-turn 상한.** 같은 가설로 4번째 인라인 턴을 시도하지 마라. ruled-out 가설을 모두 포함해서 `/codex:rescue`(read-only)에 위임하라 — Three-Turn Rescue 프로토콜 참고.
 
-**보안 민감 변경에는 adversarial 리뷰.** authentication, authorization, 데이터베이스 쓰기, 네트워크 경계, secret 처리, trust 경계를 건드리는 모든 동작 변경 뒤에는 `/review`를 호출한다. read-only 읽기나 순수 내부 리팩터링은 트리거하지 않는다. 리뷰어 페르소나 — 회의적, 보안 우선, 발견을 P0–P3로 분류, 높은 커버리지에서 critical 이슈가 없을 때만 `VERDICT: SAFE`를 반환 — 는 agents/adversarial-reviewer.md(`~/.claude/agents/`에 설치됨)에 있고, 스킬이 stdin으로 `codex review`에 파이프한다.
+**보안 민감 변경에는 adversarial 리뷰.** authentication, authorization, 데이터베이스 쓰기, 네트워크 경계, secret 처리, trust 경계를 건드리는 모든 동작 변경 뒤에는 `/review`를 호출한다. read-only 읽기나 순수 내부 리팩터링은 트리거하지 않는다. 리뷰어 페르소나 — 회의적, 보안 우선, 발견을 P0–P3로 분류, 높은 커버리지에서 critical 이슈가 없을 때만 `VERDICT: SAFE`를 반환 — 는 agents/adversarial-reviewer.md(`~/.claude/agents/`에 설치됨)에 있고, 스킬이 stdin으로 `codex exec --json --sandbox read-only`에 파이프한다(`--json` 이벤트 스트림 덕에 Claude가 codex 진행을 실시간으로 본다; `/review` 스킬 참조).
 
 **Capability routing은 첫 턴에 발동한다.** 이미지 생성, TTS, 그 외 OpenAI 전용 도구 필요는 즉시 Codex로 라우팅한다. 결과물이 이미지나 오디오 산출물일 때 텍스트 기반 우회(ASCII 아트, 손으로 짠 SVG)에 턴을 낭비하지 마라.
 

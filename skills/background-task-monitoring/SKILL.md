@@ -31,7 +31,7 @@ description: "Apply when a long-running task runs in the background and the user
     → continue with unrelated work                                               
     → completion notification arrives → Read output → report result            
                                                                                   
-  Applies to: Codex reviews, single-shot builds, test suites, one-off migrations, 
+  Applies to: single-shot builds, test suites, one-off migrations, 
   any task whose value is in the final result, not the journey.                   
                                                                                   
   ### Rung 2 — Streamed events (when progress matters)                           
@@ -46,7 +46,7 @@ description: "Apply when a long-running task runs in the background and the user
     → summarize meaningful phases as they arrive                                 
     → completion event stops the subscription                                    
                                                                                   
-  Applies to: data pipelines with phase boundaries, long seed scripts, crawlers,  
+  Applies to: codex `--json` reviews (the `/review` skill — the event stream shows which files codex is inspecting and its reasoning live), data pipelines with phase boundaries, long seed scripts, crawlers,  
   anything where mid-run phase boundaries carry information the user wants.       
                                                                                   
   ### Rung 3 — Interval polling (fallback only)                                  
@@ -104,14 +104,14 @@ description: "Apply when a long-running task runs in the background and the user
   enforces visibility at a fixed cost regardless of value; event-driven mechanisms
   match cost to real information arrivals.                                        
                                                                                   
-  A 5-minute Codex review gains nothing from minute-by-minute polling — the result
-  IS the progress. A 45-minute seed pipeline with 12 phases gains a lot from phase-
+  A 5-minute Codex review should not be interval-polled (Rung 3); with `--json` it streams events, so the
+  live log IS the progress — Rung 2 surfaces it at zero polling cost. A 45-minute seed pipeline with 12 phases gains a lot from phase-
   boundary notifications, but Monitor provides that at zero polling cost.         
                                                                                   
   ## When to Apply                                                                
                                                                                   
   • Any run_in_background: true task expected to outlive a single turn           
-  • Codex delegations (long-running codex exec, /review) — usually Rung 1       
+  • Codex delegations (long-running codex exec, /review) — usually Rung 2 (`--json` event stream)       
   • Data pipelines, migrations, crawlers with observable phases — usually Rung 2
   • External async jobs without completion hooks — Rung 3                       
                                                                                   
