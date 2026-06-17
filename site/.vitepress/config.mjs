@@ -78,7 +78,7 @@ const DISK_SKILLS = discover('skills')
 // lands at the bottom, never that it vanishes. A build-time warning flags it.
 // [English group title, Korean group title, [rule file basenames]]
 const RULE_GROUPS = [
-  ['Thinking Expansion', '사고 확장', ['concept-priming', 'progressive-deepening', 'capability-overhang']],
+  ['Thinking Expansion', '사고 확장', ['thinking-expansion']],
   ['Quality Assurance', '품질 보증', ['evaluation-integrity', 'claude-architect-principles', 'verify-each-instance']],
   ['User Growth', '사용자 성장', ['user-growth-coaching']],
   ['Knowledge Capture', '지식 포착', ['guardrail-maker', 'memory-minimalism']],
@@ -151,7 +151,7 @@ function sidebar(ko) {
 function nav(ko) {
   const base = ko ? '/ko' : ''
   return [
-    { text: 'Rules', link: `${base}/rules/concept-priming`, activeMatch: `${base}/rules/` },
+    { text: 'Rules', link: `${base}/rules/thinking-expansion`, activeMatch: `${base}/rules/` },
     { text: 'Skills', link: `${base}/skills/css-discipline`, activeMatch: `${base}/skills/` },
     { text: 'Agents', link: `${base}/agents/adversarial-reviewer`, activeMatch: `${base}/agents/` },
     { text: 'Hooks', link: `${base}/hooks/comment-discipline`, activeMatch: `${base}/hooks/` },

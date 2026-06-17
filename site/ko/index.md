@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: 상주 rules
-      link: /ko/rules/concept-priming
+      link: /ko/rules/thinking-expansion
     - theme: alt
       text: 상황별 skills
       link: /ko/skills/css-discipline
@@ -19,7 +19,7 @@ hero:
 features:
   - title: 상주 rules
     details: 매 세션 로드됩니다 — Claude가 추론·작성·명명·주석을 어떻게 하느냐를 좌우해요. 일부러 작게 유지합니다.
-    link: /ko/rules/concept-priming
+    link: /ko/rules/thinking-expansion
   - title: 상황별 skills
     details: 트리거가 걸릴 때만 로드됩니다. CSS, PR, Codex, 병렬화, 디버깅 교훈 — 본문은 그 작업이 나올 때만 context에 올라와요.
     link: /ko/skills/css-discipline

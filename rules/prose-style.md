@@ -2,7 +2,7 @@
 
 How writing reaches the reader comes down to two separate choices: the *words* inside a sentence, and *where the lines are cut*. Both can quietly turn clear thinking into machine-looking output, and they fail in different ways — so this rule covers both.
 
-The internal thinking rules (`concept-priming`, `capability-overhang`, `progressive-deepening`) deliberately pull in domain terminology and cross-domain keywords to broaden retrieval — but those words are for *thinking*, not for *output*. They leak into sentences easily, producing dense noun-stacks and translated-English phrasing that read as machine output rather than human speech. This rule is the output-side counterweight: no matter how much terminology the thinking step activated, the prose that reaches the user stays plain, and it breaks where the meaning pauses.
+The internal thinking rule (`thinking-expansion`) deliberately pulls in domain terminology and cross-domain keywords to broaden retrieval — but those words are for *thinking*, not for *output*. They leak into sentences easily, producing dense noun-stacks and translated-English phrasing that read as machine output rather than human speech. This rule is the output-side counterweight: no matter how much terminology the thinking step activated, the prose that reaches the user stays plain, and it breaks where the meaning pauses.
 
 ## Plain language
 
@@ -92,7 +92,7 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 ## Relationship to other rules
 
 - `terminology-discipline` governs *identifiers and domain terms* (spell out abbreviations, disambiguate collisions). This rule governs *prose rhythm and line breaks*. They compose: a sentence can use a correctly-spelled-out term and still be a noun-stack, or be cut at an awkward column.
-- `concept-priming` and `capability-overhang` activate vocabulary for thinking. This rule keeps that vocabulary out of the output unless it genuinely helps the reader. When the two pull in opposite directions, this rule wins at the output boundary.
+- `thinking-expansion` activates vocabulary for thinking. This rule keeps that vocabulary out of the output unless it genuinely helps the reader. When the two pull in opposite directions, this rule wins at the output boundary.
 - The repo's own `CLAUDE.md` forbids mid-sentence hard breaks in Markdown (let it soft-wrap). The line-break section here covers the other side: when a hard break is unavoidable, where it should fall.
 
 ## Rules

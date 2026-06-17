@@ -20,9 +20,7 @@ This keeps the resident set near ~41KB instead of ~92KB while preserving effecti
 ### Thinking Expansion
 | File | Description |
 |------|-------------|
-| `rules/concept-priming.md` | Domain-spread concept priming + complexity-based thinking expansion (Devil's Advocate, First Principles, Systems Thinking) |
-| `rules/progressive-deepening.md` | Internal quality gate that detects shallow answers and automatically digs one level deeper |
-| `rules/capability-overhang.md` | Unlock hidden knowledge — domain token injection, cross-domain connections, skill composition |
+| `rules/thinking-expansion.md` | Prime broad retrieval, deepen past the surface answer, then classify complexity and apply Devil's Advocate / First Principles / Systems Thinking — plus domain token injection and cross-domain connection to surface hidden knowledge |
 
 ### Quality Assurance
 | File | Description |

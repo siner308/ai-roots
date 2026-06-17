@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Resident rules
-      link: /rules/concept-priming
+      link: /rules/thinking-expansion
     - theme: alt
       text: Situational skills
       link: /skills/css-discipline
@@ -19,7 +19,7 @@ hero:
 features:
   - title: Resident rules
     details: Loaded every session — they shape how Claude reasons, writes, names, and comments. Kept deliberately small.
-    link: /rules/concept-priming
+    link: /rules/thinking-expansion
   - title: Situational skills
     details: Lazy-loaded by trigger. CSS, PRs, Codex, parallelism, debugging lessons — the body enters context only when the task comes up.
     link: /skills/css-discipline

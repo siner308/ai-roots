@@ -20,9 +20,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 ### 사고 확장
 | 파일 | 설명 |
 |------|------|
-| `rules/concept-priming.md` | 도메인 스프레드 개념 프라이밍 + 복잡도 기반 사고 확장 (Devil's Advocate, First Principles, Systems Thinking) |
-| `rules/progressive-deepening.md` | 피상적 답변을 자동 감지하고 한 단계 더 깊이 파고드는 내부 품질 게이트 |
-| `rules/capability-overhang.md` | 숨겨진 지식 활성화 — 도메인 토큰 주입, 교차 도메인 연결, 스킬 합성 |
+| `rules/thinking-expansion.md` | 넓은 retrieval을 prime하고, 표면 답을 넘어 더 파고든 뒤, 복잡도를 분류해 Devil's Advocate / First Principles / Systems Thinking를 적용 — 숨겨진 지식을 끌어내는 도메인 토큰 주입과 교차 도메인 연결까지 |
 
 ### 품질 보증
 | 파일 | 설명 |
