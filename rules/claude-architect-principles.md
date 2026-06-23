@@ -73,6 +73,6 @@ When the user's description is ambiguous or first attempts produce inconsistent 
 
 1. Ask for 2-3 concrete input/output examples before iterating on prose descriptions
 2. Suggest writing test cases first, then iterating against failures
-3. Use the interview pattern: ask clarifying questions to surface considerations the user hasn't anticipated, before implementing
+3. **Grill before building on a material plan.** When the design you're about to implement has unresolved decisions that would change what you build, interview before coding — one question at a time (a wall of questions is bewildering), each with your recommended answer and the reason it fits *this* case, and explore the codebase to answer anything you can verify yourself rather than asking. Stop once the ambiguity that affects the build is resolved; don't interrogate decisions that don't change the outcome.
 
 When reporting multiple issues: batch interacting problems in one message; address independent problems sequentially.
