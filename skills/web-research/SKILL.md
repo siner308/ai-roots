@@ -1,6 +1,6 @@
 ---
 name: web-research
-description: "Apply when browsing the web, extracting page content, scraping data, or fetching figures from sites — choosing between agent-browser (lightpanda default, chrome for heavy/interactive pages) and search-based tools. Covers the critical block-signal → search fallback: when a page is bot-blocked or fully dynamic, stop escalating the browser engine and switch to WebSearch / Codex --search instead of retrying."
+description: "Apply when browsing the web, extracting page content, scraping data, or fetching figures from sites — choosing between agent-browser (lightpanda default, chrome for heavy/interactive pages), WebSearch for discovery, and the insane-search skill for retrieving blocked content. Covers the critical block-signal handling: when a page is bot-blocked, stop escalating the browser engine — use WebSearch when you only need a fact, and delegate to insane-search when you need the blocked page's full content. Codex --search is the GPT-dependent last resort for cross-provider verification only."
 ---
 
 # Web Research Protocol
@@ -13,10 +13,12 @@ description: "Apply when browsing the web, extracting page content, scraping dat
 
 | Priority | Tool | When to use |
 |----------|------|-------------|
-| 1 (default) | `agent-browser --engine lightpanda` | All web browsing. 10x faster, 10x less memory than Chrome. Use for page content extraction, data scraping, reading articles, fetching structured data |
-| 2 (fallback) | `agent-browser` (chrome engine) | When lightpanda fails on a page that is *renderable but heavy* — complex JS interactions, login flows, form submissions with dynamic validation, screenshots |
-| 3 (block-bypass) | `WebSearch`, or Codex `--search` web-research mode | **When the page is bot-blocked or its data lives in dynamic JS that neither engine renders.** Search indexes return snippets without rendering the page, so they walk straight past Cloudflare / SPA walls. Promote this ABOVE chrome the moment block signals appear (see below). |
-| 4 (last resort) | `WebFetch` | Only when agent-browser is unavailable and the page is static HTML |
+| 1 (default render) | `agent-browser --engine lightpanda` | All web browsing. 10x faster, 10x less memory than Chrome. Use for page content extraction, data scraping, reading articles, fetching structured data |
+| 2 (heavy render) | `agent-browser` (chrome engine) | When lightpanda fails on a page that is *renderable but heavy, not blocked* — complex JS interactions, login flows, form submissions with dynamic validation, screenshots |
+| 3 (discovery) | `WebSearch` | **Keyword → URL or fact.** Reads the index without rendering, so it also walks past Cloudflare / SPA walls. Often step 1 — and it's what feeds a URL to the retrieval lane below. Not demotable. |
+| 4 (blocked-content retrieval) | **insane-search** skill (`python3 -m engine <url>`) | **When you need the actual content of a blocked, known URL — not a snippet.** Auto Phase 0→3 (official API → curl_cffi TLS impersonation → internal JSON API → real browser), no external LLM. Promote ABOVE chrome the moment block signals appear (see below). |
+| 5 (last resort — verify) | Codex `--search` | Cross-provider figure extraction / verification over hard primary docs. The only GPT-dependent lane; reach for it last, for verification passes, not first-line lookups. |
+| 6 (last resort — static) | `WebFetch` | Only when agent-browser is unavailable and the page is static HTML |
 
 ## Block-signal → search fallback (the key rule)
 
@@ -34,11 +36,26 @@ description: "Apply when browsing the web, extracting page content, scraping dat
 
 **Concrete escalation order for a hard-to-fetch number:**
 1. `agent-browser --engine lightpanda` on the source page.
-2. Block signal? → `WebSearch` with a keyword query that embeds the exact figure you need (e.g. `Arm Holdings 20-F China revenue percent 2026`). Read the snippet; it often contains the number outright.
-3. Still missing, and the source is an **official primary doc** (SEC/DART/regulator/issuer IR)? → chrome engine on that *primary* URL is worth it (the data exists nowhere else). For aggregator/secondary data, prefer another search query or another aggregator over chrome.
-4. If a cross-provider check is already warranted, Codex `--search -a never exec --sandbox read-only` runs the same web_search tool and is excellent at pulling figures out of primary filings — but it is heavier; reach for it for verification passes, not first-line lookups.
+2. Block signal + you just need a value → `WebSearch` with a keyword query that embeds the exact figure you need (e.g. `Arm Holdings 20-F China revenue percent 2026`). Read the snippet; it often contains the number outright.
+3. Block signal + you need the page's full content → the **insane-search** skill (it auto-triggers on block signals; `python3 -m engine "<url>"`). It tries the official API, TLS impersonation, and the site's internal JSON API before any browser — the no-render path that gets the real content, not a snippet.
+4. Still missing, and the source is an **official primary doc** (SEC/DART/regulator/issuer IR)? → chrome engine on that *primary* URL is worth it (the data exists nowhere else). For aggregator/secondary data, prefer another search query or another aggregator over chrome.
+5. Last resort, only when a cross-provider check is warranted: Codex `--search -a never exec --sandbox read-only` runs the same web_search tool and is good at pulling figures out of primary filings — but it is heavier and the only GPT-dependent lane; reach for it for verification, not first-line lookups.
 
 This protocol applies to every research lane — news, filings, analyst data, market-research forecasts. The lesson behind it: `web-fetch-block-then-search`.
+
+## Blocked but you need the full content — delegate to insane-search
+
+Search bypasses a block but only returns the *indexed snippet*. When you need the **actual page content** of a blocked site — a full Reddit thread, an X timeline, a product page — don't render it live (the browser inherits the block), and don't reach for Codex `--search` (that's the GPT lane, and it still returns snippets). Hand the URL to the **insane-search** skill, installed separately as a marketplace plugin. It retrieves blocked content with no external LLM and auto-triggers on block signals (403/402/WAF, X/Reddit/YouTube/Naver/Coupang/LinkedIn, etc.); if it hasn't fired, invoke it.
+
+Its entrypoint is `python3 -m engine "<url>"`, which runs a Phase 0→3 escalation: official no-auth API first (Reddit `.rss`, X syndication, HN, `yt-dlp`, arXiv, …), then a WAF-product-driven TLS-impersonation grid (`curl_cffi`), then internal-JSON-API discovery, then a real browser — validating against challenge markers rather than trusting HTTP 200. Its own SKILL.md (rules R1–R7) drives the agent side; let it. Access public content only — it stops at auth walls and paywalls.
+
+**If insane-search is not installed**, the same ideas by hand, in order:
+- **Official public API** (no-auth, never WAF-challenged): Reddit `https://www.reddit.com/r/<sub>/.rss` (the `.json` path is blocked), X `cdn.syndication.twimg.com/tweet-result?id=<id>&token=a`, HN `hacker-news.firebaseio.com/v0/...`, media via `yt-dlp --dump-json <url>`, plus arXiv / Wikipedia REST / GitHub `gh` / Bluesky / Mastodon / Stack Overflow public APIs.
+- **TLS impersonation**: `python3 -c "import curl_cffi" 2>/dev/null || pip install -q "curl_cffi>=0.15.0"`, then `r.get('<url>', impersonate='safari')`. If challenged, rotate `chrome`/`safari_ios`/`firefox` and try the `m.` mobile subdomain — a different identity, not the same one harder.
+- **Internal API**: open once in `agent-browser` (chrome), find `/api`·`/graphql`·`.json` calls, fetch that endpoint directly.
+- **200 ≠ success**: reject a body under ~3KB or carrying `Just a moment…`, `Access Denied`, `DataDome`, `Attention Required` — a 200 is where you *start* validating, not where you stop.
+
+> insane-search is MIT-licensed ([`fivetaku/insane-search`](https://github.com/fivetaku/insane-search)). The manual fallback above is the same approach distilled, for when the plugin isn't present.
 
 ## Lightpanda First
 
