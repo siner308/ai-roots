@@ -203,6 +203,16 @@ format_countdown() {
   fi
 }
 
+# Format a raw token count compactly (e.g. 1900000 -> 1.9M, 12300 -> 12.3K)
+format_tokens() {
+  n=$1
+  awk -v n="$n" 'BEGIN {
+    if (n >= 1000000) printf "%.1fM", n/1000000;
+    else if (n >= 1000) printf "%.1fK", n/1000;
+    else printf "%d", n;
+  }'
+}
+
 # Read from cache
 if [ -f "$CACHE_FILE" ]; then
   five_h=$(jq -r '.data.five_hour.utilization // empty' "$CACHE_FILE" 2>/dev/null)
@@ -253,16 +263,28 @@ if [ -f "$CACHE_FILE" ]; then
   fi
 fi
 
-# --- Codex rate limits (parsed from latest local session jsonl, cached) ---
+# --- Codex usage (parsed from local session jsonl, cached) ---
+# Two auth modes need different metrics:
+#   chatgpt (subscription) → rate-limit quota windows (5h / 7d percentages)
+#   apikey  (pay-as-you-go) → no quota window exists, so show token counts instead
+#     (session = latest session's cumulative tokens; today = sum across today's sessions).
+# Pricing isn't available locally (models_cache.json carries no rates), so cost is omitted.
 CODEX_DIR_HOME="$HOME/.codex/sessions"
 CODEX_CACHE="$CLAUDE_DIR/.codex-usage-cache.json"
 CODEX_LOCK="$CODEX_CACHE.lock"
 codex_part=""
 
+codex_mode="quota"
+if [ -f "$HOME/.codex/auth.json" ]; then
+  cx_auth_mode=$(jq -r '.auth_mode // empty' "$HOME/.codex/auth.json" 2>/dev/null)
+  [ "$cx_auth_mode" = "apikey" ] && codex_mode="tokens"
+fi
+
 codex_fetch_needed=1
 if [ -f "$CODEX_CACHE" ]; then
   cx_cache_ts=$(jq -r '.timestamp // 0' "$CODEX_CACHE" 2>/dev/null)
-  if [ $((now_ts - cx_cache_ts)) -lt "$CACHE_TTL" ]; then
+  cx_cache_mode=$(jq -r '.mode // "quota"' "$CODEX_CACHE" 2>/dev/null)
+  if [ $((now_ts - cx_cache_ts)) -lt "$CACHE_TTL" ] && [ "$cx_cache_mode" = "$codex_mode" ]; then
     codex_fetch_needed=0
   fi
 fi
@@ -275,39 +297,65 @@ if [ "$codex_fetch_needed" -eq 1 ] && [ -d "$CODEX_DIR_HOME" ]; then
     latest=$(find "$CODEX_DIR_HOME" -type f -name "*.jsonl" -mtime -7 2>/dev/null \
       | xargs -I {} stat -f '%m %N' {} 2>/dev/null \
       | sort -rn | head -1 | cut -d' ' -f2-)
+    today_dir="$CODEX_DIR_HOME/$(date +%Y/%m/%d)"
     if [ -n "$latest" ] && [ -f "$latest" ]; then
-      result=$(python3 - "$latest" <<'PY' 2>/dev/null
-import json, sys
-path = sys.argv[1]
-last = None
-try:
-    with open(path) as fh:
-        for line in fh:
-            if '"rate_limits"' not in line:
-                continue
-            try:
-                obj = json.loads(line)
-            except Exception:
-                continue
-            stack = [obj]
-            while stack:
-                o = stack.pop()
-                if isinstance(o, dict):
-                    rl = o.get('rate_limits')
-                    if isinstance(rl, dict):
-                        last = rl
-                    stack.extend(o.values())
-                elif isinstance(o, list):
-                    stack.extend(o)
-except Exception:
-    pass
-if last:
-    print(json.dumps(last))
+      result=$(python3 - "$codex_mode" "$latest" "$today_dir" <<'PY' 2>/dev/null
+import json, sys, os, glob
+mode, latest, today_dir = sys.argv[1], sys.argv[2], sys.argv[3]
+
+def walk_last(path, key, pick):
+    last = None
+    try:
+        with open(path) as fh:
+            for line in fh:
+                if ('"%s"' % key) not in line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except Exception:
+                    continue
+                stack = [obj]
+                while stack:
+                    o = stack.pop()
+                    if isinstance(o, dict):
+                        v = o.get(key)
+                        got = pick(v)
+                        if got is not None:
+                            last = got
+                        stack.extend(o.values())
+                    elif isinstance(o, list):
+                        stack.extend(o)
+    except Exception:
+        pass
+    return last
+
+def last_rate_limits(path):
+    return walk_last(path, 'rate_limits', lambda v: v if isinstance(v, dict) else None)
+
+def last_total_tokens(path):
+    return walk_last(path, 'total_token_usage',
+                     lambda v: v.get('total_tokens') if isinstance(v, dict) and 'total_tokens' in v else None)
+
+out = None
+if mode == 'tokens':
+    session = last_total_tokens(latest) or 0
+    today = 0
+    for p in glob.glob(os.path.join(today_dir, '*.jsonl')):
+        t = last_total_tokens(p)
+        if t:
+            today += t
+    out = {"session": session, "today": today}
+else:
+    rl = last_rate_limits(latest)
+    if rl:
+        out = rl
+if out is not None:
+    print(json.dumps(out))
 PY
 )
       if [ -n "$result" ]; then
         ts=$(date +%s)
-        printf '{"timestamp":%s,"data":%s}' "$ts" "$result" > "${CODEX_CACHE}.tmp" 2>/dev/null \
+        printf '{"timestamp":%s,"mode":"%s","data":%s}' "$ts" "$codex_mode" "$result" > "${CODEX_CACHE}.tmp" 2>/dev/null \
           && mv "${CODEX_CACHE}.tmp" "$CODEX_CACHE" 2>/dev/null
       fi
     fi
@@ -316,30 +364,43 @@ PY
 fi
 
 if [ -f "$CODEX_CACHE" ]; then
-  cx_5h=$(jq -r '.data.primary.used_percent // empty' "$CODEX_CACHE" 2>/dev/null)
-  cx_7d=$(jq -r '.data.secondary.used_percent // empty' "$CODEX_CACHE" 2>/dev/null)
-  cx_5h_e=$(jq -r '.data.primary.resets_at // empty' "$CODEX_CACHE" 2>/dev/null)
-  cx_7d_e=$(jq -r '.data.secondary.resets_at // empty' "$CODEX_CACHE" 2>/dev/null)
-
+  cx_cache_mode=$(jq -r '.mode // "quota"' "$CODEX_CACHE" 2>/dev/null)
   cx_parts=""
-  if [ -n "$cx_5h" ]; then
-    c=$(color_for_pct "$cx_5h"); v=$(printf "%.0f" "$cx_5h")
-    cd_str=""
-    if [ -n "$cx_5h_e" ]; then cd_str=$(format_countdown $((cx_5h_e - now_ts))); fi
-    if [ -n "$cd_str" ]; then
-      cx_parts="5h:${c}${v}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
-    else
-      cx_parts="5h:${c}${v}%${ESC}[0m"
+
+  if [ "$codex_mode" = "tokens" ] && [ "$cx_cache_mode" = "tokens" ]; then
+    cx_sess=$(jq -r '.data.session // empty' "$CODEX_CACHE" 2>/dev/null)
+    cx_today=$(jq -r '.data.today // empty' "$CODEX_CACHE" 2>/dev/null)
+    if [ -n "$cx_sess" ]; then
+      cx_parts="${ESC}[2msession:${ESC}[0m${ESC}[32m$(format_tokens "$cx_sess")${ESC}[0m"
     fi
-  fi
-  if [ -n "$cx_7d" ]; then
-    c=$(color_for_pct "$cx_7d"); v=$(printf "%.0f" "$cx_7d")
-    cd_str=""
-    if [ -n "$cx_7d_e" ]; then cd_str=$(format_countdown $((cx_7d_e - now_ts))); fi
-    if [ -n "$cd_str" ]; then
-      cx_parts="${cx_parts:+${cx_parts} }7d:${c}${v}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
-    else
-      cx_parts="${cx_parts:+${cx_parts} }7d:${c}${v}%${ESC}[0m"
+    if [ -n "$cx_today" ]; then
+      cx_parts="${cx_parts:+${cx_parts} }${ESC}[2mtoday:${ESC}[0m${ESC}[32m$(format_tokens "$cx_today")${ESC}[0m"
+    fi
+  elif [ "$codex_mode" = "quota" ] && [ "$cx_cache_mode" = "quota" ]; then
+    cx_5h=$(jq -r '.data.primary.used_percent // empty' "$CODEX_CACHE" 2>/dev/null)
+    cx_7d=$(jq -r '.data.secondary.used_percent // empty' "$CODEX_CACHE" 2>/dev/null)
+    cx_5h_e=$(jq -r '.data.primary.resets_at // empty' "$CODEX_CACHE" 2>/dev/null)
+    cx_7d_e=$(jq -r '.data.secondary.resets_at // empty' "$CODEX_CACHE" 2>/dev/null)
+
+    if [ -n "$cx_5h" ]; then
+      c=$(color_for_pct "$cx_5h"); v=$(printf "%.0f" "$cx_5h")
+      cd_str=""
+      if [ -n "$cx_5h_e" ]; then cd_str=$(format_countdown $((cx_5h_e - now_ts))); fi
+      if [ -n "$cd_str" ]; then
+        cx_parts="5h:${c}${v}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
+      else
+        cx_parts="5h:${c}${v}%${ESC}[0m"
+      fi
+    fi
+    if [ -n "$cx_7d" ]; then
+      c=$(color_for_pct "$cx_7d"); v=$(printf "%.0f" "$cx_7d")
+      cd_str=""
+      if [ -n "$cx_7d_e" ]; then cd_str=$(format_countdown $((cx_7d_e - now_ts))); fi
+      if [ -n "$cd_str" ]; then
+        cx_parts="${cx_parts:+${cx_parts} }7d:${c}${v}%${ESC}[0m${ESC}[2m(${cd_str})${ESC}[0m"
+      else
+        cx_parts="${cx_parts:+${cx_parts} }7d:${c}${v}%${ESC}[0m"
+      fi
     fi
   fi
 

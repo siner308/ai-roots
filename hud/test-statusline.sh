@@ -78,4 +78,28 @@ assert_contains "$out" "✦ codex"
 assert_contains "$out" "5h:27%"
 assert_contains "$out" "7d:4%"
 
+# apikey (pay-as-you-go) auth: show token counts instead of quota percentages.
+mkdir -p "$HOME_DIR/.codex"
+cat > "$HOME_DIR/.codex/auth.json" <<'JSON'
+{"auth_mode": "apikey", "OPENAI_API_KEY": "sk-test"}
+JSON
+cat > "$CLAUDE_DIR/.codex-usage-cache.json" <<'JSON'
+{
+  "timestamp": 9999999999,
+  "mode": "tokens",
+  "data": {"session": 1870965, "today": 3085067}
+}
+JSON
+
+raw=$(printf '%s' "$input" \
+  | CLAUDE_CONFIG_DIR="$CLAUDE_DIR" HOME="$HOME_DIR" sh "$SCRIPT_DIR/statusline-command.sh")
+out=$(printf '%s' "$raw" | strip_ansi)
+
+assert_contains "$out" "✦ codex"
+assert_contains "$out" "session:1.9M"
+assert_contains "$out" "today:3.1M"
+# token values are highlighted green (ESC[32m)
+assert_contains "$raw" "$(printf '\033[32m1.9M')"
+assert_contains "$raw" "$(printf '\033[32m3.1M')"
+
 echo "ok"
