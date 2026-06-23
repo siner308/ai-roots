@@ -6,6 +6,14 @@ Automatically apply production-grade architecture principles so the user doesn't
 
 When diagnosing a problem, try the simplest fix before engineering complex solutions. If a tool description is vague, improve the description before building a routing classifier. If a config value isn't taking effect, check whether it's actually reaching the process before redesigning the config system.
 
+## Write the Least Code
+
+Before writing new code, climb down before you build up. The simplest-fix principle above is for diagnosis; this is for authoring.
+
+- **Reuse before writing.** Check, in order: already in this codebase? in the standard library? a native platform feature? an installed dependency? Only then write new code — and prefer one line over a module.
+- **No unrequested abstractions.** Don't add scaffolding, config layers, or generalization for needs nobody stated. YAGNI: build what was asked, and suggest the leaner path when you see one.
+- **Minimalism never touches the safety floor.** Trust-boundary validation, data-loss handling, security, and error handling are never sacrificed for brevity. Shorter is the goal only above that floor, never through it.
+
 ## Enforcement Matching
 
 Match the enforcement mechanism to consequence severity automatically:
