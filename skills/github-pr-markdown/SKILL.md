@@ -1,6 +1,6 @@
 ---
 name: github-pr-markdown
-description: "Apply when creating or editing a pull request body or title (gh pr create, gh pr edit, gh api PR updates) or composing any PR description, including when another skill or workflow produces one. Enforces GitHub-flavored Markdown: ASCII dash bullets, task-list checkboxes, backtick code refs, mandatory Summary/Test plan sections, and the safe API-PATCH body delivery that avoids gh CLI markdown corruption. Also adds a one-line TL;DR lead, problem→cause→solution ordering in the Summary, and an optional References section whose every link is opened and verified before inclusion."
+description: "Apply when creating or editing a pull request body or title (gh pr create, gh pr edit, gh api PR updates) or composing any PR description, including when another skill or workflow produces one. Keep bodies short — three lines or fewer by default, scaled to the change — and follow the repo's PR template when one exists. Enforces GitHub-flavored Markdown: ASCII dash bullets, task-list checkboxes, backtick code refs, and the safe API-PATCH body delivery that avoids gh CLI markdown corruption. For non-trivial changes adds a Summary (problem→cause→fix), a Test plan, and a References section whose every link is opened and verified before inclusion."
 ---
 
 # GitHub PR Markdown Convention
@@ -29,31 +29,19 @@ CRITICAL: When creating or editing PRs (gh pr create, gh pr edit, PR body compos
 - URLs: ALWAYS use `[text](url)` format. Bare URLs are forbidden
 - Images use `![alt text](url)` with descriptive alt text
 
-### Required PR Body Sections
+### Body length and structure
 
-```markdown
-> **TL;DR** — one sentence: the problem and the outcome.
+Keep PR bodies short. Aim for three lines or fewer by default — match the body to the size of the change, and never pad it with ceremony sections that add nothing. Most PRs are small and need only a sentence or two on what changed and why.
 
-## Summary
-- **Problem:** what was wrong, or why this change is needed
-- **Cause:** the underlying reason (bugfix), or the motivation (feature/refactor)
-- **Fix:** what this change does
+**Follow the repo's PR template if one exists** (`.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/`). Read it, fill the sections it defines in its order, and omit sections that don't apply rather than writing "N/A" filler. The template's structure replaces the default below; the formatting rules (ASCII bullets, backtick code refs, verified links, API delivery) still apply inside it.
 
-## References
-- [Title of the spec or doc](url) — what it backs up
+**With no template, scale the body to the change:**
 
-## Test plan
-- [ ] Verification item 1
-- [ ] Verification item 2
-```
+- **Small / self-explanatory** — one to three lines: what changed and why. No headings, no checkboxes.
+- **Non-trivial** (several files, a behavior change, needs review context) — add `## Summary` (problem → cause → fix) and a `## Test plan` checklist. Add a one-line `> **TL;DR**` lead only when the body is long enough that the reader needs the gist first.
+- `## References` — optional, only when the change relies on documented external behavior (a system's documented behavior, a library API spec, an RFC, an internal design doc). Before adding any link, OPEN it and confirm it is reachable AND actually contains the behavior you cite. Never include a guessed URL. Additional sections like `## Breaking changes` may be added when they carry real content.
 
-- `## Summary` and `## Test plan` are mandatory
-- If the repo has a PR template (`.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/`), include its required sections too — the TL;DR, problem→cause→fix ordering, and verified References still apply within them
-- Lead with a one-line TL;DR (blockquote) above Summary when the body is non-trivial (Summary has 3+ bullets, or there are extra sections). A short 2-bullet PR may skip it — the Summary already is the gist
-- Open with context, then mechanism. Bugfix: problem → cause → fix. Feature/refactor: motivation → what changed → why this approach. Never lead with the cause or the fix before the reader knows the problem
-- `## References` is optional — include it when the change relies on documented external behavior (a system's documented behavior, a library API spec, an RFC, an internal design doc). One link can sit inline in its bullet; collect several under `## References`
-- Before adding any reference link, OPEN it and confirm two things: it is reachable, AND the page actually contains the behavior you cite. Never include an unverified or guessed URL
-- Additional sections like `## Breaking changes` or `## Notes` may be added as needed
+Whatever the length, open with context before mechanism: problem before cause/fix, motivation before what changed. Never lead with the fix before the reader knows the problem.
 
 ### Body Delivery — STRICT
 
@@ -68,13 +56,9 @@ gh pr create --title "the pr title" --body "" --draft
 # 2. Write body payload with Python (preserves exact bytes)
 python3 -c "
 import json
-body = '''## Summary
+body = '''Show codex token usage on API-key auth, where \x60rate_limits\x60 is null so the quota line stayed blank.
 
-- First bullet with \x60code ref\x60
-
-## Test plan
-
-- [ ] Verification item
+- [ ] Statusline renders token counts in apikey mode
 '''
 with open('/tmp/pr-payload.json', 'w', encoding='utf-8') as f:
     json.dump({'body': body}, f, ensure_ascii=False)
