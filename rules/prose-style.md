@@ -55,6 +55,8 @@ The common failure is breaking wherever a column limit happens to land. That dro
 
 Only where the break is yours to place and a real width limit forces one — code comments, commit message bodies, fixed-width text. Soft-wrapping prose (Markdown, chat) needs no hard breaks at all: let it wrap, one sentence per line. Don't insert manual breaks into text that already flows on its own.
 
+A "real width limit" is a property of the *file* — a column convention a formatter or linter enforces, or a genuinely fixed-width medium. The viewer's screen or terminal width is **not** one: it is the reader's window, not a constraint on the content, and it differs from reader to reader. Never break a line to fit how wide your current display happens to be — the file's content does not depend on your viewport.
+
 ### Where to break
 
 Cut at the lowest-cohesion gap available, preferring (high to low):
@@ -103,3 +105,4 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 - Keep precise technical terms — plainness targets rhythm, not vocabulary depth.
 - When you choose where a line breaks, break at the meaning boundary, not the column limit; keep grouped lists and subject–predicate pairs on one line.
 - Soft-wrapping prose (Markdown, chat) takes no hard breaks — let it wrap.
+- The viewer's screen/terminal width is not a width limit — never insert a hard break to fit your current display. Only a file-level column convention or a fixed-width medium justifies one.
