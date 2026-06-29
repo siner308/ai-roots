@@ -1,40 +1,34 @@
 # gh Markdown Style Hook
 
-A `PreToolUse` hook on `Bash` that enforces GitHub-flavored Markdown on `gh` and GitHub-API writes, applying the [`github-pr-markdown`](../skills/github-pr-markdown) skill at the tool boundary instead of relying on the model to remember it.
+A `PreToolUse` hook on `Bash` that blocks the one PR-markdown failure the [`github-pr-markdown`](../skills/github-pr-markdown) skill can't prevent on its own: `gh` CLI corrupting the body before it's published.
 
 ## Why it exists
 
-It started as a soft reminder (it printed the markdown rules before `gh pr/issue` commands), but two things still slipped through:
+It started as a soft reminder that printed the markdown rules before `gh pr/issue` commands. That wasn't enough on its own — but the durable reason it's a gate is narrower than "the model forgets the skill":
 
-1. The model composed a PR body without invoking the skill — a prompt-level rule it can forget.
-2. Even with the right format, `gh` CLI and shell heredocs silently corrupted the markdown (`- ` → `•`, backticks stripped, `- [ ]` → `[ ]`) *before* it was published, so the breakage was invisible until the rendered page looked wrong.
+Even when the model follows the skill perfectly, `gh` CLI corrupts markdown in every body channel (`- ` → `•`, backticks stripped, `- [ ]` → `[ ]`), and that corruption happens *inside* `gh`, after the model has already done everything right. A prompt rule can't fix a corruption that happens past the prompt. Only a gate can.
 
-A reliability gap needs deterministic enforcement, not a better prompt. This hook is now a hard gate: it inspects the command about to run and blocks it when the body is delivered through a channel that corrupts, or when the body content is already broken.
+So this hook enforces exactly that — the channel — and nothing else. Bullet/checkbox/section formatting, body length, and structure are the skill's job. The hook used to re-validate those too, which is what let the hook and the skill drift apart (the hook hard-required `## Summary` + `## Test plan` long after the skill moved to "short by default, follow the repo template"). A rule written in two places diverges; this one lives in the skill.
 
 ## What it does
 
-On every `Bash` call it checks whether the command writes a `gh` body (`gh pr create/edit/comment/review`, `gh issue create/edit/comment`) or hits the GitHub API for a PR/issue (`curl`/`gh api` to `/repos/OWNER/REPO/{pulls,issues}/N`). If so:
+On every `Bash` call it checks whether the command writes a `gh` body (`gh pr create/edit/comment/review`, `gh issue create/edit/comment`). If that body *contains markdown*, it's **blocked** — the body must be created empty and then PATCHed via the GitHub API. A plain-text body (nothing for `gh` to mangle) passes.
 
-- **Channel rule** — a `gh` body that *contains markdown* is **blocked**. `gh` corrupts markdown in every body channel, and that happens inside `gh` after any content check, so the only fix is to forbid the channel: empty body, then PATCH via the API. A plain-text body (nothing to mangle) passes.
-- **Content rule** — for the API path the body is extracted (curl `-d @file`/inline JSON, or `gh api -f body=`) and **validated**: no Unicode bullets, checkboxes carry a `- ` prefix, and a PR-resource body (`/pulls/N`) has `## Summary` + `## Test plan`.
-
-A block (exit 2) feeds the reason back to the model, which then re-authors the body via the Write tool (heredocs mangle markdown in this shell) and PATCHes via the API.
+A block (exit 2) feeds the reason back to the model, pointing it at the `github-pr-markdown` skill for how to author and deliver the body.
 
 ## What it skips
 
 - **Non-body commands** — `gh pr review --approve`, reviewer-only edits, anything with no body: no firing.
-- **Plain-text bodies** — a short `gh pr comment -b "lgtm"` with no markdown passes; only markdown-bearing bodies are pushed to the API path.
-- **Unlocatable bodies** — if a body payload can't be parsed it **fails open** (allows) rather than wedge an unfamiliar command shape. It blocks only on a positively-identified problem.
-- **Uninspectable body sources** — a body from stdin (`--body-file -`, `gh api --input -`, `curl --data @-`), a shell variable, or command substitution (`--body "$(cat f)"`) is not expanded at hook time, so it passes. The enforced path is what the model actually uses: inline `--body "…"`, `--body-file <path>`, or `curl -d @file`.
+- **Plain-text bodies** — a short `gh pr comment -b "lgtm"` with no markdown passes; only markdown-bearing bodies are blocked.
+- **The API path itself** — a `curl`/`gh api` PATCH is the *fix* this hook steers toward, so it isn't gated. Body content on that path (bullets, sections, links) is the skill's responsibility, not re-validated here.
+- **Unlocatable / uninspectable bodies** — a body that can't be parsed, or comes from stdin (`--body-file -`), a shell variable, or command substitution (`--body "$(cat f)"`), is not expanded at hook time, so it **fails open** (allows) rather than wedge an unfamiliar command shape. The enforced path is what the model actually uses: inline `--body "…"` or `--body-file <path>`.
 
 ## Known limitations (reviewed, accepted)
 
-Surfaced in adversarial review and consciously left unenforced. The principal here is the model/user, not an attacker — so deliberate-evasion shapes carry no real risk, and the common paths are covered. Don't treat the gate as total.
+The principal here is the model/user, not an attacker — so deliberate-evasion shapes carry no real risk, and the common paths are covered. Don't treat the gate as total.
 
-- **Stdin bodies aren't validated** (see above) — fail-open on what can't be inspected, rather than fail-closed and wedge legitimate stdin workflows.
+- **Stdin / variable bodies aren't inspected** (see above) — fail-open on what can't be read at hook time, rather than fail-closed and wedge legitimate workflows.
 - **String mentions can over-block** — a command that only *names* a gh body command without running it (e.g. `echo gh pr create -b '- x'`) is matched by substring and may be blocked. Rephrase if it trips.
-- **URL-valued non-endpoint flags** — a URL passed to a flag like `curl -e <url>` can mis-resolve the endpoint and skew the PR-section check. Not a shape used for GitHub writes.
-- **`gh api graphql`** body mutations are out of scope (no `/pulls|issues/N` in the command).
 
 ## Install and registration
 
