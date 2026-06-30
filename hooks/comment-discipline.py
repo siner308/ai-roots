@@ -41,7 +41,8 @@ def comment_lines(text, ext):
 def main():
     try:
         data = json.load(sys.stdin)
-    except Exception:
+    except Exception as e:
+        print(f"comment-discipline: failed to parse hook input: {e}", file=sys.stderr)
         return 0
 
     tool = data.get("tool_name", "")
