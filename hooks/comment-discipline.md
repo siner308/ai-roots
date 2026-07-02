@@ -8,9 +8,9 @@ A `PostToolUse` hook that enforces the [`comment-discipline`](../rules/comment-d
 
 ## What it does
 
-After every `Edit`, `Write`, or `MultiEdit` on a **code file**, it diffs the comment lines the edit adds. When an edit introduces new comment lines, it re-surfaces the rule's closed allowlist so the model re-checks each one at the moment it wrote it — keep only a hidden constraint, a workaround, surprising-but-correct code, or a subtle invariant; delete anything else.
+After every `Edit`, `Write`, or `MultiEdit` on a **code file**, it diffs the comment lines the edit adds. When an edit introduces new comment lines, it demands a per-line verdict with **DELETE as the default**: a line survives only if the model can name which allowlist entry it is — a hidden constraint, a workaround (with link), surprising-but-correct code, or a subtle invariant. "It explains why" is not sufficient; the why must be one a careful reader could not recover from the code itself. When in doubt, delete. The sole carve-out is a one-line contract doc on an exported identifier that lint tooling enforces.
 
-It is **non-blocking**. A legitimate WHY comment survives the re-check; noise gets removed. Because it fires only on edits that actually add comments, it stays quiet once the habit holds — the better the discipline, the rarer the nudge.
+It emits `decision: "block"`, so the verdict is a prompt the model must answer — delete the noise or name each survivor's category — rather than background context it can skim past. (An earlier `additionalContext` version proved too easy to ignore: the model rationalized comments as "WHY comments" and kept them.) The tool call itself already ran; the block only forces the re-check, it does not undo the edit. Because it fires only on edits that actually add comments, it stays quiet once the habit holds — the better the discipline, the rarer the nudge.
 
 ## What it skips
 

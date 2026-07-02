@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """PostToolUse hook for Edit/Write/MultiEdit.
 
-Detects comment lines newly added by the edit and, when found, re-surfaces the
-comment-discipline allowlist so the model re-checks each comment at the moment
-it wrote it. A resident prose rule competes with everything else in context and
+Detects comment lines newly added by the edit and, when found, demands a
+per-line verdict against the comment-discipline allowlist with DELETE as the
+default. A resident prose rule competes with everything else in context and
 loses; this fires only on edits that actually add comments, so it re-primes the
-rule exactly when it matters. Non-blocking: legitimate WHY comments are kept
-after the re-check, noise is removed.
+rule exactly when it matters. It emits decision:"block" so the verdict is a
+prompt the model must answer, not background context it can skim past — an
+earlier additionalContext version proved too easy to ignore.
 """
 import json
 import sys
@@ -81,18 +82,22 @@ def main():
     msg = (
         f"comment-discipline: this edit added {len(added)} comment line(s):\n"
         f"{sample}{more}\n\n"
-        "Re-check each against the closed allowlist — keep ONLY if it is a "
-        "hidden constraint/precondition, a workaround (with link), "
-        "surprising-but-correct code, or a subtle invariant. A comment or "
-        "docstring is never mandatory; delete any that merely restate WHAT the "
-        "code does, echo the signature, narrate the task/PR, or just fill a "
-        "bare-looking block. If a kept comment is justified, leave it as is."
+        "Verdict each line now. The default verdict is DELETE — a line stays "
+        "only if you can name which allowlist entry it is: hidden "
+        "constraint/precondition, workaround (with link or issue), "
+        "surprising-but-correct code (with the reason), or subtle invariant a "
+        "reader could break. 'It explains why' is not sufficient — keep it "
+        "only if a careful reader could NOT recover that why from the code "
+        "itself. Anything else — restating WHAT the next lines do, echoing a "
+        "signature, narrating the task or PR, filling a bare-looking block — "
+        "is noise: remove it with an Edit before continuing. When in doubt, "
+        "delete. Sole carve-out: a one-line contract doc on an exported "
+        "identifier that lint tooling enforces. If every line clearly names "
+        "its category, keep them and continue."
     )
     print(json.dumps({
-        "hookSpecificOutput": {
-            "hookEventName": "PostToolUse",
-            "additionalContext": msg,
-        }
+        "decision": "block",
+        "reason": msg,
     }))
     return 0
 

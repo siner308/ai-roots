@@ -43,8 +43,9 @@ and `check-sync.sh` enforces it.
 
 `hooks/comment-discipline.py` is a `PostToolUse` hook on `Edit|Write|MultiEdit`:
 it detects comment lines an edit newly adds to a code file (pre-existing
-comments excluded) and re-surfaces the `comment-discipline` allowlist so the
-model re-checks each one. It enforces what a resident prose rule alone couldn't.
+comments excluded) and emits `decision: "block"` demanding a per-line verdict
+against the `comment-discipline` allowlist, with delete as the default. It
+enforces what a resident prose rule alone couldn't.
 
 ## Staying up to date
 
