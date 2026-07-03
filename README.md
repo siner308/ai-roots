@@ -59,7 +59,7 @@ Body enters context only when invoked via the Skill tool. The trigger column mir
 |-------|---------|-------------|
 | `skills/css-discipline/` | Editing/writing/reviewing CSS or framework styling | Close four commonly abused CSS axes — cascade (`!important`), box model, unit soup, style location |
 | `skills/github-pr-markdown/` | Composing or editing a PR body/title | Enforce GitHub-flavored Markdown conventions for PRs, plus the safe API-PATCH body delivery |
-| `skills/model-effort-delegation/` | Deciding executor/model/effort before delegating | Threshold-based model/effort/subagent selection — delegate specified work to weaker models, keep judgment on Opus |
+| `skills/model-effort-delegation/` | Deciding executor/model/effort before delegating | Threshold-based model/effort/subagent selection — delegate specified work to weaker models, keep judgment on Opus, reserve Fable 5 for exceptional reasoning |
 | `skills/parallel-execution-modes/` | Choosing sequential vs subagent vs team, inline vs background | Pick the parallelism mode by task independence and communication needs |
 | `skills/parallel-hypothesis-investigation/` | A problem has multiple plausible causes or criteria | Decompose into layered hypotheses or judgment criteria and investigate with parallel agents |
 | `skills/codex-delegation/` | Delegating to the OpenAI Codex CLI | Cross-provider policy — `/review` triggers, three-turn rescue protocol, mode/flag cheatsheet, capability routing |

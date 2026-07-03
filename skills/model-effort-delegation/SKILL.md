@@ -34,10 +34,14 @@ For executor topology (main session / subagent / team) and the inline-vs-subagen
 
 **Fable 5** (`claude-fable-5`; Agent tool selector `model: "fable"`) is Anthropic's most capable widely released model — one tier above Opus 4.8 — for the most demanding reasoning and long-horizon agentic work. Adaptive thinking is always on; 1M-token context.
 
-Reach for it only when the everyday Opus tier is genuinely insufficient:
+Escalate only on observable signals — "this feels hard" or "Opus seems stuck" is a self-assessment, not a trigger:
 
-- **Exceptionally hard reasoning** — architecture or root-cause debugging where Opus has stalled on the reasoning itself, not where the spec was merely unclear.
-- **Long-horizon agentic work** that must hold a very large context coherently and whose blast radius justifies the top model.
+- **Non-convergence** — Opus made 3+ consecutive failed hypotheses or fix attempts on the same problem despite a working verification loop.
+- **Contradictory analysis** — Opus reached mutually conflicting conclusions on the same question across 2+ passes.
+- **Unresolved hard-to-reverse decision** — a schema migration, public API contract, or similar one-way door where a full Opus analysis pass still leaves the trade-off unresolved.
+- **Lost coherence on a long-horizon run** — a single autonomous run where Opus has already re-derived or contradicted its own earlier work 2+ times.
+
+Context-window size is never the trigger: Opus 4.8 has the same 1M window as Fable 5. The difference is reasoning capability, not capacity.
 
 **Not the default.** Fable 5 costs roughly 2× Opus 4.8 ($10 / $50 vs $5 / $25 per MTok, input / output), so Opus stays the ceiling for everyday architectural work and you escalate to Fable 5 deliberately, for the exceptional case.
 
@@ -71,7 +75,7 @@ If any signal appears during subagent execution, **escalate to Opus**:
 - Failure rooted in **code comprehension gaps**, not spec ambiguity
 - Verification loop fails repeatedly with unclear cause
 
-Escalation is part of the rule, not a failure. Stubbornly pushing a weak model leads to hysteresis — the wrong direction gets locked in. The ladder has one rung above Opus: when Opus itself stalls on genuinely hard reasoning (not spec ambiguity), escalate to **Fable 5** — reserved for that exceptional case, given its cost.
+Escalation is part of the rule, not a failure. Stubbornly pushing a weak model leads to hysteresis — the wrong direction gets locked in. The ladder has one rung above Opus: escalate Opus → **Fable 5** only on the observable signals listed under Top tier (non-convergence, contradictory analysis, an unresolved one-way-door decision) — never on a feeling that the problem is hard.
 
 ## Cross-Provider Delegation (Codex)
 
@@ -135,11 +139,11 @@ Right: Delegate to Haiku Explore agent
 ## Rule Summary
 
 - Main session stays on Opus — focus on planning, review, conversation, localized edits
-- **Fable 5** is the ceiling above Opus — reserve it for exceptional reasoning or long-horizon agentic work Opus cannot crack; ~2× Opus cost, so never the default
+- **Fable 5** is the ceiling above Opus — escalate only on observable signals (3+ failed attempts, contradictory conclusions, unresolved one-way-door decision, lost coherence); ~2× Opus cost, so never the default
 - Delegate to a subagent when: ≥5 min + independent + verifiable
 - Downgrade only when BOTH plan precision and a verification loop exist
 - Never downgrade model or effort when blast radius is high
-- Escalate to Opus after 3 failures or when a design decision surfaces; escalate Opus → Fable 5 only when Opus itself stalls on genuinely hard reasoning
+- Escalate to Opus after 3 failures or when a design decision surfaces; escalate Opus → Fable 5 only when the same observable signals fire against Opus itself
 - Briefings must include file paths, signatures, verification, and a request for decision reasoning
 - If Codex CLI is available, see the codex-delegation skill for cross-provider rules (three-turn cap, adversarial review via /review, capability routing, plan-stage review).
 - **Project CLAUDE.md can strengthen these defaults** — e.g., per-PR two-reviewer rule. Project rules override the minimum where they are stricter; the minimum applies where the project is silent.

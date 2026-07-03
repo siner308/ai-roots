@@ -59,7 +59,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 |-------|--------|------|
 | `skills/css-discipline/` | CSS·프레임워크 스타일 편집/작성/리뷰 | CSS에서 흔히 남용되는 4가지 축을 닫는다 — 캐스케이드(`!important`), 박스 모델, 단위 혼란, 스타일 위치 |
 | `skills/github-pr-markdown/` | PR 본문/제목 작성·수정 | GitHub PR용 GFM 마크다운 컨벤션 강제 + gh CLI 손상을 피하는 API-PATCH 본문 전달 |
-| `skills/model-effort-delegation/` | 위임 전 executor/모델/effort 결정 | 임계치 기반 모델/effort/subagent 선택 — 명세된 구현은 약한 모델에 위임, 판단은 Opus에 집중 |
+| `skills/model-effort-delegation/` | 위임 전 executor/모델/effort 결정 | 임계치 기반 모델/effort/subagent 선택 — 명세된 구현은 약한 모델에 위임, 판단은 Opus에 집중, Fable 5는 예외적 추론에만 |
 | `skills/parallel-execution-modes/` | 순차/서브에이전트/팀, 인라인/백그라운드 선택 | 작업 독립성과 통신 필요도로 병렬 실행 모드 선택 |
 | `skills/parallel-hypothesis-investigation/` | 원인·판단 기준이 여러 갈래인 문제 | 계층별 가설 또는 판단 기준으로 분리해 병렬 에이전트로 조사 |
 | `skills/codex-delegation/` | OpenAI Codex CLI 위임 | Cross-provider 정책 — `/review` 트리거, 3-턴 rescue protocol, 모드/플래그 cheatsheet, capability routing |
