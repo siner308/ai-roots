@@ -41,14 +41,24 @@ ai_roots_update_check() {
   fi
 
   printf '[ai-roots] %s update(s) available. Apply now? [Y/n] ' "$behind"
-  local reply=""
+  local reply="" ok=0
+  # Single keystroke, no Enter needed — the flag is -k in zsh, -n in bash.
+  if [ -n "${ZSH_VERSION:-}" ]; then
+    read -r -k 1 reply && ok=1
+  elif [ -n "${BASH_VERSION:-}" ]; then
+    read -r -n 1 reply && ok=1
+  else
+    read -r reply && ok=1
+  fi
   # A failed read means EOF / no TTY — never fall through to the yes-default.
-  if ! read -r reply; then
+  if [ "$ok" -ne 1 ]; then
     printf '\n[ai-roots] no input; skipped.\n'
     return 0
   fi
+  # Enter already echoed its own newline; any other key leaves the cursor mid-line.
+  case "$reply" in '' | $'\n') ;; *) printf '\n' ;; esac
   case "$reply" in
-    '' | y | Y | yes | YES | Yes)
+    '' | $'\n' | y | Y)
       if git -C "$repo" pull --ff-only && bash "$repo/install.sh"; then
         printf '[ai-roots] updated.\n'
       else
