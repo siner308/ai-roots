@@ -37,7 +37,7 @@ The PR body is at most **three lines**. This is a ceiling, not a default — a b
 - A line may be a sentence, a `- ` bullet, or a verified `[text](url)` link — but three lines total. Never include a guessed URL; open any link and confirm it contains what you cite before adding it.
 - Open with the problem or motivation, then the change. Never lead with the fix before the reader knows the problem.
 
-**Only exception — the repo's PR template** (`.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/`): follow its sections in its order, but fill each as tersely as the cap's spirit demands, and omit sections that don't apply rather than writing "N/A" filler. The formatting rules (ASCII bullets, backtick code refs, API delivery) still apply inside it.
+**Only exception — the repo's PR template** (`.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/`): the template's structure wins, but the cap moves inside it — at most three lines per section you fill. Omit sections that don't apply rather than writing "N/A" filler, and never add sections the template doesn't define. The formatting rules (ASCII bullets, backtick code refs, API delivery) still apply inside it.
 
 ### Body Delivery — STRICT
 
