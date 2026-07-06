@@ -1,6 +1,6 @@
 ---
 name: github-pr-markdown
-description: "Apply when creating or editing a pull request body or title (gh pr create, gh pr edit, gh api PR updates) or composing any PR description, including when another skill or workflow produces one. Keep bodies short — three lines or fewer by default, scaled to the change — and follow the repo's PR template when one exists. Enforces GitHub-flavored Markdown: ASCII dash bullets, task-list checkboxes, backtick code refs, and the safe API-PATCH body delivery that avoids gh CLI markdown corruption. For non-trivial changes adds a Summary (problem→cause→fix), a Test plan, and a References section whose every link is opened and verified before inclusion."
+description: "Apply when creating or editing a pull request body or title (gh pr create, gh pr edit, gh api PR updates) or composing any PR description, including when another skill or workflow produces one. The body is capped at three lines — a hard ceiling, not a default — with the repo's PR template as the only exception. Enforces GitHub-flavored Markdown: ASCII dash bullets, task-list checkboxes, backtick code refs, and the safe API-PATCH body delivery that avoids gh CLI markdown corruption."
 ---
 
 # GitHub PR Markdown Convention
@@ -29,19 +29,15 @@ CRITICAL: When creating or editing PRs (gh pr create, gh pr edit, PR body compos
 - URLs: ALWAYS use `[text](url)` format. Bare URLs are forbidden
 - Images use `![alt text](url)` with descriptive alt text
 
-### Body length and structure
+### Body length — HARD CAP
 
-Keep PR bodies short. Aim for three lines or fewer by default — match the body to the size of the change, and never pad it with ceremony sections that add nothing. Most PRs are small and need only a sentence or two on what changed and why.
+The PR body is at most **three lines**. This is a ceiling, not a default — a big diff does not buy a longer body. Long generated bodies read as machine output and reviewers skip them; three lines that say what changed and why get read.
 
-**Follow the repo's PR template if one exists** (`.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/`). Read it, fill the sections it defines in its order, and omit sections that don't apply rather than writing "N/A" filler. The template's structure replaces the default below; the formatting rules (ASCII bullets, backtick code refs, verified links, API delivery) still apply inside it.
+- No `## Summary`, `## Test plan`, `## References`, TL;DR, or any other ceremony section. Deeper context belongs in commit messages or review comments, not the body.
+- A line may be a sentence, a `- ` bullet, or a verified `[text](url)` link — but three lines total. Never include a guessed URL; open any link and confirm it contains what you cite before adding it.
+- Open with the problem or motivation, then the change. Never lead with the fix before the reader knows the problem.
 
-**With no template, scale the body to the change:**
-
-- **Small / self-explanatory** — one to three lines: what changed and why. No headings, no checkboxes.
-- **Non-trivial** (several files, a behavior change, needs review context) — add `## Summary` (problem → cause → fix) and a `## Test plan` checklist. Add a one-line `> **TL;DR**` lead only when the body is long enough that the reader needs the gist first.
-- `## References` — optional, only when the change relies on documented external behavior (a system's documented behavior, a library API spec, an RFC, an internal design doc). Before adding any link, OPEN it and confirm it is reachable AND actually contains the behavior you cite. Never include a guessed URL. Additional sections like `## Breaking changes` may be added when they carry real content.
-
-Whatever the length, open with context before mechanism: problem before cause/fix, motivation before what changed. Never lead with the fix before the reader knows the problem.
+**Only exception — the repo's PR template** (`.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/`): follow its sections in its order, but fill each as tersely as the cap's spirit demands, and omit sections that don't apply rather than writing "N/A" filler. The formatting rules (ASCII bullets, backtick code refs, API delivery) still apply inside it.
 
 ### Body Delivery — STRICT
 
