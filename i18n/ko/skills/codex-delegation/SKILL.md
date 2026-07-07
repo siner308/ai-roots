@@ -49,11 +49,11 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 | Need | Invocation |
 |------|------------|
 | 독립적 + 보안 민감 리뷰 | `/review` 스킬 |
-| 세 번 실패 후 막힘 | `codex exec --sandbox read-only -m gpt-5…` |
-| 최신 docs 또는 웹 리서치 | `codex --search -a never exec --sandbox …` |
-| 범위가 정해진 구현(workspace edit…) | `codex exec --full-auto -m gpt-5.5 -c mo…` |
-| 무인 장시간 구현(worksp…) | `codex --search -a never exec --sandbox …` |
-| 명시적 no-sandbox 실행(use… 일 때만) | `codex --search --dangerously-bypass-app…` |
+| 세 번 실패 후 막힘 | `codex exec --sandbox read-only -m gpt-5.5 -c model_reasoning_effort=xhigh` |
+| 최신 docs 또는 웹 리서치 | `codex --search -a never exec --sandbox read-only -c model_reasoning_effort=xhigh` |
+| 범위가 정해진 구현(workspace 편집) | `codex exec --full-auto -m gpt-5.5 -c model_reasoning_effort=xhigh` |
+| 무인 장시간 구현(workspace + 리서치) | `codex --search -a never exec --sandbox workspace-write -c model_reasoning_effort=xhigh` |
+| 명시적 no-sandbox 실행(사용자가 명시적으로 요청할 때만) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -c model_reasoning_effort=xhigh` |
 
 편의를 위해 더 넓은 모드를 고르지 마라. 리서치에는 쓰기 권한이 필요 없다. 이미지 생성에는 ecosystem capability가 필요하지, no-sandbox 접근이 필요한 게 아니다. 의존성 설치, 외부 CLI, 사설 네트워크 호출은 별개의 요구사항이고 brief에 명시해야 한다.
 
@@ -93,7 +93,7 @@ Bash(
 # 백그라운드 작업이 끝나면 "$LOG"를 Read 한다.
 ```
 
-sentinel 없이, Claude 쪽 `tail -f` 없이, split pane 없이. 이전 래퍼가 왜 실패했는지는 lessons/codex-tmux-monitoring.md 참고.
+sentinel 없이, Claude 쪽 `tail -f` 없이, split pane 없이. 이전 래퍼가 왜 실패했는지는 background-task-monitoring 스킬(§"교훈 — tmux sentinel wrapper는 실패했다") 참고.
 
 **Stdin-piping 호출**(`exec`, `review`)은 프롬프트를 stdin으로 받는다. 먼저 temp 파일에 쓰고 리다이렉트하라:
 

@@ -48,11 +48,11 @@ codex review [REVIEW FLAGS]    # read-only by design; does not accept --sandbox 
 | Need | Invocation |
 |------|------------|
 | Independent + security-sensitive review | `/review` skill |
-| Stuck after three failed attempts | `codex exec --sandbox read-only -m gpt-5…` |
-| Current docs or web research | `codex --search -a never exec --sandbox …` |
-| Bounded implementation (workspace edit…) | `codex exec --full-auto -m gpt-5.5 -c mo…` |
-| Unattended long implementation (worksp…) | `codex --search -a never exec --sandbox …` |
-| Explicit no-sandbox run (only when use…) | `codex --search --dangerously-bypass-app…` |
+| Stuck after three failed attempts | `codex exec --sandbox read-only -m gpt-5.5 -c model_reasoning_effort=xhigh` |
+| Current docs or web research | `codex --search -a never exec --sandbox read-only -c model_reasoning_effort=xhigh` |
+| Bounded implementation (workspace edits) | `codex exec --full-auto -m gpt-5.5 -c model_reasoning_effort=xhigh` |
+| Unattended long implementation (workspace + research) | `codex --search -a never exec --sandbox workspace-write -c model_reasoning_effort=xhigh` |
+| Explicit no-sandbox run (only when user explicitly asks) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -c model_reasoning_effort=xhigh` |
 
 Do not pick a broader mode for convenience. Research does not need write access. Image generation needs ecosystem capability, not no-sandbox access. Dependency installation, external CLIs, and private network calls are separate requirements that must be named in the brief.
 
@@ -92,7 +92,7 @@ Bash(
 # When the background task completes, Read "$LOG".
 ```
 
-No sentinel, no `tail -f` from Claude, no split pane. See lessons/codex-tmux-monitoring.md for why the previous wrapper failed.
+No sentinel, no `tail -f` from Claude, no split pane. See the background-task-monitoring skill (§"Lesson — the tmux sentinel wrapper failed") for why the previous wrapper failed.
 
 **Stdin-piping invocations** (`exec`, `review`) take their prompt via stdin. Write to a temp file first, then redirect:
 
