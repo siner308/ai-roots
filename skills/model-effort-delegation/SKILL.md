@@ -1,19 +1,19 @@
 ---
 name: model-effort-delegation
-description: "Apply when deciding which executor (main session vs subagent vs team), which model (Fable/Opus/Sonnet/Haiku), and what effort level fits a task — i.e. before delegating non-trivial work. Covers strict downgrade conditions (plan precision + verification loop), escalation triggers, blast-radius override, and the subagent briefing standard."
+description: "Apply when deciding which executor (main session vs subagent vs team), which model (Opus/Sonnet/Haiku), and what effort level fits a task — i.e. before delegating non-trivial work. Covers strict downgrade conditions (plan precision + verification loop), escalation triggers, blast-radius override, and the subagent briefing standard."
 ---
 
 # Model, Effort, and Subagent Delegation
 
-For every task, deliberately choose the **executor** (main session vs subagent), **model** (Fable / Opus / Sonnet / Haiku), and **effort level**. Concentrate expensive models on architectural judgment; delegate well-specified implementation to cheaper models.
+For every task, deliberately choose the **executor** (main session vs subagent), **model** (Opus / Sonnet / Haiku), and **effort level**. Concentrate expensive models on architectural judgment; delegate well-specified implementation to cheaper models.
 
 ## Principle
 
-Keep the main session on Opus — for planning, review, conversation, and localized edits. Delegate large, independent work to Sonnet/Haiku subagents. **The more specific the plan, the better weaker models preserve quality** — so the prerequisite for delegation is a precise plan. One tier above Opus, **Fable 5** is the most capable model available — reserve it for exceptional reasoning the everyday Opus tier cannot crack (see Top tier below), not routine work.
+Keep the main session on Opus — for planning, review, conversation, and localized edits. Delegate large, independent work to Sonnet/Haiku subagents. **The more specific the plan, the better weaker models preserve quality** — so the prerequisite for delegation is a precise plan.
 
 ## Executor Selection
 
-For executor topology (main session / subagent / team) and the inline-vs-subagent threshold, see parallel-execution-modes.md. This rule covers the orthogonal choice of *which model* runs in the chosen executor.
+For executor topology (main session / subagent / team) and the inline-vs-subagent threshold, see the parallel-execution-modes skill. This rule covers the orthogonal choice of *which model* runs in the chosen executor.
 
 **Per-executor application.** The rule applies per executor, not per session. In a team, the team lead plays the same role as main Opus (planning, coordination, review); each teammate is selected by task type using the table below; downgrade conditions and escalation triggers apply to each teammate independently.
 
@@ -30,20 +30,16 @@ For executor topology (main session / subagent / team) and the inline-vs-subagen
 | Format conversion, comment adds, simple substitution | Haiku | Mechanical work |
 | Log inspection, status checks | Haiku | Read-only, no judgment |
 
-### Top tier — Fable 5 (most demanding work)
+### Above Opus — when a higher tier is available
 
-**Fable 5** (`claude-fable-5`; Agent tool selector `model: "fable"`) is Anthropic's most capable widely released model — one tier above Opus 4.8 — for the most demanding reasoning and long-horizon agentic work. Adaptive thinking is always on; 1M-token context.
-
-Escalate only on observable signals — "this feels hard" or "Opus seems stuck" is a self-assessment, not a trigger:
+Anthropic occasionally makes a tier above Opus available (a limited release or research preview). When one is, it is never the default — Opus stays the ceiling for everyday architectural work, and you escalate deliberately, for the exceptional case, on observable signals only. "This feels hard" or "Opus seems stuck" is a self-assessment, not a trigger:
 
 - **Non-convergence** — Opus made 3+ consecutive failed hypotheses or fix attempts on the same problem despite a working verification loop.
 - **Contradictory analysis** — Opus reached mutually conflicting conclusions on the same question across 2+ passes.
 - **Unresolved hard-to-reverse decision** — a schema migration, public API contract, or similar one-way door where a full Opus analysis pass still leaves the trade-off unresolved.
 - **Lost coherence on a long-horizon run** — a single autonomous run where Opus has already re-derived or contradicted its own earlier work 2+ times.
 
-Context-window size is never the trigger: Opus 4.8 has the same 1M window as Fable 5. The difference is reasoning capability, not capacity.
-
-**Not the default.** Fable 5 costs roughly 2× Opus 4.8 ($10 / $50 vs $5 / $25 per MTok, input / output), so Opus stays the ceiling for everyday architectural work and you escalate to Fable 5 deliberately, for the exceptional case.
+When no higher tier is available, these same signals mean: stop grinding, change strategy — decompose differently, bring in a cross-provider evaluator (see codex-delegation), or surface the unresolved trade-off to the user.
 
 ### Downgrade Conditions — STRICT
 
@@ -75,7 +71,7 @@ If any signal appears during subagent execution, **escalate to Opus**:
 - Failure rooted in **code comprehension gaps**, not spec ambiguity
 - Verification loop fails repeatedly with unclear cause
 
-Escalation is part of the rule, not a failure. Stubbornly pushing a weak model leads to hysteresis — the wrong direction gets locked in. The ladder has one rung above Opus: escalate Opus → **Fable 5** only on the observable signals listed under Top tier (non-convergence, contradictory analysis, an unresolved one-way-door decision) — never on a feeling that the problem is hard.
+Escalation is part of the rule, not a failure. Stubbornly pushing a weak model leads to hysteresis — the wrong direction gets locked in. Above Opus there is a rung only when a higher tier happens to be available (see Above Opus) — and even then only on the observable signals listed there, never on a feeling that the problem is hard.
 
 ## Cross-Provider Delegation (Codex)
 
@@ -139,11 +135,11 @@ Right: Delegate to Haiku Explore agent
 ## Rule Summary
 
 - Main session stays on Opus — focus on planning, review, conversation, localized edits
-- **Fable 5** is the ceiling above Opus — escalate only on observable signals (3+ failed attempts, contradictory conclusions, unresolved one-way-door decision, lost coherence); ~2× Opus cost, so never the default
+- A tier above Opus, when one is available, is escalation-only: observable signals (3+ failed attempts, contradictory conclusions, unresolved one-way-door decision, lost coherence), never the default
 - Delegate to a subagent when: ≥5 min + independent + verifiable
 - Downgrade only when BOTH plan precision and a verification loop exist
 - Never downgrade model or effort when blast radius is high
-- Escalate to Opus after 3 failures or when a design decision surfaces; escalate Opus → Fable 5 only when the same observable signals fire against Opus itself
+- Escalate to Opus after 3 failures or when a design decision surfaces
 - Briefings must include file paths, signatures, verification, and a request for decision reasoning
 - If Codex CLI is available, see the codex-delegation skill for cross-provider rules (three-turn cap, adversarial review via /review, capability routing, plan-stage review).
 - **Project CLAUDE.md can strengthen these defaults** — e.g., per-PR two-reviewer rule. Project rules override the minimum where they are stricter; the minimum applies where the project is silent.

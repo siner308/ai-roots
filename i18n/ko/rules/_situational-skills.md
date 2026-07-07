@@ -8,7 +8,7 @@
 |-----------------|--------------|
 | CSS나 프레임워크 스타일링(Tailwind, CSS Modules, scoped styles, inline `style`, CSS-in-JS) 편집·작성·리뷰 | `css-discipline` |
 | PR 본문이나 제목 작성·수정 (`gh pr create`, `gh pr edit`, `gh api` PR 업데이트) | `github-pr-markdown` |
-| 사소하지 않은 작업을 위임하기 전, executor(main vs subagent vs team)·모델(Fable/Opus/Sonnet/Haiku)·effort 결정 | `model-effort-delegation` |
+| 사소하지 않은 작업을 위임하기 전, executor(main vs subagent vs team)·모델(Opus/Sonnet/Haiku)·effort 결정 | `model-effort-delegation` |
 | sequential vs subagent vs team, inline vs subagent, foreground vs background 선택 | `parallel-execution-modes` |
 | 문제 원인이 여러 계층에 걸쳐 그럴듯한 후보가 여럿이거나, 출력이 여러 독립 판단 기준을 통과해야 할 때 | `parallel-hypothesis-investigation` |
 | OpenAI Codex CLI 위임 — rescue 디버깅, cross-provider 리뷰, 최신 문서 리서치, 범위가 정해진 구현 (Codex가 `PATH`에 있을 때) | `codex-delegation` |
