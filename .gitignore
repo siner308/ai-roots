@@ -16,3 +16,4 @@ site/ko/rules/
 site/ko/skills/
 site/ko/agents/
 site/ko/hooks/
+__pycache__/
