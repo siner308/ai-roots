@@ -14,10 +14,8 @@
 | OpenAI Codex CLI 위임 — rescue 디버깅, cross-provider 리뷰, 최신 문서 리서치, 범위가 정해진 구현 (Codex가 `PATH`에 있을 때) | `codex-delegation` |
 | 작업 결과가 불확실 — 외부 API, 브라우저 자동화, 셸 escaping, 낯선 라이브러리, 데이터 파이프라인 | `incremental-verification` |
 | 읽었지만 실행해 보지 않은 코드를 포팅·디버깅·구현 | `simulate-dont-just-scan` |
-| 장시간 도는 서브프로세스를 tmux split pane, sentinel 문자열, foreground tail/grep 루프로 감시하고 싶은 충동 | `codex-tmux-monitoring` |
-| 장시간 작업이 백그라운드로 돌고 사용자가 완료나 진행 상황을 봐야 할 때 | `background-task-monitoring` |
-| 웹을 둘러보거나, 페이지 내용을 추출하거나, 데이터를 긁거나, 사이트에서 수치를 가져올 때 | `web-research` |
-| agent-browser가 차단된/빈/동적 내용을 돌려줘서 다른 엔진으로 재시도하거나 형제 URL을 추측하고 싶은 충동 | `web-fetch-block-then-search` |
+| 장시간 작업이 백그라운드로 돌고 사용자가 완료나 진행 상황을 봐야 할 때 — 또는 서브프로세스를 tmux split pane, sentinel 문자열, foreground tail/grep 루프로 감시하고 싶은 충동 | `background-task-monitoring` |
+| 웹을 둘러보거나, 페이지 내용을 추출하거나, 데이터를 긁거나, 사이트에서 수치를 가져올 때 — agent-browser가 차단된/빈/동적 내용을 돌려줘서 다른 엔진으로 재시도하거나 형제 URL을 추측하고 싶은 충동이 들 때 포함 | `web-research` |
 
 ## 규칙
 

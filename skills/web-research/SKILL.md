@@ -1,6 +1,6 @@
 ---
 name: web-research
-description: "Apply when browsing the web, extracting page content, scraping data, or fetching figures from sites — choosing between agent-browser (lightpanda default, chrome for heavy/interactive pages), WebSearch for discovery, and the insane-search skill for retrieving blocked content. Covers the critical block-signal handling: when a page is bot-blocked, stop escalating the browser engine — use WebSearch when you only need a fact, and delegate to insane-search when you need the blocked page's full content. Codex --search is the GPT-dependent last resort for cross-provider verification only."
+description: "Apply when browsing the web, extracting page content, scraping data, or fetching figures from sites — choosing between agent-browser (lightpanda default, chrome for heavy/interactive pages), WebSearch for discovery, and the insane-search skill for retrieving blocked content. Also apply the moment agent-browser returns blocked/empty/dynamic content and you are tempted to retry with another engine or guess sibling URLs — stop escalating the browser and switch to a search-based tool. Codex --search is the GPT-dependent last resort for cross-provider verification only."
 ---
 
 # Web Research Protocol
@@ -22,7 +22,7 @@ description: "Apply when browsing the web, extracting page content, scraping dat
 
 ## Block-signal → search fallback (the key rule)
 
-`agent-browser` (either engine) renders the live page, so it inherits every anti-bot defense the site has. Searching does NOT render the page — it reads the search engine's already-indexed snippet. That difference is why search bypasses blocks that no browser engine can.
+`agent-browser` (either engine) renders the live page, so it inherits every anti-bot defense the site has. Searching does NOT render the page — it reads the search engine's already-indexed snippet. The two tools fail for completely different reasons, so they are **not a "try harder" ladder — they are different mechanisms**. That difference is why search bypasses blocks that no browser engine can defeat.
 
 **Block signals — when ANY of these appear, stop escalating the browser and switch to search:**
 - Empty / broken `body` text, or a "Just a moment…" / Cloudflare challenge string
@@ -32,16 +32,25 @@ description: "Apply when browsing the web, extracting page content, scraping dat
 
 **Do NOT** respond to a block by: switching lightpanda→chrome and retrying the same blocked URL, guessing alternate URLs on the same blocked domain, or looping the same fetch 3+ times. Those repeat the failure. The block is on *live rendering*; only a non-rendering path (search) gets around it.
 
-**Sites where this fires most:** market-research firms (SHD Group, Gartner-style), financial aggregators (Yahoo Finance, Bloomberg, MarketBeat, Morningstar), government filings (SEC EDGAR, DART), and the search engines' own result pages (Google/Bing/DuckDuckGo HTML often won't render snippets under lightpanda).
+**Sites where this fires most:** market-research firms, financial aggregators (Yahoo Finance, Bloomberg, MarketBeat, Morningstar), government filings (SEC EDGAR, DART), and the search engines' own result pages (Google/Bing/DuckDuckGo HTML often won't render snippets under lightpanda).
 
 **Concrete escalation order for a hard-to-fetch number:**
 1. `agent-browser --engine lightpanda` on the source page.
-2. Block signal + you just need a value → `WebSearch` with a keyword query that embeds the exact figure you need (e.g. `Arm Holdings 20-F China revenue percent 2026`). Read the snippet; it often contains the number outright.
+2. Block signal + you just need a value → `WebSearch` with a keyword query that embeds the exact figure you need (e.g. `<company> annual report <segment> revenue percent <year>`). Read the snippet; it often contains the number outright.
 3. Block signal + you need the page's full content → the **insane-search** skill (it auto-triggers on block signals; `python3 -m engine "<url>"`). It tries the official API, TLS impersonation, and the site's internal JSON API before any browser — the no-render path that gets the real content, not a snippet.
 4. Still missing, and the source is an **official primary doc** (SEC/DART/regulator/issuer IR)? → chrome engine on that *primary* URL is worth it (the data exists nowhere else). For aggregator/secondary data, prefer another search query or another aggregator over chrome.
 5. Last resort, only when a cross-provider check is warranted: Codex `--search -a never exec --sandbox read-only` runs the same web_search tool and is good at pulling figures out of primary filings — but it is heavier and the only GPT-dependent lane; reach for it for verification, not first-line lookups.
 
-This protocol applies to every research lane — news, filings, analyst data, market-research forecasts. The lesson behind it: `web-fetch-block-then-search`.
+This protocol applies to every research lane — news, filings, analyst data, market-research forecasts.
+
+### The lesson behind the rule
+
+This fallback was learned the hard way. Fact-checking an analysis, two hard figures (a company's regional revenue share from its annual filing, and an industry-body shipment forecast) had to be confirmed:
+
+- **The failing approach (live rendering, repeated):** lightpanda on the source pages returned empty bodies. Switching to chrome — still empty. Google/Bing/DuckDuckGo result pages fetched *through agent-browser* returned mangled garbage (the engine couldn't run the result JS). Guessing alternate article URLs — 404s. Four-plus attempts, both numbers logged as "research failed." Every rung was still *live rendering*, so every rung hit the same wall.
+- **The working approach (non-rendering search):** the same task run through a search tool put the exact figures in the query and read them straight out of the indexed snippets — which even surfaced the primary filing URL.
+
+There was no secret crawling technique. A search tool was used instead of a browser. The same bypass had been available the whole time; the protocol had just buried `WebSearch` low and over-emphasized "agent-browser is default," which got mis-read as "keep using the browser."
 
 ## Blocked but you need the full content — delegate to insane-search
 
