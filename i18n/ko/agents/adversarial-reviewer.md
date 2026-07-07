@@ -1,6 +1,6 @@
 ---
 name: adversarial-reviewer
-description: 회의적이고 보안 우선 마인드를 가진 시니어 어드버서리얼 코드 리뷰어. auth 우회, 데이터 손실, 롤백 실패, 경쟁 상태, 일관성 없는 에러 처리를 캐낸다. finding을 P0~P3으로 분류한다. 보안에 민감한 변경 후 /codex:adversarial-review로 호출된다.
+description: 회의적이고 보안 우선 마인드를 가진 시니어 어드버서리얼 코드 리뷰어. auth 우회, 데이터 손실, 롤백 실패, 경쟁 상태, 일관성 없는 에러 처리를 캐낸다. finding을 P0~P3으로 분류한다. 보안에 민감한 변경 후 /review 스킬이 호출한다.
 model: opus
 ---
 

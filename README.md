@@ -59,25 +59,25 @@ Body enters context only when invoked via the Skill tool. The trigger column mir
 |-------|---------|-------------|
 | `skills/css-discipline/` | Editing/writing/reviewing CSS or framework styling | Close four commonly abused CSS axes — cascade (`!important`), box model, unit soup, style location |
 | `skills/github-pr-markdown/` | Composing or editing a PR body/title | Enforce GitHub-flavored Markdown conventions for PRs, plus the safe API-PATCH body delivery |
-| `skills/model-effort-delegation/` | Deciding executor/model/effort before delegating | Threshold-based model/effort/subagent selection — delegate specified work to weaker models, keep judgment on Opus, reserve Fable 5 for exceptional reasoning |
+| `skills/model-effort-delegation/` | Deciding executor/model/effort before delegating | Threshold-based model/effort/subagent selection — delegate specified work to weaker models, keep judgment on Opus |
 | `skills/parallel-execution-modes/` | Choosing sequential vs subagent vs team, inline vs background | Pick the parallelism mode by task independence and communication needs |
 | `skills/parallel-hypothesis-investigation/` | A problem has multiple plausible causes or criteria | Decompose into layered hypotheses or judgment criteria and investigate with parallel agents |
 | `skills/codex-delegation/` | Delegating to the OpenAI Codex CLI | Cross-provider policy — `/review` triggers, three-turn rescue protocol, mode/flag cheatsheet, capability routing |
 | `skills/incremental-verification/` | Task outcome uncertain (API, browser, shell, pipeline) | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
 | `skills/simulate-dont-just-scan/` | Porting/debugging code you read but did not run | Mentally execute code to predict actual runtime output before acting |
-| `skills/codex-tmux-monitoring/` | Tempted to monitor a subprocess via tmux/sentinel/tail | Why that pattern failed — use `run_in_background` Bash + harness completion notification instead |
-| `skills/background-task-monitoring/` | Long background task needs completion/progress visibility | Pick the cheapest visibility mechanism — completion notification first, event streams second, polling last |
+| `skills/background-task-monitoring/` | Long background task needs completion/progress visibility, or tempted to monitor via tmux/sentinel/tail | Pick the cheapest visibility mechanism — completion notification first, event streams second, polling last; includes the tmux-sentinel post-mortem |
+| `skills/web-research/` | Browsing/scraping the web, or a page comes back blocked/empty | agent-browser engine selection, and the block-signal → search fallback (a block on live rendering is bypassed by reading the index, not by a bigger browser) |
 
 ## Skill — `/review` (ai-roots)
 
 A skill installed under `~/.claude/skills/review/` and invoked as `/review`. Because the skill is not packaged as a Claude Code plugin, the call name carries no `ai-roots:` prefix; the ai-roots origin is signaled by the `[ai-roots]` tag at the start of the skill description, which lets you distinguish it from other `review`-named skills (e.g., Claude Code's built-in `/review`).
 
-It performs a **two-evaluator code review** on a resolved target. By default the target is the current branch's changes against its base branch — the PR diff (when a PR exists) plus local uncommitted edits — but `--base <ref>`, `--commit <sha>`, `--uncommitted`, and trailing path filters override it. A Claude Code subagent (`adversarial-reviewer` persona) and a `codex review` invocation run in parallel on the same diff, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/evaluation-integrity.md` §Multi-advisor synthesis.
+It performs a **two-evaluator review of any artifact** — code changes, a plan, a document, a config. From the natural-language request it resolves ONE concrete shared artifact (for code, by default the current branch's changes against its base — the PR diff plus local uncommitted edits; "vs main", "the last commit", "uncommitted", and path mentions narrow it). A Claude Code subagent (`adversarial-reviewer` persona) and a `codex exec --json --sandbox read-only` run evaluate the same artifact in parallel, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/evaluation-integrity.md` §Multi-advisor synthesis.
 
 | File | Description |
 |------|-------------|
-| `skills/review/SKILL.md` | The `/review` skill body. Spawns Claude subagent + `codex review` in parallel; synthesizes per `evaluation-integrity.md`. |
-| `agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Used both as the `subagent_type` for the Claude-side reviewer and piped via stdin to `codex review`. |
+| `skills/review/SKILL.md` | The `/review` skill body. Spawns Claude subagent + a Codex run in parallel; synthesizes per `evaluation-integrity.md`. |
+| `agents/adversarial-reviewer.md` | Security-first adversarial reviewer persona. Used both as the `subagent_type` for the Claude-side reviewer and piped via stdin to `codex exec`. |
 | `skills/codex-delegation/SKILL.md` | Cross-provider policy — when to invoke `/review`, three-turn rescue protocol, direct Codex invocation cheatsheet for non-review modes, capability routing, execution mechanics, plan-stage review. |
 
 If Codex CLI is not on `PATH`, the skill falls back to a single Claude-side evaluator (the cross-provider diversity is lost but the synthesis structure still applies).

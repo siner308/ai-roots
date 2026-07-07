@@ -59,25 +59,25 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 |-------|--------|------|
 | `skills/css-discipline/` | CSS·프레임워크 스타일 편집/작성/리뷰 | CSS에서 흔히 남용되는 4가지 축을 닫는다 — 캐스케이드(`!important`), 박스 모델, 단위 혼란, 스타일 위치 |
 | `skills/github-pr-markdown/` | PR 본문/제목 작성·수정 | GitHub PR용 GFM 마크다운 컨벤션 강제 + gh CLI 손상을 피하는 API-PATCH 본문 전달 |
-| `skills/model-effort-delegation/` | 위임 전 executor/모델/effort 결정 | 임계치 기반 모델/effort/subagent 선택 — 명세된 구현은 약한 모델에 위임, 판단은 Opus에 집중, Fable 5는 예외적 추론에만 |
+| `skills/model-effort-delegation/` | 위임 전 executor/모델/effort 결정 | 임계치 기반 모델/effort/subagent 선택 — 명세된 구현은 약한 모델에 위임, 판단은 Opus에 집중 |
 | `skills/parallel-execution-modes/` | 순차/서브에이전트/팀, 인라인/백그라운드 선택 | 작업 독립성과 통신 필요도로 병렬 실행 모드 선택 |
 | `skills/parallel-hypothesis-investigation/` | 원인·판단 기준이 여러 갈래인 문제 | 계층별 가설 또는 판단 기준으로 분리해 병렬 에이전트로 조사 |
 | `skills/codex-delegation/` | OpenAI Codex CLI 위임 | Cross-provider 정책 — `/review` 트리거, 3-턴 rescue protocol, 모드/플래그 cheatsheet, capability routing |
 | `skills/incremental-verification/` | 결과 불확실(API/브라우저/셸/파이프라인) | 불확실한 작업은 가장 작은 검증 단위로 — 인라인 테스트 먼저, 스크립트는 나중에, 점진적 확장 |
 | `skills/simulate-dont-just-scan/` | 읽었지만 실행 안 한 코드 포팅/디버깅 | 실제 실행 결과를 머릿속으로 시뮬레이션한 뒤 행동 |
-| `skills/codex-tmux-monitoring/` | 서브프로세스를 tmux/sentinel/tail로 감시하려는 충동 | 그 패턴이 실패한 이유 — `run_in_background` Bash + 하네스 완료 알림을 쓰라 |
-| `skills/background-task-monitoring/` | 장시간 백그라운드 작업의 완료·진행 가시성 | 가장 저렴한 가시성 메커니즘 선택 — 완료 알림 우선, 이벤트 스트림 다음, 폴링은 최후 |
+| `skills/background-task-monitoring/` | 장시간 백그라운드 작업의 완료·진행 가시성, 또는 tmux/sentinel/tail로 감시하려는 충동 | 가장 저렴한 가시성 메커니즘 선택 — 완료 알림 우선, 이벤트 스트림 다음, 폴링은 최후; tmux-sentinel post-mortem 포함 |
+| `skills/web-research/` | 웹 브라우징/스크래핑, 또는 페이지가 차단/빈 응답으로 올 때 | agent-browser 엔진 선택과 차단 신호 → 검색 fallback (라이브 렌더링에 걸린 차단은 더 센 브라우저가 아니라 인덱스 읽기로 우회) |
 
 ## Skill — `/review` (ai-roots)
 
 `~/.claude/skills/review/` 아래 설치되며 호출명은 `/review`입니다. 이 스킬은 Claude Code 플러그인으로 패키징되어 있지 않아 호출명에 `ai-roots:` 접두사가 붙지 않습니다. 다른 `review` 계열 스킬(예: Claude Code 빌트인 `/review`)과 구분할 수 있도록 스킬 설명 맨 앞에 `[ai-roots]` 태그가 붙어 있습니다.
 
-결정된 리뷰 타겟에 대해 **두 평가자 코드 리뷰**를 수행합니다. 기본 타겟은 현재 브랜치와 base 브랜치 사이의 변경 — PR이 있으면 PR diff + 로컬 uncommitted 변경 — 이며, `--base <ref>`, `--commit <sha>`, `--uncommitted`, 뒤따르는 경로 필터로 재정의할 수 있습니다. Claude Code subagent (`adversarial-reviewer` 페르소나)와 `codex review`를 동일한 diff에 대해 병렬로 띄우고, 두 결과를 `rules/evaluation-integrity.md` §Multi-advisor synthesis의 Agreed / Conflicting / Chosen-direction 포맷으로 종합합니다.
+**임의의 아티팩트에 대한 두 평가자 리뷰**를 수행합니다 — 코드 변경, plan, 문서, config. 자연어 요청에서 하나의 공유 아티팩트를 결정합니다(코드는 기본이 현재 브랜치와 base 사이의 변경 — PR diff + 로컬 uncommitted 변경 — 이고, "vs main", "마지막 커밋", "uncommitted", 경로 언급으로 좁힙니다). Claude Code subagent (`adversarial-reviewer` 페르소나)와 `codex exec --json --sandbox read-only` 실행이 동일한 아티팩트를 병렬로 평가하고, 두 결과를 `rules/evaluation-integrity.md` §Multi-advisor synthesis의 Agreed / Conflicting / Chosen-direction 포맷으로 종합합니다.
 
 | 파일 | 설명 |
 |------|------|
-| `skills/review/SKILL.md` | `/review` 스킬 본문. Claude subagent + `codex review`를 병렬로 띄우고 `evaluation-integrity.md`에 따라 종합 |
-| `agents/adversarial-reviewer.md` | 보안 우선 어드버서리얼 리뷰어 페르소나. Claude 측 리뷰어의 `subagent_type`으로 쓰이고, 동시에 `codex review`에 stdin으로 전달됨 |
+| `skills/review/SKILL.md` | `/review` 스킬 본문. Claude subagent + Codex 실행을 병렬로 띄우고 `evaluation-integrity.md`에 따라 종합 |
+| `agents/adversarial-reviewer.md` | 보안 우선 어드버서리얼 리뷰어 페르소나. Claude 측 리뷰어의 `subagent_type`으로 쓰이고, 동시에 `codex exec`에 stdin으로 전달됨 |
 | `skills/codex-delegation/SKILL.md` | Cross-provider 정책 — 언제 `/review`를 호출할지, 3-턴 rescue protocol, 리뷰가 아닌 Codex 모드의 직접 호출 cheatsheet, capability routing, 실행 메커니즘, plan-stage review |
 
 Codex CLI가 `PATH`에 없으면 스킬은 Claude 측 단일 평가자로 fallback합니다 (cross-provider 다양성은 잃지만 synthesis 구조는 유지).

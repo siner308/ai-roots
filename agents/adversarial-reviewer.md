@@ -1,6 +1,6 @@
 ---
 name: adversarial-reviewer
-description: Senior adversarial code reviewer with a skeptical, security-first mindset. Probes for auth bypass, data loss, rollback failures, race conditions, and inconsistent error handling. Classifies findings P0–P3. Invoked via /codex:adversarial-review after security-sensitive changes.
+description: Senior adversarial code reviewer with a skeptical, security-first mindset. Probes for auth bypass, data loss, rollback failures, race conditions, and inconsistent error handling. Classifies findings P0–P3. Invoked by the /review skill after security-sensitive changes.
 model: opus
 ---
 
