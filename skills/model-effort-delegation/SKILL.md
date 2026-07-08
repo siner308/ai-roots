@@ -1,6 +1,6 @@
 ---
 name: model-effort-delegation
-description: "Apply when deciding which executor (main session vs subagent vs team), which model (Opus/Sonnet/Haiku), and what effort level fits a task — i.e. before delegating non-trivial work. Covers strict downgrade conditions (plan precision + verification loop), escalation triggers, blast-radius override, and the subagent briefing standard."
+description: "Apply when deciding which executor (main session vs subagent vs team), which model (Opus/Sonnet/Haiku), and what effort level fits a task — i.e. before delegating non-trivial work or launching a multi-agent workflow/fan-out. Covers strict downgrade conditions (plan precision + verification loop), per-stage model pinning for fan-outs, escalation triggers, blast-radius override, and the subagent briefing standard."
 ---
 
 # Model, Effort, and Subagent Delegation
@@ -49,6 +49,16 @@ To downgrade to Sonnet/Haiku, BOTH must be true:
 2. A **verification loop exists** — tests, type checker, lint, or similar
 
 If either is missing, keep Opus. Downgrading without a verification loop produces silent quality regressions (see evaluation-integrity).
+
+### Fan-outs Pin Models Explicitly
+
+Workflow scripts and multi-agent fan-outs inherit the session model by default, and fan-out multiplies that model's cost by the agent count. A 30-agent run inheriting a top-tier session (Opus or above) spends 30× top-tier tokens — almost never what anyone intended. This happened: a 32-agent concept tournament launched on a Mythos-tier session had to be killed mid-run.
+
+- Before launching any workflow or fan-out of 3+ agents, set the model per stage explicitly in the script or spawn opts. Never rely on session-model inheritance for workers.
+- The downgrade conditions apply at stage granularity: a precise rubric (checklist skill, fixed output schema) substitutes for plan precision, and structural redundancy (N independent votes, adversarial verify, majority rule) substitutes for a verification loop. High-volume judge/scan stages usually qualify for Sonnet; creative generation and cross-item synthesis usually don't — keep those on Opus.
+- A session tier above Opus is for the orchestrator's judgment (planning, briefing, reading results), never for fan-out workers.
+
+Example (32-agent concept tournament): scout = Sonnet (specified research, sources checkable), ideation = Opus (creative, no verification loop), 27 judges = Sonnet (each a single narrow lens + gate checklist + 3-vote redundancy), synthesis = Opus (cross-item trade-offs).
 
 ## Effort Selection
 
@@ -139,6 +149,7 @@ Right: Delegate to Haiku Explore agent
 - Delegate to a subagent when: ≥5 min + independent + verifiable
 - Downgrade only when BOTH plan precision and a verification loop exist
 - Never downgrade model or effort when blast radius is high
+- Fan-outs never inherit the session model — pin a model per stage before launching any 3+-agent workflow; a stage-level rubric plus vote redundancy can satisfy the downgrade conditions
 - Escalate to Opus after 3 failures or when a design decision surfaces
 - Briefings must include file paths, signatures, verification, and a request for decision reasoning
 - If Codex CLI is available, see the codex-delegation skill for cross-provider rules (three-turn cap, adversarial review via /review, capability routing, plan-stage review).
