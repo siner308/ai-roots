@@ -27,6 +27,8 @@ This keeps the resident set near ~41KB instead of ~92KB while preserving effecti
 |------|-------------|
 | `rules/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
 | `rules/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
+| `rules/grounded-assertions.md` | Never state an inference as fact — verify look-up-able claims before asserting them, keep the uncertainty marker otherwise, and sweep every conclusion-bearing draft at finalization |
+| `rules/verify-each-instance.md` | A recurring pattern is a hypothesis, not a license — check each instance against its own facts instead of stamping the template |
 
 ### User Growth
 | File | Description |
