@@ -17,6 +17,10 @@ When writing or editing any `.md` under `rules/`, `skills/`, `agents/`, or
   structure, team names, or product characteristics (e.g. which component
   consumes which API). ai-roots is org-agnostic — an example that only makes
   sense given the author's org must be rewritten in neutral terms.
+- Fictional examples must also avoid the org's real *business domains*: a
+  made-up service in a business area the org actually works in still reveals
+  what the org does. Set examples in distant domains (a library, an
+  observatory, a greenhouse), not adjacent ones with the names swapped.
 - Write clean GitHub-flavored Markdown. No fixed-width padding (e.g. trailing
   spaces to an 82-column box) and no mid-sentence hard line breaks — one bullet
   is one line; let it soft-wrap. Use `-` bullets and fenced code blocks.
