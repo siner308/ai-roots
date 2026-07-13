@@ -13,6 +13,10 @@ When writing or editing any `.md` under `rules/`, `skills/`, `agents/`, or
   Write `[Title of the spec or doc](url)` or `owner/repo#123`, not a concrete
   product, tool, or PR. The motivating case can live in a commit message or PR
   body, but the rule/skill text stays generic.
+- Nothing from the machine-local `~/.claude/CLAUDE.md` leaks in: no org
+  structure, team names, or product characteristics (e.g. which component
+  consumes which API). ai-roots is org-agnostic — an example that only makes
+  sense given the author's org must be rewritten in neutral terms.
 - Write clean GitHub-flavored Markdown. No fixed-width padding (e.g. trailing
   spaces to an 82-column box) and no mid-sentence hard line breaks — one bullet
   is one line; let it soft-wrap. Use `-` bullets and fenced code blocks.
