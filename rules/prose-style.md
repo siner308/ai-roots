@@ -53,9 +53,11 @@ The common failure is breaking wherever a column limit happens to land. That dro
 
 ### Where this applies
 
-Only where the break is yours to place and a real width limit forces one — code comments, commit message bodies, fixed-width text. Soft-wrapping prose (Markdown, chat) needs no hard breaks at all: let it wrap, one sentence per line. Don't insert manual breaks into text that already flows on its own.
+Only where the break is yours to place, and in two situations: a real width limit forces one (code comments, commit message bodies, fixed-width text), or the break itself renders — `\` or `<br>` in Markdown/MDX, anything the reader actually sees as a line break. Soft-wrapping prose (Markdown, chat) needs no *source-level* hard breaks at all: let it wrap, one sentence per line. Don't insert manual breaks into text that already flows on its own.
 
 A "real width limit" is a property of the *file* — a column width a formatter or linter actually errors on, or a genuinely fixed-width medium. The viewer's screen or terminal width is **not** one: it is the reader's window, not a constraint on the content, and it differs from reader to reader. Never break a line to fit how wide your current display happens to be — the file's content does not depend on your viewport. A file's incumbent hard-wrap style is not a width limit either: that a document was historically wrapped at 80 columns obliges nothing — matching it reproduces mid-phrase breaks with fresh text. Unless tooling errors on the width, keep each sentence on one line (several sentences may share a line) and re-flow the paragraphs you touch.
+
+A rendered break is the width-independent case: the reader actually sees it, so it is a presentation choice, and it follows the same judgment as any cut you place — add one where the flow pauses (a topic shift, a breath), keep sentences read in one breath flowing together, and never put one inside a sentence. The no-hard-breaks default above targets source-level wraps the renderer collapses anyway; it does not forbid a deliberate rendered break that carries meaning.
 
 ### Where to break
 
@@ -64,6 +66,23 @@ Cut at the lowest-cohesion gap available, preferring (high to low):
 - Sentence boundary — `.`, `—`, `;`
 - Clause boundary — after a conjunction, after a topic marker (`~는/은`), before a new logical unit
 - Between complete list items — keep one item and its sub-parts together on one line
+
+Within the top tier, not every sentence boundary earns a break. A period marks a candidate cut, not an obligation: break where the flow actually pauses — the topic shifts, or a reader would take a breath before the next sentence — and let sentences that are read in one breath share a line. A pronoun-linked follow-on, a claim and its immediate qualifier, a statement and the example that unpacks it belong together; a break between them inserts a pause the reader shouldn't take.
+
+❌ a break at every period cuts one thought in half:
+
+```
+// The vents open at 30°C.
+// They close again at 26 to avoid oscillation.
+// Watering runs on a separate schedule.
+```
+
+✅ the coupled pair shares a line; the break falls where the topic shifts:
+
+```
+// The vents open at 30°C. They close again at 26 to avoid oscillation.
+// Watering runs on a separate schedule.
+```
 
 ### Where not to break
 
@@ -104,6 +123,7 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 - Priming and domain keywords stay in the thinking step; do not surface them in sentences unless the name itself helps the reader.
 - Keep precise technical terms — plainness targets rhythm, not vocabulary depth.
 - When you choose where a line breaks, break at the meaning boundary, not the column limit; keep grouped lists and subject–predicate pairs on one line.
-- Soft-wrapping prose (Markdown, chat) takes no hard breaks — never split a sentence across lines, let it wrap.
+- Not every sentence boundary earns a break: cut where the flow pauses — a topic shift, a breath — and keep sentences that are read in one breath on the same line.
+- Soft-wrapping prose (Markdown, chat) takes no source-level hard breaks — never split a sentence across lines, let it wrap. A rendered break (`\`, `<br>`) is a presentation choice, not a wrap: allowed where the flow pauses, never mid-sentence.
 - A file's incumbent hard-wrap style is not a width limit. Unless a linter or formatter errors on the width, don't imitate the wrap — re-flow the paragraphs you edit so no sentence is split across lines. Breaking after a sentence is allowed, never required.
 - The viewer's screen/terminal width is not a width limit — never insert a hard break to fit your current display. Only a file-level column convention or a fixed-width medium justifies one.
