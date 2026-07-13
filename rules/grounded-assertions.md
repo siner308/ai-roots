@@ -6,8 +6,6 @@ An inference is allowed to exist only as an inference. The moment it is about to
 
 Mid-task, plausible inferences accumulate: "the consumer of this API surely owns its spec", "this table is env-scoped, so a per-env rollout works", "this page is legacy, so nobody calls it". Each sounds reasonable, and autoregressive writing turns them into confident declarative sentences. The reader then acts on a guess dressed as a fact — coordinating with the wrong team, skipping a live code path, shipping the wrong rollout plan.
 
-Motivating instance (generic): a handoff note declared that the team consuming an API owned its spec, inferred purely from code structure. The actual owner was a different team — and ownership was a look-up-able fact the whole time, replaced by an inference that was never checked.
-
 ## What to do
 
 - Before writing an inference as a declarative statement, ask: **could I verify this right now?** If yes (a file, a config, an org chart, a git log, a route table), go look — verification is usually one search away and cheaper than a wrong handoff.
