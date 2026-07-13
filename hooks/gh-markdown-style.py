@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 """PreToolUse gate for Bash blocking the one thing the skill can't self-enforce.
 
-gh CLI corrupts markdown in every body channel (`- ` -> `•`, backticks stripped,
-`- [ ]` -> `[ ]`), and that happens inside gh AFTER the model has done everything
-right — so even a body that perfectly follows the `github-pr-markdown` skill comes
-out broken. A prompt rule can't fix a corruption that happens past the prompt; only
-a gate can. So a `gh pr/issue ...` body that CONTAINS markdown is blocked: create
-with an empty body, then PATCH via the GitHub API. A plain-text body (nothing for
-gh to mangle) passes.
+gh CLI corrupts markdown in every body channel (`- ` -> `•`, backticks stripped, `- [ ]` -> `[ ]`), and that happens inside gh AFTER the model has done everything right — so even a body that perfectly follows the `github-pr-markdown` skill comes out broken.
+A prompt rule can't fix a corruption that happens past the prompt; only a gate can.
+So a `gh pr/issue ...` body that CONTAINS markdown is blocked: create with an empty body, then PATCH via the GitHub API.
+A plain-text body (nothing for gh to mangle) passes.
 
-Everything else — bullet/checkbox/section formatting, body length, structure — is
-the `github-pr-markdown` skill's job. This hook does not re-encode those rules; it
-points at the skill. Duplicating them here is what let the two drift apart.
+Everything else — bullet/checkbox/section formatting, body length, structure — is the `github-pr-markdown` skill's job.
+This hook does not re-encode those rules; it points at the skill.
+Duplicating them here is what let the two drift apart.
 
-Fail-open: any parse/IO error or unrecognized shape exits 0 (allow), so it never
-wedges unrelated Bash. It blocks (exit 2) only on a positively-identified problem.
+Fail-open: any parse/IO error or unrecognized shape exits 0 (allow), so it never wedges unrelated Bash.
+It blocks (exit 2) only on a positively-identified problem.
 """
 import json
 import os

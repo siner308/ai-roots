@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 """PreToolUse hook for Bash: gate outward-facing git pushes.
 
-A push publishes commits to a shared remote — it is the outward-facing moment
-of the git workflow, and a broad Bash allowlist or permissive session mode can
-let it through silently. This hook forces a per-push human decision
-(permissionDecision "ask") so verification happens before publication, and
-hard-denies force pushes, which rewrite already-reviewed history.
+A push publishes commits to a shared remote — it is the outward-facing moment of the git workflow, and a broad Bash allowlist or permissive session mode can let it through silently.
+This hook forces a per-push human decision (permissionDecision "ask") so verification happens before publication, and hard-denies force pushes, which rewrite already-reviewed history.
 """
 import json
 import re

@@ -1,7 +1,7 @@
 # ai-roots update check — sourced from an interactive shell rc (~/.zshrc, ~/.bashrc).
-# Mirrors oh-my-zsh: on a new terminal, throttled, asks before pulling. Nothing is
-# pulled or executed without a "yes" at the prompt. Repo path comes from $AI_ROOTS_DIR,
-# set by install.sh in the rc line that sources this file.
+# Mirrors oh-my-zsh: on a new terminal, throttled, asks before pulling.
+# Nothing is pulled or executed without a "yes" at the prompt.
+# Repo path comes from $AI_ROOTS_DIR, set by install.sh in the rc line that sources this file.
 
 ai_roots_update_check() {
   # Interactive shells only — a script or CI that sources the rc must never block on read.
@@ -22,8 +22,7 @@ ai_roots_update_check() {
   last="$(cat "$stamp" 2>/dev/null || echo 0)"
   case "$last" in '' | *[!0-9]*) last=0 ;; esac
   [ "$((now - last))" -lt "$interval" ] && return 0
-  # Stamp before fetching so an unreachable remote backs off for the interval
-  # instead of probing the network on every new terminal.
+  # Stamp before fetching so an unreachable remote backs off for the interval instead of probing the network on every new terminal.
   printf '%s\n' "$now" >"$stamp" 2>/dev/null
 
   # Read-only: fetch moves remote-tracking refs without touching the worktree.

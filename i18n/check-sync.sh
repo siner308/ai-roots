@@ -1,7 +1,6 @@
 #!/bin/bash
-# Reports English source files that have no Korean mirror, and Korean mirrors
-# that no longer have an English source. The Korean tree under i18n/ko/ is a
-# read-only mirror for humans — it is never symlinked into ~/.claude.
+# Reports English source files that have no Korean mirror, and Korean mirrors that no longer have an English source.
+# The Korean tree under i18n/ko/ is a read-only mirror for humans — it is never symlinked into ~/.claude.
 
 set -e
 

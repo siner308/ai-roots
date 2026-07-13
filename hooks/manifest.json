@@ -16,5 +16,11 @@
     "matcher": "Bash",
     "script": "push-gate.py",
     "run": "python3"
+  },
+  {
+    "event": "PostToolUse",
+    "matcher": "Edit|Write|MultiEdit",
+    "script": "linebreak-discipline.py",
+    "run": "python3"
   }
 ]

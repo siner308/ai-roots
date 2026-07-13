@@ -106,8 +106,7 @@ CACHE_TTL=90
 LOCK_STALE_SECS=300
 now_ts=$(date +%s)
 
-# Remove a lock dir whose mtime is older than LOCK_STALE_SECS — the previous
-# fetch process died before its EXIT trap could fire (SIGKILL, shell teardown).
+# Remove a lock dir whose mtime is older than LOCK_STALE_SECS — the previous fetch process died before its EXIT trap could fire (SIGKILL, shell teardown).
 reap_stale_lock() {
   lock=$1
   [ -d "$lock" ] || return 0

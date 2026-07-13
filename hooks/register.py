@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-"""Hook installer, split out from install.sh because registration is a JSON
-merge bash can't do safely.
+"""Hook installer, split out from install.sh because registration is a JSON merge bash can't do safely.
 
-Idempotent on purpose so install.sh can call it every run: re-linking adds no
-duplicate symlink and the merge skips a hook whose command is already present.
+Idempotent on purpose so install.sh can call it every run: re-linking adds no duplicate symlink and the merge skips a hook whose command is already present.
 settings.json is backed up before any write because it holds live machine config.
 
 Usage: register.py <hooks_src_dir> <home_dir>
@@ -37,9 +35,8 @@ def main():
         relink(src, dst)
         print(f"linked hook: {src} -> {dst}")
 
-    # Only links resolving into the repo are removed — never a user's own. Record
-    # what we pruned so the settings cleanup can key on provenance, not on a bare
-    # missing-file test that would also reap a user's own dead registration.
+    # Only links resolving into the repo are removed — never a user's own.
+    # Record what we pruned so the settings cleanup can key on provenance, not on a bare missing-file test that would also reap a user's own dead registration.
     repo = os.path.dirname(os.path.abspath(hooks_src))
     managed = {e["script"] for e in manifest}
     pruned_scripts = set()
@@ -59,9 +56,7 @@ def main():
     state_dir = os.path.join(home, ".claude", ".ai-roots")
     os.makedirs(state_dir, exist_ok=True)
 
-    # Serialize the read-modify-write so a manual install.sh and a shell-update
-    # one can't clobber each other's edits; write via temp + atomic rename so an
-    # interrupted run can never leave a half-written settings.json.
+    # Serialize the read-modify-write so a manual install.sh and a shell-update one can't clobber each other's edits; write via temp + atomic rename so an interrupted run can never leave a half-written settings.json.
     with open(os.path.join(state_dir, "settings.lock"), "w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
 
@@ -75,9 +70,7 @@ def main():
                 kept = []
                 for h in g.get("hooks", []):
                     cmd = h.get("command", "")
-                    # Match against the path we'd have written for each pruned hook
-                    # as a substring — robust to quoted, unquoted, and space-bearing
-                    # paths alike (shlex.split mis-splits a legacy unquoted spaced path).
+                    # Match against the path we'd have written for each pruned hook as a substring — robust to quoted, unquoted, and space-bearing paths alike (shlex.split mis-splits a legacy unquoted spaced path).
                     if any(os.path.join(hooks_dst, base) in cmd for base in pruned_scripts):
                         print(f"pruned stale registration: {event} {g.get('matcher')} -> {cmd}")
                         changed = True
@@ -89,14 +82,12 @@ def main():
                 del hooks_cfg[event]
 
         for e in manifest:
-            # Claude Code runs a no-args hook command through `sh -c`, so a space
-            # in the path would word-split; quote it. quote() is a no-op for plain
-            # paths, keeping existing registrations byte-identical.
+            # Claude Code runs a no-args hook command through `sh -c`, so a space in the path would word-split; quote it.
+            # quote() is a no-op for plain paths, keeping existing registrations byte-identical.
             command = f"{e['run']} {shlex.quote(os.path.join(hooks_dst, e['script']))}"
             groups = hooks_cfg.setdefault(e["event"], [])
             group = next((g for g in groups if g.get("matcher") == e["matcher"]), None)
-            # Identical commands across matchers (SessionStart startup/resume/clear)
-            # force dedup to key on the matcher too, not the command alone.
+            # Identical commands across matchers (SessionStart startup/resume/clear) force dedup to key on the matcher too, not the command alone.
             if group is not None and any(h.get("command") == command for h in group.get("hooks", [])):
                 continue
             if group is None:

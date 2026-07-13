@@ -113,6 +113,7 @@ Currently installed:
 - `comment-discipline.py` — `PostToolUse` on `Edit|Write|MultiEdit`: detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and re-surfaces the `comment-discipline` allowlist so the model re-checks each one.
 - `gh-markdown-style.py` — `PreToolUse` on `Bash`: blocks `gh pr/issue` commands that carry a markdown body, which `gh` CLI corrupts in transit; steers to the empty-body-then-API-PATCH path from the `github-pr-markdown` skill.
 - `push-gate.py` — `PreToolUse` on `Bash`: forces a per-push permission prompt for `git push` (approval for one push is not standing permission for the next) and denies force pushes outright.
+- `linebreak-discipline.py` — `PostToolUse` on `Edit|Write|MultiEdit`: flags newly added Markdown lines that hard-break mid-sentence; a break may fall only where a sentence ends, unless a linter enforces the width.
 
 ### Staying up to date
 

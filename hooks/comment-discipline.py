@@ -1,21 +1,15 @@
 #!/usr/bin/env python3
 """PostToolUse hook for Edit/Write/MultiEdit.
 
-Detects comment lines newly added by the edit and, when found, demands a
-per-line verdict against the comment-discipline allowlist with DELETE as the
-default. A resident prose rule competes with everything else in context and
-loses; this fires only on edits that actually add comments, so it re-primes the
-rule exactly when it matters. It emits decision:"block" so the verdict is a
-prompt the model must answer, not background context it can skim past — an
-earlier additionalContext version proved too easy to ignore.
+Detects comment lines newly added by the edit and, when found, demands a per-line verdict against the comment-discipline allowlist with DELETE as the default.
+A resident prose rule competes with everything else in context and loses; this fires only on edits that actually add comments, so it re-primes the rule exactly when it matters.
+It emits decision:"block" so the verdict is a prompt the model must answer, not background context it can skim past — an earlier additionalContext version proved too easy to ignore.
 """
 import json
 import sys
 
-# Full-line comment openers per language family. Trailing comments are NOT
-# matched on purpose — `"http://..."` and `url // x` produce too many false
-# positives, and the dominant over-commenting habit is whole comment lines
-# (explanatory lines above code, doc comments, docstrings) anyway.
+# Full-line comment openers per language family.
+# Trailing comments are NOT matched on purpose — `"http://..."` and `url // x` produce too many false positives, and the dominant over-commenting habit is whole comment lines (explanatory lines above code, doc comments, docstrings) anyway.
 C_STYLE = {".go", ".c", ".cc", ".cpp", ".h", ".hpp", ".java", ".js", ".jsx",
            ".ts", ".tsx", ".rs", ".kt", ".kts", ".scala", ".swift", ".php",
            ".cs", ".dart", ".m", ".mm"}
