@@ -10,10 +10,11 @@ A prompt rule cannot close this reliably — the model that misreads the earlier
 
 ## What it does
 
-- **`git push` (any remote, any form, including compound commands and `git -C dir push`)** → `ask`: the user confirms this specific push, with a reason reminding that explicit instruction and pre-push verification should exist.
+- **`git push` (any remote, any form, including compound commands, `git -C dir push`, and `git subtree push`)** → `ask`: the user confirms this specific push, with a reason reminding that explicit instruction and pre-push verification should exist.
 - **`git push --force` / `--force-with-lease` / `-f`** → `deny`: force pushes rewrite already-reviewed history; stacking commits is the required alternative.
 - **`git push --dry-run` / `-n`** → allowed through: nothing is published.
-- **Non-push commands** (`git status`, `echo push`, `git log | grep push`) → untouched; the push pattern does not cross pipe or `;`/`&&` boundaries into other commands.
+- **Local-only lookalikes** (`git stash push`) → untouched: the pattern matches `push` only in git's subcommand position, so commands that merely contain the word publish nothing and pass through.
+- **Non-push commands** (`git status`, `echo push`, `git log | grep push`) → untouched; the push pattern does not cross pipe or `;`/`&&` boundaries into other commands, and each push's flags (`--force`, `--dry-run`) are judged within its own command segment even when several pushes are chained.
 
 ## Per-repo opt-out
 

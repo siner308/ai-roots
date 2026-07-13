@@ -10,9 +10,14 @@ import re
 import subprocess
 import sys
 
-PUSH_RE = re.compile(r"\bgit\b[^|;&\n]*?\bpush\b")
+# Anchored to git's subcommand position so local-only lookalikes
+# (`git stash push`) don't match; `subtree push` does publish, so it stays in.
+PUSH_RE = re.compile(
+    r"\bgit(?:\s+(?:-[Cc]\s+\S+|--[\w-]+(?:=\S+)?))*\s+(?:subtree\s+)?push\b"
+)
 FORCE_RE = re.compile(r"(^|\s)(--force(-with-lease(=\S+)?)?|-f)(\s|$)")
 DRY_RE = re.compile(r"(^|\s)(--dry-run|-n)(\s|$)")
+SEP_RE = re.compile(r"[|;&\n]")
 
 
 def decide(decision, reason):
@@ -44,16 +49,19 @@ def main():
     if data.get("tool_name") != "Bash":
         return 0
     cmd = data.get("tool_input", {}).get("command", "")
-    match = PUSH_RE.search(cmd)
-    if not match:
+    segments = []
+    for match in PUSH_RE.finditer(cmd):
+        segment = cmd[match.start():]
+        sep = SEP_RE.search(segment)
+        segments.append(segment[:sep.start()] if sep else segment)
+    if not segments:
         return 0
-    segment = cmd[match.start():]
-    if DRY_RE.search(segment):
-        return 0
-    if FORCE_RE.search(segment):
+    if any(FORCE_RE.search(s) for s in segments):
         decide("deny",
                "force push는 이미 리뷰된 히스토리를 다시 쓰므로 금지 — "
                "커밋을 쌓아서 일반 push로 올리세요.")
+        return 0
+    if all(DRY_RE.search(s) for s in segments):
         return 0
     if gate_off(data.get("cwd")):
         return 0
