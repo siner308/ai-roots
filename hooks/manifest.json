@@ -10,5 +10,11 @@
     "matcher": "Bash",
     "script": "gh-markdown-style.py",
     "run": "python3"
+  },
+  {
+    "event": "PreToolUse",
+    "matcher": "Bash",
+    "script": "push-gate.py",
+    "run": "python3"
   }
 ]
