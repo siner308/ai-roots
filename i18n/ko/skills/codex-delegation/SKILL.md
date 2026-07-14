@@ -49,13 +49,15 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 | Need | Invocation |
 |------|------------|
 | 독립적 + 보안 민감 리뷰 | `/review` 스킬 |
-| 세 번 실패 후 막힘 | `codex exec --sandbox read-only -m gpt-5.5 -c model_reasoning_effort=xhigh` |
-| 최신 docs 또는 웹 리서치 | `codex --search -a never exec --sandbox read-only -c model_reasoning_effort=xhigh` |
-| 범위가 정해진 구현(workspace 편집) | `codex exec --full-auto -m gpt-5.5 -c model_reasoning_effort=xhigh` |
-| 무인 장시간 구현(workspace + 리서치) | `codex --search -a never exec --sandbox workspace-write -c model_reasoning_effort=xhigh` |
-| 명시적 no-sandbox 실행(사용자가 명시적으로 요청할 때만) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -c model_reasoning_effort=xhigh` |
+| 세 번 실패 후 막힘 | `codex exec --sandbox read-only -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
+| 최신 docs 또는 웹 리서치 | `codex --search -a never exec --sandbox read-only -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
+| 범위가 정해진 구현(workspace 편집) | `codex exec --full-auto -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
+| 무인 장시간 구현(workspace + 리서치) | `codex --search -a never exec --sandbox workspace-write -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
+| 명시적 no-sandbox 실행(사용자가 명시적으로 요청할 때만) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
 
 편의를 위해 더 넓은 모드를 고르지 마라. 리서치에는 쓰기 권한이 필요 없다. 이미지 생성에는 ecosystem capability가 필요하지, no-sandbox 접근이 필요한 게 아니다. 의존성 설치, 외부 CLI, 사설 네트워크 호출은 별개의 요구사항이고 brief에 명시해야 한다.
+
+모든 호출은 모델을 리터럴로 박는다(`-m gpt-5.6-sol`) — 공유 변수도, config 파일도, 설치 시점 간접화도 없이, 의도적으로. 중복이 곧 설계다: 각 명령이 자기완결적이고, `grep`이 모든 사본을 찾아낸다. 모델 교체는 리터럴을 repo 전체(모든 스킬 + 한국어 미러)에서 한 번에 검색·치환하는 커밋 하나로 끝난다. `~/.codex/config.toml`은 codex 자신의 파일이고 사용자의 인터랙티브 세션에만 관여한다; 스킬은 그 파일을 읽지도 쓰지도 않는다.
 
 ## 라우팅 규칙
 

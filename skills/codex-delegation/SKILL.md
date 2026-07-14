@@ -48,13 +48,15 @@ codex review [REVIEW FLAGS]    # read-only by design; does not accept --sandbox 
 | Need | Invocation |
 |------|------------|
 | Independent + security-sensitive review | `/review` skill |
-| Stuck after three failed attempts | `codex exec --sandbox read-only -m gpt-5.5 -c model_reasoning_effort=xhigh` |
-| Current docs or web research | `codex --search -a never exec --sandbox read-only -c model_reasoning_effort=xhigh` |
-| Bounded implementation (workspace edits) | `codex exec --full-auto -m gpt-5.5 -c model_reasoning_effort=xhigh` |
-| Unattended long implementation (workspace + research) | `codex --search -a never exec --sandbox workspace-write -c model_reasoning_effort=xhigh` |
-| Explicit no-sandbox run (only when user explicitly asks) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -c model_reasoning_effort=xhigh` |
+| Stuck after three failed attempts | `codex exec --sandbox read-only -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
+| Current docs or web research | `codex --search -a never exec --sandbox read-only -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
+| Bounded implementation (workspace edits) | `codex exec --full-auto -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
+| Unattended long implementation (workspace + research) | `codex --search -a never exec --sandbox workspace-write -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
+| Explicit no-sandbox run (only when user explicitly asks) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
 
 Do not pick a broader mode for convenience. Research does not need write access. Image generation needs ecosystem capability, not no-sandbox access. Dependency installation, external CLIs, and private network calls are separate requirements that must be named in the brief.
+
+Every invocation pins the model as a literal (`-m gpt-5.6-sol`) — deliberately, with no shared variable, config file, or install-time indirection. Duplication is the design: each command is self-contained, and `grep` finds every copy. A model bump is one repo-wide search-and-replace of the literal (all skills plus the Korean mirror) in a single commit. `~/.codex/config.toml` belongs to codex itself and governs only the user's interactive sessions; skills never read or write it.
 
 ## Routing Rules
 

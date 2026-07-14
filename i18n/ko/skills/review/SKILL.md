@@ -139,11 +139,12 @@ elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 # boundary: codex may read files and run `git diff`, but CANNOT modify the
 # workspace — codex exec is a general agent that could otherwise write, so review
 # ALWAYS passes this flag. -o writes the final report to $FINAL as clean text so
-# synthesis does not parse the event log. gpt-5.5 is the default model.
+# synthesis does not parse the event log. -m pins the model as a literal on
+# purpose — a model bump is a repo-wide search-and-replace of the literal.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -m gpt-5.6-sol -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex exec --json --sandbox read-only -o "$FINAL" -m gpt-5.6-sol -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
 command cat "$FINAL"
@@ -169,11 +170,11 @@ elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 
 # Same flags and rationale as the code block: --json for the live event stream
 # Monitor keys on, --sandbox read-only as the enforced no-write boundary, -o for
-# the clean final report. gpt-5.5 is the default model.
+# the clean final report, -m for the same pinned model literal.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -m gpt-5.6-sol -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex exec --json --sandbox read-only -o "$FINAL" -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex exec --json --sandbox read-only -o "$FINAL" -m gpt-5.6-sol -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
 command cat "$FINAL"
