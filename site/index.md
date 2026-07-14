@@ -35,6 +35,6 @@ To keep the always-loaded context small, rules are split by how often they apply
 - **Resident rules** (`rules/`) shape thinking or output on essentially every turn — how Claude reasons, writes, names, and comments. Claude Code loads them into context every session.
 - **Situational skills** (`skills/<name>/`) apply only when a specific task type comes up — CSS, PRs, Codex, parallelism, a debugging lesson. Only their one-line description stays in context; the full body loads via the Skill tool when the trigger fires.
 
-This keeps the resident set near ~41KB instead of ~92KB while preserving effective behavior: a situational rule still applies in exactly the task where it matters.
+This keeps the always-loaded set a fraction of the full corpus while preserving effective behavior: a situational rule still applies in exactly the task where it matters.
 
-> The pages on this site are generated from the English sources in `rules/`, `skills/`, and `agents/`. Korean translations live under [한국어](/ko/) — switch languages from the top-right menu. English is the source of truth; the Korean tree is a read-only mirror for reading.
+> The pages on this site are generated from the English sources in `rules/`, `skills/`, `agents/`, and `hooks/`. Korean translations live under [한국어](/ko/) — switch languages from the top-right menu. English is the source of truth; the Korean tree is a read-only mirror for reading.

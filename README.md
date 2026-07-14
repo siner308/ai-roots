@@ -13,7 +13,7 @@ To keep the always-loaded context small, rules are split by how often they apply
 - **Resident rules** (`rules/`) shape thinking or output on essentially every turn — how Claude reasons, writes, names, and comments. Claude Code loads them into context every session.
 - **Situational skills** (`skills/<name>/`) apply only when a specific task type comes up — CSS, PRs, Codex, parallelism, a debugging lesson. Only their one-line description stays in context; the full body loads via the Skill tool when the trigger fires. `rules/_situational-skills.md` is a resident index mapping each trigger to its skill so the trigger is never forgotten.
 
-This keeps the resident set near ~41KB instead of ~92KB while preserving effective behavior: a situational rule still applies in exactly the task where it matters.
+This keeps the always-loaded set a fraction of the full corpus while preserving effective behavior: a situational rule still applies in exactly the task where it matters.
 
 ## Roots — always-resident rules
 
@@ -102,7 +102,7 @@ The installer creates symlinks:
 
 If a previous version of the installer created `~/.claude/skills/ai-roots` (a single symlink to the whole `skills/` directory), the new installer removes it automatically — that layout was never recognized by Claude Code's skill loader.
 
-README files, HUD scripts, and the `evals/` workspace (if any) are not symlinked, so they are not loaded as always-on rules.
+README files and HUD scripts are not symlinked, so they are not loaded as always-on rules.
 
 ### Hooks
 
@@ -112,7 +112,7 @@ Currently installed:
 
 - `comment-discipline.py` — `PostToolUse` on `Edit|Write|MultiEdit`: detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and re-surfaces the `comment-discipline` allowlist so the model re-checks each one.
 - `gh-markdown-style.py` — `PreToolUse` on `Bash`: blocks `gh pr/issue` commands that carry a markdown body, which `gh` CLI corrupts in transit; steers to the empty-body-then-API-PATCH path from the `github-pr-markdown` skill.
-- `push-gate.py` — `PreToolUse` on `Bash`: forces a per-push permission prompt for `git push` (approval for one push is not standing permission for the next) and denies force pushes outright.
+- `push-gate.py` — `PreToolUse` on `Bash`: forces a per-push permission prompt for `git push` (approval for one push is not standing permission for the next) and denies force pushes outright. Toggle it per-repo with the `/push-gate` skill.
 - `linebreak-discipline.py` — `PostToolUse` on `Edit|Write|MultiEdit`: flags newly added Markdown lines that hard-break mid-sentence; a break may fall only where a sentence ends, unless a linter enforces the width.
 
 ### Staying up to date

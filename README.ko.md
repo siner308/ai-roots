@@ -13,7 +13,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 - **상주 rules** (`rules/`) — 거의 매 턴 사고·출력을 깎는 규칙. Claude가 추론·작성·명명·주석을 어떻게 하느냐를 좌우합니다. Claude Code가 매 세션 context에 올립니다.
 - **상황별 skills** (`skills/<name>/`) — 특정 작업이 나올 때만 필요한 규칙. CSS, PR, Codex, 병렬화, 디버깅 교훈 등. 한 줄짜리 description만 context에 상주하고, 본문은 트리거가 걸릴 때 Skill 도구로 로드됩니다. `rules/_situational-skills.md`가 "이 상황이면 이 skill" 트리거를 상주 인덱스로 들고 있어, lazy skill의 발동 시점을 놓치지 않습니다.
 
-이렇게 하면 상주 세트가 ~92KB 대신 ~41KB로 줄지만, 동작은 보존됩니다 — 상황별 규칙은 정작 필요한 그 작업에서 그대로 적용됩니다.
+이렇게 하면 상시 로드되는 양이 전체의 일부로 줄지만, 동작은 보존됩니다 — 상황별 규칙은 정작 필요한 그 작업에서 그대로 적용됩니다.
 
 ## Roots — 상주 rules
 
@@ -100,13 +100,18 @@ chmod +x install.sh
 
 이전 버전 설치 스크립트가 만든 `~/.claude/skills/ai-roots` (전체 `skills/` 디렉터리를 단일 심링크로 건 형태)는 새 설치 스크립트가 자동으로 제거합니다 — 그 레이아웃은 Claude Code 스킬 로더가 인식하지 못했습니다.
 
-README, HUD 스크립트, `evals/` 워크스페이스(있다면)는 심링크되지 않으므로 상시 rules로 로드되지 않습니다.
+README와 HUD 스크립트는 심링크되지 않으므로 상시 rules로 로드되지 않습니다.
 
 ### Hook
 
 `hooks/register.py`(install.sh가 실행)가 `hooks/manifest.json`에 따라 심링크와 등록을 모두 처리합니다. 병합은 멱등이라(재실행해도 중복 hook이 안 생김) 안전하고, 머신별 설정이 든 `settings.json`은 쓰기 전에 백업합니다. hook 추가 방법: 스크립트를 `hooks/`에 넣고, `manifest.json` 항목(`event`, `matcher`, `script`, `run`)을 추가한 뒤 `install.sh`를 다시 실행하면 됩니다.
 
-현재 설치됨: `comment-discipline.py` — `Edit|Write|MultiEdit`에 걸리는 `PostToolUse` hook. 코드 파일에 **새로 추가된** 주석 줄을 감지(기존 주석 제외)해 `comment-discipline` 허용 목록과 대조하도록 다시 띄웁니다. 상주 prose 규칙만으로는 강제할 수 없던 것을 보강합니다.
+현재 설치됨:
+
+- `comment-discipline.py` — `Edit|Write|MultiEdit`에 걸리는 `PostToolUse` hook. 코드 파일에 **새로 추가된** 주석 줄을 감지(기존 주석 제외)해 `comment-discipline` 허용 목록과 대조하도록 다시 띄웁니다.
+- `gh-markdown-style.py` — `Bash`에 걸리는 `PreToolUse` hook. markdown 본문을 실은 `gh pr/issue` 명령을 차단합니다 — `gh` CLI가 전송 중에 본문을 훼손하기 때문에, `github-pr-markdown` 스킬의 빈 본문 + API PATCH 경로로 유도합니다.
+- `push-gate.py` — `Bash`에 걸리는 `PreToolUse` hook. `git push`마다 개별 권한 프롬프트를 강제하고(한 번의 승인이 다음 push의 상시 허가가 되지 않도록), force push는 바로 거부합니다. 저장소별 토글은 `/push-gate` 스킬로 합니다.
+- `linebreak-discipline.py` — `Edit|Write|MultiEdit`에 걸리는 `PostToolUse` hook. 새로 추가된 Markdown 줄이 문장 중간에서 하드 줄바꿈되면 표시합니다. 줄바꿈은 문장이 끝나는 곳에만 올 수 있습니다(린터가 폭을 강제하는 경우 제외).
 
 ### 최신 상태 유지
 
