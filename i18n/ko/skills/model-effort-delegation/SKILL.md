@@ -1,6 +1,6 @@
 ---
 name: model-effort-delegation
-description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Haiku), effort 레벨 중 무엇이 작업에 맞는지 정할 때 적용 — 즉 사소하지 않은 작업을 위임하기 전에. 다운그레이드 엄격 조건(plan 정밀도 + 검증 루프), 에스컬레이션 트리거, blast-radius 오버라이드, subagent 브리핑 기준을 다룬다."
+description: "executor(메인 세션 vs subagent vs team), 모델(Opus/Sonnet/Haiku), effort 레벨 중 무엇이 작업에 맞는지 정할 때 적용 — 즉 사소하지 않은 작업을 위임하거나 멀티 에이전트 workflow/fan-out을 시작하기 전에. 다운그레이드 엄격 조건(plan 정밀도 + 검증 루프), fan-out의 스테이지별 모델 고정, 에스컬레이션 트리거, blast-radius 오버라이드, subagent 브리핑 기준을 다룬다."
 ---
 
 # Model, Effort, and Subagent Delegation
@@ -49,6 +49,16 @@ Sonnet/Haiku로 다운그레이드하려면 둘 다 참이어야 한다:
 2. **검증 루프가 존재한다** — 테스트, type checker, lint, 또는 비슷한 것
 
 둘 중 하나라도 없으면 Opus를 유지한다. 검증 루프 없이 다운그레이드하면 조용한 품질 저하가 생긴다(evaluation-integrity 참고).
+
+### Fan-out은 모델을 명시적으로 고정한다
+
+Workflow 스크립트와 멀티 에이전트 fan-out은 기본적으로 세션 모델을 상속하고, fan-out은 그 모델의 비용을 에이전트 수만큼 곱한다. 최상위 세션(Opus 이상)을 상속한 30-agent 실행은 최상위 토큰을 30배로 쓴다 — 누구도 의도한 적 없는 결과다. 실제로 일어났다: Mythos급 세션에서 띄운 32-agent 컨셉 토너먼트를 실행 도중에 죽여야 했다.
+
+- 3개 이상 에이전트의 workflow나 fan-out을 띄우기 전에, 스크립트나 spawn opts에서 스테이지별로 모델을 명시적으로 지정한다. worker에 대해서는 세션 모델 상속에 절대 기대지 않는다.
+- 다운그레이드 조건은 스테이지 단위로 적용된다: 정밀한 rubric(체크리스트 스킬, 고정된 출력 스키마)이 plan 정밀도를 대신하고, 구조적 중복(독립 투표 N개, adversarial verify, 다수결)이 검증 루프를 대신한다. 대량의 심사/스캔 스테이지는 대개 Sonnet 자격이 되고, 창의적 생성과 항목 간 종합은 대개 안 된다 — 그런 스테이지는 Opus에 둔다.
+- Opus 위 세션 티어는 오케스트레이터의 판단(계획, 브리핑, 결과 읽기)을 위한 것이지, fan-out worker를 위한 것이 결코 아니다.
+
+예시(32-agent 컨셉 토너먼트): scout = Sonnet (조사 대상이 명세됨, 출처 확인 가능), ideation = Opus (창의적, 검증 루프 없음), 심사 27명 = Sonnet (각자 좁은 렌즈 하나 + gate 체크리스트 + 3표 중복), synthesis = Opus (항목 간 트레이드오프).
 
 ## Effort Selection
 
@@ -139,6 +149,7 @@ Right: Delegate to Haiku Explore agent
 - subagent에 위임하는 조건: 5분 이상 + 독립적 + 검증 가능
 - plan 정밀도와 검증 루프가 둘 다 있을 때만 다운그레이드
 - blast radius가 클 때는 절대 모델이나 effort를 다운그레이드하지 않는다
+- Fan-out은 세션 모델을 절대 상속하지 않는다 — 3개 이상 에이전트 workflow를 띄우기 전에 스테이지별로 모델을 고정한다. 스테이지 수준 rubric과 투표 중복이 다운그레이드 조건을 충족할 수 있다
 - 실패가 3번 쌓이거나 설계 판단이 떠오르면 Opus로 에스컬레이션
 - 브리핑에는 file path, 시그니처, 검증, 그리고 판단 근거 보고 요청이 들어가야 한다
 - Codex CLI가 있으면 cross-provider 규칙(3-턴 상한, /review를 통한 어드버서리얼 리뷰, capability routing, plan-stage review)은 codex-delegation 스킬을 보라.
