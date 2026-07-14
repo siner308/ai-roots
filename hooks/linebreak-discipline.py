@@ -15,9 +15,8 @@ NEW_BLOCK = re.compile(r'^\s*(#|[-*+]\s|\d+\.\s|>|\||```|~~~|---\s*$)')
 STRUCTURAL = re.compile(r'^\s*(#|\||```|~~~|---\s*$)')
 
 
-def midsentence_breaks(text):
+def midsentence_breaks(text, fence=False):
     out = []
-    fence = False
     lines = text.splitlines()
     for i, raw in enumerate(lines[:-1]):
         line = raw.rstrip()
@@ -36,7 +35,18 @@ def midsentence_breaks(text):
     return out
 
 
+def fence_open_before(file_text, idx):
+    opens = sum(
+        1 for line in file_text[:idx].splitlines()
+        if line.rstrip().startswith(("```", "~~~"))
+    )
+    return opens % 2 == 1
+
+
 def added_text(data):
+    # An Edit's new_string carries no surrounding fence markers, so code inside a
+    # fenced block would read as prose. PostToolUse runs after the edit landed, so
+    # the chunk's fence state is recovered by locating it in the written file.
     name = data.get("tool_name")
     ti = data.get("tool_input", {})
     if name == "Write":
@@ -45,11 +55,29 @@ def added_text(data):
             end = content.find("\n---", 4)
             if end != -1:
                 content = content[end + 4:]
-        return [content]
+        return [(content, False)]
+
+    try:
+        with open(ti.get("file_path", "")) as f:
+            file_text = f.read()
+    except OSError:
+        file_text = None
+
+    def occurrences(new_string):
+        if not new_string:
+            return []
+        if file_text is None:
+            return [(new_string, False)]
+        out, start = [], 0
+        while (idx := file_text.find(new_string, start)) != -1:
+            out.append((new_string, fence_open_before(file_text, idx)))
+            start = idx + 1
+        return out or [(new_string, False)]
+
     if name == "Edit":
-        return [ti.get("new_string", "")]
+        return occurrences(ti.get("new_string", ""))
     if name == "MultiEdit":
-        return [e.get("new_string", "") for e in ti.get("edits", [])]
+        return [p for e in ti.get("edits", []) for p in occurrences(e.get("new_string", ""))]
     return []
 
 
@@ -63,8 +91,9 @@ def main():
         return 0
 
     hits = []
-    for chunk in added_text(data):
-        hits.extend(midsentence_breaks(chunk))
+    for chunk, fence in added_text(data):
+        hits.extend(midsentence_breaks(chunk, fence))
+    hits = list(dict.fromkeys(hits))
     if not hits:
         return 0
 
