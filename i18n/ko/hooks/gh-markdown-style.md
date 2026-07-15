@@ -1,6 +1,6 @@
 # gh Markdown Style Hook
 
-`Bash` `PreToolUse` hook. [`github-pr-markdown`](../skills/github-pr-markdown) 스킬이 혼자서는 못 막는 단 하나의 PR 마크다운 실패 — 발행 전에 `gh` CLI가 본문을 망가뜨리는 것 — 만 차단한다.
+`Bash` `PreToolUse` hook. [`github-pr-markdown`](../skills/github-pr-markdown) 스킬이 혼자서는 못 막는 두 가지 본문 손상 — 발행 전에 `gh` CLI가 마크다운을 망가뜨리는 것과, aliased 렌더러(bat/glow) 출력으로 만든 본문이 어느 채널로든 깨진 줄바꿈·`•` 불릿으로 나가는 것 — 을 차단한다.
 
 ## 왜 있나
 
@@ -12,7 +12,10 @@
 
 ## 무엇을 하나
 
-매 `Bash` 호출마다 그 명령이 `gh` 본문을 쓰는지 검사한다(`gh pr create/edit/comment/review`, `gh issue create/edit/comment`). 그 본문이 *마크다운을 담고 있으면* **차단**한다 — 본문을 비운 채로 만들고 GitHub API로 PATCH해야 한다. 일반 텍스트 본문(`gh`가 망가뜨릴 게 없다)은 통과한다.
+매 `Bash` 호출마다 그 명령이 `gh` 본문을 쓰는지 검사한다 — CLI(`gh pr create/edit/comment/review`, `gh issue create/edit/comment`)든 API(`gh api … /pulls|/issues`에 `body=` 필드)든. 두 검사를 적용한다:
+
+- **CLI 본문의 마크다운**은 **차단**한다 — `gh` CLI가 망가뜨리므로 본문을 비운 채로 만들고 GitHub API로 PATCH해야 한다. 일반 텍스트 CLI 본문(망가뜨릴 게 없다)은 통과한다.
+- **렌더러 아티팩트**(`•` 불릿, 또는 5칸 이상 후행 공백으로 패딩된 줄)는 **`gh api`를 포함한 모든 채널에서 차단**한다. 이건 본문을 aliased 렌더러(bat/glow가 텍스트를 리플로우하고 `- ` → `•`로 바꾼다)에서 캡처했을 때만 나타나며, 그 손상은 `gh`가 돌기 전에 이미 바이트에 박혀 있어 안전한 API 경로로도 새어나간다. (진짜 마크다운 하드 브레이크는 정확히 후행 공백 두 칸이라, 5칸 이상 임계값은 의도를 오탐하지 않는다.)
 
 차단(exit 2)되면 그 이유가 모델에 피드백되고, 본문을 어떻게 작성·전달할지는 `github-pr-markdown` 스킬을 가리킨다.
 
@@ -20,7 +23,7 @@
 
 - **본문 없는 명령** — `gh pr review --approve`, 리뷰어만 바꾸는 edit, 본문이 없는 것: 발동 안 함.
 - **일반 텍스트 본문** — 마크다운 없는 짧은 `gh pr comment -b "lgtm"`은 통과한다. 마크다운을 담은 본문만 차단된다.
-- **API 경로 자체** — `curl`/`gh api` PATCH는 이 hook이 유도하는 *해법*이라 게이트하지 않는다. 그 경로의 본문 내용(불릿, 섹션, 링크)은 스킬의 책임이고 여기서 다시 검증하지 않는다.
+- **API 경로의 깨끗한 마크다운** — `gh api` PATCH는 이 hook이 유도하는 *해법*이라, 손으로 쓴 마크다운(불릿, 섹션, 링크)은 거기서 통과한다. 그 경로에선 렌더러 아티팩트만 게이트한다 — 그건 본문을 작성한 게 아니라 렌더러에서 캡처했다는 뜻이기 때문이다.
 - **위치를 못 찾거나 검사 불가능한 본문** — 파싱할 수 없는 본문, 또는 stdin(`--body-file -`)·셸 변수·명령 치환(`--body "$(cat f)"`)에서 온 본문은 hook 시점에 펼쳐지지 않아 낯선 명령을 막느니 **fail open**(허용)한다. 강제 대상은 모델이 실제로 쓰는 경로다 — 인라인 `--body "…"` 또는 `--body-file <path>`.
 
 ## 알려진 한계 (검토 후 수용)
