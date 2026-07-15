@@ -12,6 +12,7 @@ Before writing new code, climb down before you build up. The simplest-fix princi
 
 - **Reuse before writing.** Check, in order: already in this codebase? in the standard library? a native platform feature? an installed dependency? Only then write new code — and prefer one line over a module.
 - **No unrequested abstractions.** Don't add scaffolding, config layers, or generalization for needs nobody stated. YAGNI: build what was asked, and suggest the leaner path when you see one.
+- **Don't build a branch for a case the requirements forbid.** A flag, parameter, config field, or if-branch whose alternate value the requirements rule out is dead code — its other path can never correctly run. When a requirement is unconditional ("always read-only", "must always go through X"), enforce the invariant structurally by always taking the one path, instead of making it toggleable; imitating surrounding code that happens to be toggleable is not a reason to add one. If you notice the ruled-out path would be unsafe, that is the signal to remove it, not to guard it.
 - **Minimalism never touches the safety floor.** Trust-boundary validation, data-loss handling, security, and error handling are never sacrificed for brevity. Shorter is the goal only above that floor, never through it.
 
 ## Enforcement Matching
