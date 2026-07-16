@@ -20,7 +20,7 @@
   {
     "event": "PostToolUse",
     "matcher": "Edit|Write|MultiEdit",
-    "script": "linebreak-discipline.py",
+    "script": "prose-discipline.py",
     "run": "python3"
   }
 ]

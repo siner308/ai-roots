@@ -17,20 +17,31 @@ HASH_STYLE = {".py", ".rb"}
 DOCSTRING = {".py"}
 
 
+def is_comment_line(line, ext):
+    line = line.strip()
+    if not line:
+        return False
+    if ext in C_STYLE:
+        return line.startswith(("//", "/*", "*"))
+    if ext in HASH_STYLE:
+        return line.startswith("#") and not line.startswith("#!")
+    if ext in DOCSTRING:
+        return line.startswith(('"""', "'''"))
+    return False
+
+
 def comment_lines(text, ext):
-    out = []
+    return [raw.strip() for raw in text.splitlines() if is_comment_line(raw, ext)]
+
+
+def has_multiline_comment(text, ext):
+    prev = False
     for raw in text.splitlines():
-        line = raw.strip()
-        if not line:
-            continue
-        if ext in C_STYLE and (line.startswith("//") or line.startswith("/*")
-                               or line.startswith("*")):
-            out.append(line)
-        elif ext in HASH_STYLE and line.startswith("#") and not line.startswith("#!"):
-            out.append(line)
-        elif ext in DOCSTRING and (line.startswith('"""') or line.startswith("'''")):
-            out.append(line)
-    return out
+        cur = is_comment_line(raw, ext)
+        if cur and prev:
+            return True
+        prev = cur
+    return False
 
 
 def main():
@@ -89,6 +100,16 @@ def main():
         "identifier that lint tooling enforces. If every line clearly names "
         "its category, keep them and continue."
     )
+    if has_multiline_comment(new_text, ext):
+        msg += (
+            "\n\nOne or more added comments span multiple lines. For any comment "
+            "you keep, also verify every line break falls at a meaning boundary "
+            "— a sentence or clause boundary — never mid-phrase: no split bracket "
+            "group, and nothing dangling that binds to the next line (an English "
+            "article/preposition, a Korean adnominal/particle, or the equivalent "
+            "in any language the comment is written in). When no linter enforces "
+            "a width, prefer a single line."
+        )
     print(json.dumps({
         "decision": "block",
         "reason": msg,

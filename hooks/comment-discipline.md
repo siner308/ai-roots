@@ -12,6 +12,8 @@ After every `Edit`, `Write`, or `MultiEdit` on a **code file**, it diffs the com
 
 It emits `decision: "block"`, so the verdict is a prompt the model must answer — delete the noise or name each survivor's category — rather than background context it can skim past. (An earlier `additionalContext` version proved too easy to ignore: the model rationalized comments as "WHY comments" and kept them.) The tool call itself already ran; the block only forces the re-check, it does not undo the edit. Because it fires only on edits that actually add comments, it stays quiet once the habit holds — the better the discipline, the rarer the nudge.
 
+When an added comment spans multiple lines, the same block also asks the model to check that each line break sits at a meaning boundary — a sentence or clause boundary — not mid-phrase (a split bracket group, or a word left dangling that binds to the next line: an English article/preposition, a Korean adnominal/particle, or the equivalent in any language). This is the code-comment side of line-break discipline: it rides on the comment handoff that already makes the model read each added line, so the model judges the break in the comment's own language and no static grammar table is needed. Markdown line breaks (and doc conciseness) are handled separately by the [`prose-discipline`](prose-discipline) hook.
+
 ## What it skips
 
 - **Pre-existing comments** — only lines the edit newly adds are flagged (the old text is diffed out), so untouched comments never trigger it.
