@@ -10,7 +10,7 @@ When writing or editing any `.md` in this repo (including this file, the READMEs
 - Use generic placeholders, never real product/company names or real PR numbers. Write `[Title of the spec or doc](url)` or `owner/repo#123`, not a concrete product, tool, or PR. The motivating case can live in a commit message or PR body, but the rule/skill text stays generic.
 - Nothing from the machine-local `~/.claude/CLAUDE.md` leaks in: no org structure, team names, or product characteristics (e.g. which component consumes which API). ai-roots is org-agnostic — an example that only makes sense given the author's org must be rewritten in neutral terms.
 - Fictional examples must also avoid the org's real *business domains*: a made-up service in a business area the org actually works in still reveals what the org does. Set examples in distant domains (a library, an observatory, a greenhouse), not adjacent ones with the names swapped.
-- Never hard-break mid-sentence, unless a linter or formatter errors on the width. A hard break may fall only where a sentence ends — and is never required there; a line holding several sentences is fine. A file's incumbent hard-wrap style is not a width limit and gets re-flowed on edit, not imitated. No fixed-width padding (e.g. trailing spaces to an 82-column box). Use `-` bullets and fenced code blocks. Enforced by the `linebreak-discipline.py` hook.
+- Never hard-break mid-sentence, unless a linter or formatter errors on the width. A hard break may fall only where a sentence ends — and is never required there; a line holding several sentences is fine. A file's incumbent hard-wrap style is not a width limit and gets re-flowed on edit, not imitated. No fixed-width padding (e.g. trailing spaces to an 82-column box). Use `-` bullets and fenced code blocks. Enforced by the `prose-discipline.py` hook.
 - English source files (`rules/`, `skills/`, `agents/`, `hooks/`) are written in English. Use another language only for content that is inherently language-specific — translationese examples, a Korean `~는/은` grammar illustration — never for explanatory prose that English can carry. The Korean mirror under `i18n/ko/` is where the full translation lives.
 - In shell snippets a skill tells Claude to execute, prefix `command` on stock text/file utilities whose output is piped, redirected, or read back: `cat`, `ls`, `grep`, `find`, `diff`, `head`, `tail`, `less`, `tree`. These get aliased to renderers/colorizers (`glow`, `bat`, `eza`, `rg`, `delta`) that silently corrupt the consumed bytes. Don't blanket-prefix: `command` can't precede shell keywords (`if`/`for`/`{`) and is noise where there's no alias. Executed snippets only — not prose examples or commit messages.
 
@@ -24,7 +24,29 @@ Hook **scripts** (`.py`/`.json`/`.sh`) have no Korean mirror — they are code.
 A hook's **doc** page (`hooks/<name>.md`) does: mirror it as `i18n/ko/hooks/<name>.md`, same as a rule, and `check-sync.sh` enforces it.
 
 `hooks/comment-discipline.py` is a `PostToolUse` hook on `Edit|Write|MultiEdit`: it detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and emits `decision: "block"` demanding a per-line verdict against the `comment-discipline` allowlist, with delete as the default.
-It enforces what a resident prose rule alone couldn't.
+When an added comment spans multiple lines it also asks the model to check that each break falls at a meaning boundary, not mid-phrase — the code-comment side of line-break discipline, judged by the model so it works in any language.
+`hooks/prose-discipline.py` is the non-code counterpart on the same event: on Markdown it flags mid-sentence hard breaks and, past a sentence-count gate, asks for a conciseness pass. The two never double-fire — code edits hit `comment-discipline`, Markdown edits hit `prose-discipline`.
+Both enforce what a resident prose rule alone couldn't.
+
+## Writing discipline: three layers, one concern
+
+Rules on how to write are spread across three layers on purpose — a rule holds the knowledge, a hook enforces it, a skill carries the situational case.
+This is not accidental scatter: a resident rule competes with the whole context and loses under pressure, and a hook is the only layer that runs after an edit to force a correction — so anything that must hold every time needs one, not a better-worded rule.
+Use this map to find where a writing concern lives before changing it.
+
+| Concern | Knowledge (rule) | Enforcement (hook) | Situational (skill) |
+|---------|------------------|--------------------|---------------------|
+| Comment existence | `comment-discipline` | `comment-discipline.py` | — |
+| Code-comment line breaks | `prose-style` | `comment-discipline.py` (multi-line comments) | — |
+| Markdown line breaks | `prose-style` | `prose-discipline.py` | — |
+| Doc conciseness | `prose-style` | `prose-discipline.py` (sentence gate) | — |
+| Plain language, noun-stacks, translationese | `prose-style` | — (not statically detectable) | — |
+| Korean naturalness (loanwords, translationese, rhythm) | `korean-style` | — (chat: rule-only) | — |
+| Terminology, abbreviations | `terminology-discipline` | — | — |
+| PR body format and delivery | — | `gh-markdown-style.py` (delivery only) | `github-pr-markdown` |
+
+A blank enforcement cell means the concern is rule-only: it can't be detected statically, so it rides on the resident rule.
+When a criterion changes, the rule is the source of truth; a hook that also restates that criterion (`comment-discipline`, `prose-discipline`) has to be updated alongside it, or the two drift — the known cost of keeping the hook message self-contained instead of a bare pointer.
 
 ## Staying up to date
 

@@ -45,6 +45,7 @@ This keeps the always-loaded set a fraction of the full corpus while preserving 
 | File | Description |
 |------|-------------|
 | `rules/prose-style.md` | Plain spoken-rhythm language (no noun-stacks, no translationese, verbs over nominalizations) and line breaks that fall at meaning boundaries, not the column limit |
+| `rules/korean-style.md` | Natural Korean output: the AI-Korean tells (comma habits, transliterated loanwords, translationese, sentence rhythm), judged by ear rather than token-matching |
 | `rules/terminology-discipline.md` | Spell out domain terms; expand established abbreviations on first use; disambiguate collision-prone ones |
 | `rules/comment-discipline.md` | Default to no comments; a comment or docstring is never mandatory. Write one only when it's on a closed allowlist (non-obvious WHY). Enforced by the `comment-discipline.py` `PostToolUse` hook |
 
@@ -110,10 +111,10 @@ README files and HUD scripts are not symlinked, so they are not loaded as always
 
 Currently installed:
 
-- `comment-discipline.py` — `PostToolUse` on `Edit|Write|MultiEdit`: detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and re-surfaces the `comment-discipline` allowlist so the model re-checks each one.
+- `comment-discipline.py` — `PostToolUse` on `Edit|Write|MultiEdit`: detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and re-surfaces the `comment-discipline` allowlist so the model re-checks each one; for multi-line comments it also asks the model to check each break falls at a meaning boundary.
 - `gh-markdown-style.py` — `PreToolUse` on `Bash`: blocks `gh pr/issue` commands that carry a markdown body, which `gh` CLI corrupts in transit; steers to the empty-body-then-API-PATCH path from the `github-pr-markdown` skill.
 - `push-gate.py` — `PreToolUse` on `Bash`: forces a per-push permission prompt for `git push` (approval for one push is not standing permission for the next) and denies force pushes outright. Toggle it per-repo with the `/push-gate` skill.
-- `linebreak-discipline.py` — `PostToolUse` on `Edit|Write|MultiEdit`: flags newly added Markdown lines that hard-break mid-sentence; a break may fall only where a sentence ends, unless a linter enforces the width.
+- `prose-discipline.py` — `PostToolUse` on `Edit|Write|MultiEdit`: the non-code counterpart to `comment-discipline`. On Markdown it flags lines that hard-break mid-sentence (a break may fall only where a sentence ends, unless a linter enforces the width) and, past a sentence-count gate, asks for a conciseness pass on the added prose.
 
 ### Staying up to date
 

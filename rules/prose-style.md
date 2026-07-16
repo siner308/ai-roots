@@ -12,6 +12,7 @@ The internal thinking rule (`thinking-expansion`) deliberately pulls in domain t
 - **Translated-English rhythm** — "~을 통한", "~에 대한", "~의 관점에서" piled up where a verb would do. If it reads like a literal translation of English, rewrite it as something you'd actually say.
 - **Gratuitous concept citation** — naming a principle (Goodhart's Law, backpressure, idempotency) when a plain sentence carries the same point. Cite a concept only when the name itself earns its place for the reader, not as decoration.
 - **Density theater** — packing jargon to *look* informative. High word-density is not the same as high information.
+- **Narrating the brief** — restating the request's framing inside the deliverable: the audience ("so a beginner can follow"), the instruction ("as requested", "to keep it concise"), or the format ask. How and for whom you were told to write is context for the writing, not content to put in it — the artifact should *be* clear, not announce that it is. This is a strong AI tell: a human writing the same doc would never label it with its own brief.
 
 ### What to do instead
 
@@ -29,6 +30,8 @@ These accumulate over time — add a ❌/✅ pair whenever a phrasing actually g
 | EN | utilization of caching for latency reduction | cache it so requests come back faster |
 | KO | 관찰 가능성 확보를 통한 운영 부담의 최소화 | 로그를 잘 남겨두면 나중에 운영할 때 덜 고생해요 |
 | KO | `Create`의 묵음 dedup | `Create`는 중복이 들어와도 에러 없이 조용히 무시해요 |
+| KO | 파드는 컨테이너 묶음이에요 (쿠버네티스 잘 몰라도 이해되게) | 파드는 컨테이너 묶음이에요 |
+| EN | Here's a concise summary, as you asked: … | … |
 
 ### Scope — two axes, applied separately
 
@@ -112,6 +115,7 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 
 ## Relationship to other rules
 
+- `korean-style` is the Korean-specific extension of this rule: it names the AI-Korean tells (comma habits, transliterated loanwords, translationese, sentence rhythm) with concrete ❌/✅ examples. When writing Korean, apply both — this rule for cross-language rhythm, that one for the Korean-only tells.
 - `terminology-discipline` governs *identifiers and domain terms* (spell out abbreviations, disambiguate collisions). This rule governs *prose rhythm and line breaks*. They compose: a sentence can use a correctly-spelled-out term and still be a noun-stack, or be cut at an awkward column.
 - `thinking-expansion` activates vocabulary for thinking. This rule keeps that vocabulary out of the output unless it genuinely helps the reader. When the two pull in opposite directions, this rule wins at the output boundary.
 - The repo's own `CLAUDE.md` forbids mid-sentence hard breaks in Markdown (let it soft-wrap). The line-break section here covers the other side: when a hard break is unavoidable, where it should fall.
@@ -122,6 +126,7 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 - Spoken rhythm is the default only for conversational and explanatory prose; structured artifacts keep their own register (see Scope).
 - Priming and domain keywords stay in the thinking step; do not surface them in sentences unless the name itself helps the reader.
 - Keep precise technical terms — plainness targets rhythm, not vocabulary depth.
+- Never narrate the brief: the request's audience, instruction, or format ask is context for writing, not content to state in the artifact. Make it clear; don't announce that it is.
 - When you choose where a line breaks, break at the meaning boundary, not the column limit; keep grouped lists and subject–predicate pairs on one line.
 - Not every sentence boundary earns a break: cut where the flow pauses — a topic shift, a breath — and keep sentences that are read in one breath on the same line.
 - Soft-wrapping prose (Markdown, chat) takes no source-level hard breaks — never split a sentence across lines, let it wrap. A rendered break (`\`, `<br>`) is a presentation choice, not a wrap: allowed where the flow pauses, never mid-sentence.
