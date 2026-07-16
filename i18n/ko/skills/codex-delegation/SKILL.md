@@ -83,7 +83,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 따로 관리할 관심사 세 가지:
 
 1. **Claude는 codex가 언제 끝나는지 알아야 한다.** `run_in_background: true` Bash를 쓴다; 하네스의 완료 알림이 Claude를 깨운다.
-2. **사용자는 codex의 추론을 실시간으로 보고 싶을 수 있다.** 로그 경로를 주고, 자기 터미널에서 `tail -f` 하게 둔다. 실시간 뷰를 Claude 쪽에서 스크립트로 짜지 마라.
+2. **사용자는 codex의 추론을 실시간으로 보고 싶을 수 있다.** 로그 경로를 주고 자기 터미널에서 `tail -f` 하게 둔다. 실시간 뷰를 Claude 쪽에서 스크립트로 짜지 마라.
 3. **codex는 반드시 끝나야 한다.** 멈춘 codex는 절대 exit하지 않으므로 완료 알림이 안 뜨고 메인 세션이 영원히 기다린다. 모든 codex 호출을 timeout으로 감싼다(`timeout <secs> codex …`, 또는 coreutils 없는 macOS에서는 `gtimeout`; 둘 다 없으면 우아하게 degrade). 만료되면 codex는 124로 exit한다 — exit status를 읽고 timeout을 깨끗한 결과가 아니라 codex 사용 불가로 다룬다. 그냥 `timeout`은 직계 자식에게만 신호를 보낸다; codex(node)가 pipe를 쥔 손자 프로세스를 남기면 `| tee`가 EOF를 못 받아, codex가 죽은 뒤에도 백그라운드 작업이 hang된다. 완료 시점에 멈추면 kill-after grace(`gtimeout -k 10 <secs> …`)를 쓰고 `| tee` 대신 파일로 리다이렉트(`> "$LOG" 2>&1`)하라.
 
 ```

@@ -21,7 +21,7 @@ description: "CSS를 편집·작성·리뷰할 때 적용 — 스타일시트, s
 
 ## R1 — 닫힌 spacing scale을 써라
 
-작성하는 모든 spacing(padding, gap, positioned offset, 레이아웃 크기의 width/height)은 토큰 또는 utility 레이어에 한 번 선언된 유한한 집합에서 나온다. 새 값은 호출부가 아니라 아래의 예외 절차를 통해 들어온다.
+작성하는 모든 spacing(padding, gap, positioned offset, 레이아웃 크기의 width/height)은 토큰 또는 utility 레이어에 한 번 선언된 유한한 집합에서 나온다. 새 값은 호출부가 아니라 아래의 예외 절차를 거쳐 들어온다.
 
 고정 픽셀 chrome 치수(아이콘 크기, 버튼 탭 타깃)는 그 집합 안에 있으면 괜찮다. 집합 밖이면 → 이름 있는 토큰을 먼저 선언하고 `var()`로 소비한다.
 
@@ -108,7 +108,7 @@ CSS 기본값(`visible`)이 대부분의 레이아웃에 맞는다. clipping이 
 4. 토큰 레이어에 추가한다. 값이 아니라 의도로 이름 짓는다(`--spacing-card-inset`).
 5. 토큰 + 첫 소비자를 하나의 atomic commit으로 올린다.
 
-토큰 레이어가 아직 없으면 먼저 선언하라: 기존 리터럴을 조사하고, 의도된 scale로 묶고, 별도 commit으로 올린다. 그때까지 R1–R9는 지향점으로 다룬다.
+토큰 레이어가 아직 없으면 먼저 선언하라: 기존 리터럴을 조사하고 의도된 scale로 묶고 별도 commit으로 올린다. 그때까지 R1–R9는 지향점으로 다룬다.
 
 ## 강제 신호 (리뷰 휴리스틱)
 

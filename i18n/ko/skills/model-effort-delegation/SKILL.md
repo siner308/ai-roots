@@ -152,5 +152,5 @@ Right: Delegate to Haiku Explore agent
 - Fan-out은 세션 모델을 절대 상속하지 않는다 — 3개 이상 에이전트 workflow를 띄우기 전에 스테이지별로 모델을 고정한다. 스테이지 수준 rubric과 투표 중복이 다운그레이드 조건을 충족할 수 있다
 - 실패가 3번 쌓이거나 설계 판단이 떠오르면 Opus로 에스컬레이션
 - 브리핑에는 file path, 시그니처, 검증, 그리고 판단 근거 보고 요청이 들어가야 한다
-- Codex CLI가 있으면 cross-provider 규칙(3-턴 상한, /review를 통한 어드버서리얼 리뷰, capability routing, plan-stage review)은 codex-delegation 스킬을 보라.
+- Codex CLI가 있으면 cross-provider 규칙(3-턴 상한, /review로 하는 어드버서리얼 리뷰, capability routing, plan-stage review)은 codex-delegation 스킬을 보라.
 - **프로젝트 CLAUDE.md가 이 기본값을 더 강하게 만들 수 있다** — 예를 들어 PR당 리뷰어 2명 규칙. 프로젝트 규칙은 더 엄격한 쪽에서 최소 기준을 덮어쓴다. 프로젝트가 말이 없는 곳에는 최소 기준이 적용된다.
