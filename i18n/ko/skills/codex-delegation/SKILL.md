@@ -57,7 +57,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 편의를 위해 더 넓은 모드를 고르지 마라. 리서치에는 쓰기 권한이 필요 없다. 이미지 생성에는 ecosystem capability가 필요하지, no-sandbox 접근이 필요한 게 아니다. 의존성 설치, 외부 CLI, 사설 네트워크 호출은 별개의 요구사항이고 brief에 명시해야 한다.
 
-모든 호출은 모델을 리터럴로 박는다(`-m gpt-5.6-sol`) — 공유 변수도, config 파일도, 설치 시점 간접화도 없이, 의도적으로. 중복이 곧 설계다: 각 명령이 자기완결적이고, `grep`이 모든 사본을 찾아낸다. 모델 교체는 리터럴을 repo 전체(모든 스킬 + 한국어 미러)에서 한 번에 검색·치환하는 커밋 하나로 끝난다. `~/.codex/config.toml`은 codex 자신의 파일이고 사용자의 인터랙티브 세션에만 관여한다; 스킬은 그 파일을 읽지도 쓰지도 않는다.
+모든 호출은 모델을 리터럴로 박는다(`-m gpt-5.6-sol`) — 공유 변수도, config 파일도, 설치 시점 간접화도 없이, 의도적으로. 중복이 곧 설계다: 각 명령이 자기완결적이고, `grep`이 모든 사본을 찾아낸다. 모델 교체는 리터럴을 repo 전체(모든 스킬 + 한국어 미러)에서 한 번에 검색·치환하는 commit 하나로 끝난다. `~/.codex/config.toml`은 codex 자신의 파일이고 사용자의 인터랙티브 세션에만 관여한다; 스킬은 그 파일을 읽지도 쓰지도 않는다.
 
 ## 라우팅 규칙
 
@@ -119,7 +119,7 @@ Bash(run_in_background: true, command: "codex exec ... -- - < '$PROMPT' 2>&1 | t
 
 **Plan 리뷰는 권고이지 차단이 아니다.** PR 단계 리뷰는 여전히 필수다. 수정할지 진행할지는 사용자가 정한다.
 
-**Anti-patterns:** stale-revision 리뷰(아래 Cross-Provider Rules 참고); ~3을 넘는 라운드 부풀리기(plan 주인이 수렴 못한 것 — 대신 사용자와 목표를 명확히 하라); 권고를 차단으로 다루기.
+**Anti-patterns:** stale-revision 리뷰(아래 Cross-Provider 규칙 참고); ~3을 넘는 라운드 부풀리기(plan 주인이 수렴 못한 것 — 대신 사용자와 목표를 명확히 하라); 권고를 차단으로 다루기.
 
 ## Cross-Provider 규칙
 

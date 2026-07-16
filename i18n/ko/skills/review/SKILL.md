@@ -15,7 +15,7 @@ diff에 한정되지 않는다. 산출물은 코드 변경, Claude가 방금 만
 
 KIND — 가장 잘 맞는 것을 고른다:
 
-- **code** — "내 변경/PR/이 브랜치/그 커밋 봐줘", 또는 repo의 코드에 관한 요청. repo 안이고 대상이 코드면 기본값.
+- **code** — "내 변경/PR/이 브랜치/그 commit 봐줘", 또는 repo의 코드에 관한 요청. repo 안이고 대상이 코드면 기본값.
 - **plan** — "이 plan / 방금 쓴 plan / 이 접근 / 이 설계 봐줘". 산출물이 *이 대화에서* Claude가 만든 텍스트인 경우가 많다.
 - **doc** — 산문 문서, README, 스펙, PRD, 제안서.
 - **generic** — 그 외 전부: config, 데이터셋, 결정, 체크리스트. 포괄.
@@ -36,12 +36,12 @@ KIND — 가장 잘 맞는 것을 고른다:
 |----------------------|--------|------------|
 | _(없음)_, "내 변경 봐줘", "이 브랜치" | branch vs base | `git diff <merge-base SHA>` |
 | "vs main", "develop 대비", "<ref>랑 비교" | branch vs 명시한 base | `git diff <merge-base SHA>` |
-| "uncommitted", "워킹 트리", "아직 커밋 안 한 거" | 워킹 트리만 | `git diff HEAD` (untracked 포함) |
-| "마지막 커밋", "HEAD", "커밋 <sha>" | 커밋 하나 | `git show <SHA>` |
-| "최근 3개 커밋", "<ref> 이후" | 커밋 범위 | `git diff <범위 시작 SHA>` |
+| "uncommitted", "워킹 트리", "아직 commit 안 한 거" | 워킹 트리만 | `git diff HEAD` (untracked 포함) |
+| "마지막 commit", "HEAD", "commit <sha>" | commit 하나 | `git show <SHA>` |
+| "최근 3개 commit", "<ref> 이후" | commit 범위 | `git diff <범위 시작 SHA>` |
 | "X 파일만", "<path>만" | 위 어떤 것이든 좁힘 | ` -- '<path>'…` 추가 |
 
-범위가 비었거나 모호하면 기본은 **branch-vs-base**. `git diff <merge-base SHA>`는 fork point부터 워킹 트리까지를 diff하므로 커밋된 브랜치 변경과 uncommitted 로컬 편집을 한 diff에 담는다 — "PR diff + 로컬 변경".
+범위가 비었거나 모호하면 기본은 **branch-vs-base**. `git diff <merge-base SHA>`는 fork point부터 워킹 트리까지를 diff하므로 commit된 브랜치 변경과 uncommitted 로컬 편집을 한 diff에 담는다 — "PR diff + 로컬 변경".
 
 **Injection 안전 — STRICT.** `DIFF_CMD`는 평가자가 셸에서 실행하는 프롬프트에 박힌다. git ref나 브랜치 이름에는 셸 메타문자(`;`, `$( )`, 백틱)가 정당하게 들어갈 수 있어 raw ref를 끼우면 command injection 통로다 — 특히 명시한 base나 신뢰할 수 없는 fork의 PR base. 모든 ref를 **메인 세션에서 commit SHA로 풀고**(거기서는 따옴표 친 셸 변수라 injection 불가) 16진수 SHA만 박는다. raw ref는 절대 박지 말고 path filter는 single-quote 한다(single quote 든 경로는 거부).
 
@@ -67,11 +67,11 @@ MERGE_BASE="$(git merge-base "$BASE_REF" HEAD)" || { echo "no merge-base with $B
 DIFF_CMD="git diff $MERGE_BASE"
 ```
 
-커밋 하나: `SHA="$(git rev-parse --verify "$REF^{commit}")" || exit 1; DIFF_CMD="git show $SHA"`. 범위: `START="$(git rev-parse --verify "$RANGESTART^{commit}")" || exit 1; DIFF_CMD="git diff $START"` (예: "최근 3개 커밋"이면 `$RANGESTART`는 `HEAD~3`). `git rev-parse --verify`는 ref가 아닌 인자를 거부해 메타문자 문자열이 박히는 명령까지 가닿는 것도 막는다.
+commit 하나: `SHA="$(git rev-parse --verify "$REF^{commit}")" || exit 1; DIFF_CMD="git show $SHA"`. 범위: `START="$(git rev-parse --verify "$RANGESTART^{commit}")" || exit 1; DIFF_CMD="git diff $START"` (예: "최근 3개 commit"이면 `$RANGESTART`는 `HEAD~3`). `git rev-parse --verify`는 ref가 아닌 인자를 거부해 메타문자 문자열이 박히는 명령까지 가닿는 것도 막는다.
 
 엣지 케이스:
-- **base 브랜치 위에 앞선 커밋이 없을 때**(예: `main`, PR 없음): merge-base가 `HEAD`라 `DIFF_CMD`가 uncommitted diff로 줄어든다 — 거기 있는 걸 리뷰한다.
-- **타겟이 비었을 때**(앞선 커밋도 uncommitted도 없음): "nothing to review"라 보고하고 멈춘다.
+- **base 브랜치 위에 앞선 commit이 없을 때**(예: `main`, PR 없음): merge-base가 `HEAD`라 `DIFF_CMD`가 uncommitted diff로 줄어든다 — 거기 있는 걸 리뷰한다.
+- **타겟이 비었을 때**(앞선 commit도 uncommitted도 없음): "nothing to review"라 보고하고 멈춘다.
 - **PR base가 remote에만 있을 때**: `origin/<BASE>`가 없으면 먼저 `git fetch origin <BASE>` 한 뒤 푼다.
 
 ### 인라인 산출물 고정 (KIND=plan/doc/generic)
