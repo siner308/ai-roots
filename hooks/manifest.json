@@ -22,5 +22,11 @@
     "matcher": "Edit|Write|MultiEdit",
     "script": "prose-discipline.py",
     "run": "python3"
+  },
+  {
+    "event": "Stop",
+    "matcher": "",
+    "script": "grounded-assertions.py",
+    "run": "python3"
   }
 ]

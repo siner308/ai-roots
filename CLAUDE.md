@@ -27,6 +27,7 @@ A hook's **doc** page (`hooks/<name>.md`) does: mirror it as `i18n/ko/hooks/<nam
 When an added comment spans multiple lines it also asks the model to check that each break falls at a meaning boundary, not mid-phrase — the code-comment side of line-break discipline, judged by the model so it works in any language.
 `hooks/prose-discipline.py` is the non-code counterpart on the same event: on Markdown it flags mid-sentence hard breaks and, past a sentence-count gate, asks for a conciseness pass. The two never double-fire — code edits hit `comment-discipline`, Markdown edits hit `prose-discipline`.
 Both enforce what a resident prose rule alone couldn't.
+`hooks/grounded-assertions.py` is a `Stop` hook: when a turn's final message passes a sentence-count gate, it blocks once (`stop_hook_active` caps the loop) and demands a claim-by-claim audit — evidenced claims stay untouched, verifiable ones get verified now, the rest get their uncertainty markers restored. It is the enforcement layer for the `grounded-assertions` rule; `/fact-check` (skill) toggles it or tunes the gate, and `AI_ROOTS_FACT_CHECK=0` is the emergency off switch.
 
 ## Writing discipline: three layers, one concern
 
@@ -43,6 +44,7 @@ Use this map to find where a writing concern lives before changing it.
 | Plain language, noun-stacks, translationese | `prose-style` | — (not statically detectable) | — |
 | Korean naturalness (loanwords, translationese, rhythm) | `korean-style` | — (chat: rule-only) | — |
 | Terminology, abbreviations | `terminology-discipline` | — | — |
+| Ungrounded assertions (hedge-stripping) | `grounded-assertions` | `grounded-assertions.py` (Stop, sentence gate) | — |
 | PR body format and delivery | — | `gh-markdown-style.py` (delivery only) | `github-pr-markdown` |
 
 A blank enforcement cell means the concern is rule-only: it can't be detected statically, so it rides on the resident rule.
