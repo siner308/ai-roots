@@ -39,6 +39,24 @@ The PR body is at most **three lines**. This is a ceiling, not a default — a b
 
 **Only exception — the repo's PR template** (`.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/`): the template's structure wins, but the cap moves inside it — at most three lines per section you fill. Omit sections that don't apply rather than writing "N/A" filler, and never add sections the template doesn't define. The formatting rules (ASCII bullets, backtick code refs, API delivery) still apply inside it.
 
+### Content — describe the diff, not the journey
+
+The body describes what the merged diff does and why, read from the reviewer's side. It is not a log of how you got there. "Motivation" in the HARD CAP section means the problem this change solves — not the path you took to find it. Cut anything that isn't in the diff in front of the reader:
+
+- **Reverted or abandoned approaches** — an option you tried and backed out of is not part of this change. Describe only what ships.
+- **Reasoning for a path not taken** — justifying why you *didn't* do X sends the reader hunting for code that isn't there. It belongs in a review comment at most, never the body.
+- **Behavior already on the base branch** — if a bullet describes what the base branch already did, delete it. Self-check every bullet: does the diff actually add this line? If not, cut it.
+- **Mechanism over-explanation** — the full causal chain and reference tables (status-code maps, every layer touched) are density theater. Keep the one concrete symptom a reader would grep for — the real error string, the actual value — over an abstract summary of it.
+
+Language-level AI tells (noun-stacks, translationese, over-hedging, em-dash add-ons) are governed by `prose-style` and `korean-style`; apply those to the body too.
+
+| Failure | ❌ | ✅ |
+|---|----|----|
+| Describes the journey, not the diff | Summary explains "parses the body for the code instead of branching on status" — behavior the base branch already had, and the rationale for an approach that was reverted | What the diff ships: "surface the HTTP status and first 512 bytes of the body so the failure cause is visible" |
+| Justifies a path not taken | "At first I branched on the status code, but 4xx also carries a code in the body, so I dropped it. Instead…" | (omitted entirely — a discarded approach is not in the body) |
+| Abstract instead of concrete symptom | "an unexpected parsing error occurs during deserialization" | "unmarshal fails with `invalid character 'u' looking for beginning of value`" |
+| Restates pre-existing behavior as work done | `- [x] parses the body and uses the response code` (the base branch already did this) | (deleted) |
+
 ### Body Delivery — STRICT
 
 gh CLI corrupts markdown in ALL body delivery methods (`--body`, `--body-file`, `gh pr edit --body-file`): dashes become •, backticks are stripped, `- [ ]` becomes `[ ]`. **Never pass the PR body through the gh CLI. Always use the GitHub API directly.**

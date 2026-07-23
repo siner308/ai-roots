@@ -39,6 +39,24 @@ PR 본문은 최대 **3줄**이다. 기본값이 아니라 상한이다 — diff
 
 **유일한 예외 — 레포의 PR 템플릿**(`.github/pull_request_template.md` 또는 `.github/PULL_REQUEST_TEMPLATE/`): 템플릿 구조가 우선하되, 캡이 그 안으로 들어간다 — 채우는 섹션마다 최대 3줄. 해당 없는 섹션은 "N/A" 채우기 대신 빼버리고, 템플릿에 없는 섹션은 추가하지 않는다. 포맷 규칙(ASCII 불릿, 백틱 코드 참조, API 전달)은 그 안에서도 그대로 적용된다.
 
+### 내용 — journey가 아니라 diff를 서술한다
+
+본문은 merged diff가 무엇을 왜 하는지를 리뷰어 관점에서 서술한다. 거기까지 도달한 과정의 기록이 아니다. 하드 캡 섹션의 "동기"는 이 변경이 푸는 문제를 뜻하지, 그 문제를 찾아간 경로가 아니다. 독자 앞의 diff에 없는 것은 모두 뺀다:
+
+- **되돌리거나 버린 접근** — 시도했다 물러난 선택지는 이 변경의 일부가 아니다. 실제로 반영되는 것만 서술한다.
+- **하지 않기로 한 결정의 근거** — X를 *안 한* 이유를 정당화하면 리뷰어가 없는 코드를 찾아 헤맨다. 그건 기껏해야 리뷰 코멘트감이지 본문이 아니다.
+- **base branch에 이미 있던 동작** — bullet이 base branch가 이미 하던 일을 서술하면 지운다. bullet마다 자문한다: 이게 diff에 실제로 추가되나? 아니면 뺀다.
+- **동작 과설명** — 전체 인과 사슬과 참조 표(status code 맵, 거친 모든 레이어)는 density theater다. 그것의 추상 요약보다 리뷰어가 grep할 구체적 증상 하나 — 실제 에러 문자열, 실제 값 — 를 남긴다.
+
+언어 수준의 AI 티(noun-stack, 번역투, 과도한 hedging, em-dash 덧붙임)는 `prose-style`·`korean-style`이 관장한다 — 본문에도 그대로 적용한다.
+
+| 실패 | ❌ | ✅ |
+|---|----|----|
+| diff가 아니라 journey를 서술 | 개요에 "status로 안 끊고 body를 파싱해 code를 쓴다"까지 적음 — base branch가 이미 하던 동작이고, 되돌린 접근의 근거임 | diff가 실제로 반영한 것만: "실패 원인이 보이도록 HTTP status와 body 앞 512바이트를 남깁니다" |
+| 안 간 길을 정당화 | "처음엔 status code로 분기하려 했으나 4xx도 body에 code가 실려서 버렸습니다. 그래서…" | (아예 쓰지 않음 — 버린 접근은 본문에 없다) |
+| 구체 증상 대신 추상 | "역직렬화 과정에서 예기치 못한 파싱 오류가 발생합니다" | "`invalid character 'u' looking for beginning of value`로 unmarshal이 실패합니다" |
+| 기존 동작을 한 일로 재진술 | `- [x] body를 파싱해 응답 code를 그대로 사용` (base branch가 이미 하던 일) | (삭제) |
+
 ### 본문 전달 — STRICT
 
 gh CLI는 모든 본문 전달 방식에서 Markdown을 손상시킨다(`--body`, `--body-file`, `gh pr edit --body-file`): 대시가 •로, 백틱이 벗겨지고, `- [ ]`가 `[ ]`로 바뀐다. **PR 본문을 절대 gh CLI로 넘기지 않는다. 항상 GitHub API를 직접 쓴다.**
