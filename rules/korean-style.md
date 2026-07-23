@@ -49,10 +49,31 @@ Comma habits separate AI Korean from human Korean more reliably than anything el
 - **Connective overuse** — `그리고`, `또한`, `뿐만 아니라` stacked. Join clauses with endings (`-고`, `-며`) instead of starting sentences with a conjunction.
 - **Register drift** — keep one politeness level; don't slide between `합니다` and `-다` in the same passage.
 
+## Voice
+
+Naturalness keeps Korean from reading as machine-made; voice makes it read as *this user*. When the task is Korean prose meant to be read as writing — explanations, walkthroughs, docs, longer answers — carry the user's own voice: first-person, motivation-led, honest about dead ends. The profile below was drawn from the user's own long-form writing; treat it as an ear to train, not a checklist to stamp.
+
+Register for such writing standardizes on **`-습니다`/`-요` 공손체** — the register-drift rule above picks *whether* to stay level; this picks *which* level, and holds it even where a diary-style `-다` would feel natural.
+
+- **Open with motivation, not a definition.** Start from why you're writing this or what problem prompted it. "무중단 마이그레이션을 잘하는 개발자가 되고 싶었습니다", not "CDC란 데이터베이스의 변경을 추적하는 기법이다".
+- **First-person retrospective.** Frame the material as your own path — wanted, tried, hit, concluded. "고민하게 됐습니다", "제 경우엔".
+- **Record the dead ends.** Say what failed or went unsolved; don't launder it into a clean success. "찾아봤지만 실패했습니다", "마땅한 해결책은 보이지 않았습니다".
+- **Mark guesses as guesses** (composes with `grounded-assertions`). "추측하기로는", "~인 것으로 보였습니다".
+- **Parenthetical asides for honest footnotes** — a cost, a caveat, a shrug. "(.com치고는 12달러로 꽤 쌌습니다)", "(부족하지만요)".
+- **Ellipsis for a trailing beat**, sparingly, not as filler. "이건 js인가 ts인가…".
+- **Talk to the reader in a walkthrough** — 청유·수사의문 pull them along. "가정해 봅시다", "이러면 어떨까요?".
+- **Concrete over abstract** — the specific symptom, value, or number a reader could act on beats a smooth summary of it (the same instinct `github-pr-markdown` applies to PR bodies).
+
+Voice is additive: it only ever dresses an already-clean sentence, never excuses a machine-shaped one — every rule above this section still binds.
+
+The voice **stands down** where writing is not the deliverable: terse work replies (a status line, a yes/no — the user's `CLAUDE.md` asks for concise answers, and that wins), structured artifacts (PR bodies, commit messages, code, comments, tables — each keeps its own convention, and a PR body is the *opposite* of this voice: it describes the diff, not the journey), and English output (keep only the language-neutral instincts — motivation-first, concrete, honest hedges).
+
 ## Rules
 
 - The test is judgment by ear (read it back as speech), not token-matching; the patterns are smells, not a grep list. Re-say the whole sentence, don't swap the flagged word.
 - Every term is a Korean word or English letters, never a Hangul transliteration: a plain concept goes to Korean (`컨셉` → `개념`), a domain term keeps its English spelling (`커밋` → `commit`), and a loanword settled in the dictionary counts as Korean (`파일` stays `파일`).
 - Prefer verbs over `-화`/`-성` nominalizations, and cut commas Korean does not need — comma habit is the single strongest AI tell.
 - Watch frequency tells (`-들`, `~할 수 있다`, three-beat lists, `이러한`): one is fine, repetition is the tell.
+- For Korean writing meant to be read (explanations, docs, longer answers), carry the user's voice: motivation-first opening, first-person retrospective, honest about failures and guesses, concrete over abstract, one `-습니다`/`-요` register throughout.
+- Voice is additive and self-limiting — it dresses an already-clean sentence, never excuses one, and stands down for terse replies, structured artifacts (PR bodies, commits, code, tables), and English output.
 - This rule composes with `prose-style` (rhythm, line breaks) and `terminology-discipline` (identifiers, domain terms); when writing Korean, all three apply.

@@ -42,7 +42,7 @@ Use this map to find where a writing concern lives before changing it.
 | Markdown line breaks | `prose-style` | `prose-discipline.py` | — |
 | Doc conciseness | `prose-style` | `prose-discipline.py` (sentence gate) | — |
 | Plain language, noun-stacks, translationese | `prose-style` | — (not statically detectable) | — |
-| Korean naturalness (loanwords, translationese, rhythm) | `korean-style` | — (chat: rule-only) | — |
+| Korean naturalness + voice (loanwords, translationese, rhythm; first-person, motivation-first, honest) | `korean-style` | — (chat: rule-only) | — |
 | Terminology, abbreviations | `terminology-discipline` | — | — |
 | Ungrounded assertions (hedge-stripping) | `grounded-assertions` | `grounded-assertions.py` (Stop, sentence gate) | — |
 | PR body format and delivery | — | `gh-markdown-style.py` (delivery only) | `github-pr-markdown` |
