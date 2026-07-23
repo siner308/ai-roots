@@ -19,9 +19,9 @@ Self-check: "If I delete this, would a careful reader be *confused or surprised*
 
 ## Everything else: no comment
 
-Don't keep a catalog of forbidden comment types — that list never ends, and the next bad comment always slips between its entries. There is one rule: **not on the allowlist above → don't write it.**
+Keep one rule, not a catalog of forbidden comment types — a catalog never ends, and the next bad comment always slips between its entries: **not on the allowlist above → leave it out.**
 
-The familiar ways code gets over-commented are not separate rules to memorize — they are all the same failure (not on the list): restating WHAT the next lines do, echoing the signature, narrating the task or PR, describing what a *caller or another layer* does with the result, scratchpad notes, gravestones for deleted code, section dividers. Don't enumerate them; just apply the list.
+The familiar ways code gets over-commented are not separate rules to memorize — they are all the same failure (not on the list): restating WHAT the next lines do, echoing the signature, narrating the task or PR, describing what a *caller or another layer* does with the result, scratchpad notes, gravestones for deleted code, section dividers. Apply the list rather than enumerating them.
 
 Signals you're drifting into defensive commenting: the block "felt bare," the comment paraphrases the next three lines, you're narrating to a hypothetical reviewer, or every function gets a docstring regardless. Notice it, delete it, trust the code.
 
