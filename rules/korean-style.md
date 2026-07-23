@@ -47,7 +47,7 @@ Comma habits separate AI Korean from human Korean more reliably than anything el
 - **Monotone sentence length** — AI writes sentences of near-identical length; vary them, let a short one land after a long one.
 - **Three-beat lists** — `A, B, C` triplets repeated across paragraphs. Break the pattern; sometimes two items, sometimes a clause.
 - **Connective overuse** — `그리고`, `또한`, `뿐만 아니라` stacked. Join clauses with endings (`-고`, `-며`) instead of starting sentences with a conjunction.
-- **Register drift** — keep one politeness level; don't slide between `합니다` and `-다` in the same passage.
+- **Register drift** — keep one politeness level, holding it across the whole passage rather than sliding between `합니다` and `-다`.
 
 ## Voice
 
@@ -57,7 +57,7 @@ Register for such writing standardizes on **`-습니다`/`-요` 공손체** — 
 
 - **Open with motivation, not a definition.** Start from why you're writing this or what problem prompted it. "무중단 마이그레이션을 잘하는 개발자가 되고 싶었습니다", not "CDC란 데이터베이스의 변경을 추적하는 기법이다".
 - **First-person retrospective.** Frame the material as your own path — wanted, tried, hit, concluded. "고민하게 됐습니다", "제 경우엔".
-- **Record the dead ends.** Say what failed or went unsolved; don't launder it into a clean success. "찾아봤지만 실패했습니다", "마땅한 해결책은 보이지 않았습니다".
+- **Record the dead ends.** Say what failed or went unsolved rather than laundering it into a clean success. "찾아봤지만 실패했습니다", "마땅한 해결책은 보이지 않았습니다".
 - **Mark guesses as guesses** (composes with `grounded-assertions`). "추측하기로는", "~인 것으로 보였습니다".
 - **Parenthetical asides for honest footnotes** — a cost, a caveat, a shrug. "(.com치고는 12달러로 꽤 쌌습니다)", "(부족하지만요)".
 - **Ellipsis for a trailing beat**, sparingly, not as filler. "이건 js인가 ts인가…".
@@ -70,7 +70,7 @@ The voice **stands down** where writing is not the deliverable: terse work repli
 
 ## Rules
 
-- The test is judgment by ear (read it back as speech), not token-matching; the patterns are smells, not a grep list. Re-say the whole sentence, don't swap the flagged word.
+- The test is judgment by ear (read it back as speech), not token-matching; the patterns are smells, not a grep list. Re-say the whole sentence rather than swapping the flagged word.
 - Every term is a Korean word or English letters, never a Hangul transliteration: a plain concept goes to Korean (`컨셉` → `개념`), a domain term keeps its English spelling (`커밋` → `commit`), and a loanword settled in the dictionary counts as Korean (`파일` stays `파일`).
 - Prefer verbs over `-화`/`-성` nominalizations, and cut commas Korean does not need — comma habit is the single strongest AI tell.
 - Watch frequency tells (`-들`, `~할 수 있다`, three-beat lists, `이러한`): one is fine, repetition is the tell.
