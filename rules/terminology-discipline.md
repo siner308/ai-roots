@@ -8,7 +8,7 @@ Spell out domain terms. Abbreviations that feel obvious to the author are ambigu
 |----------|-----------|----------|
 | **Industry-standard abbreviations** | Use as-is | `env`, `prod`, `dev`, `repo`, `svc`, `db`, `api`, `url`, `id`, `auth`, `config`, `ctx`, `req`, `res` |
 | **Established domain terms** | Keep the abbreviation, but expand on first use | Project-specific abbreviations already entrenched in the codebase or team vocabulary |
-| **Ad-hoc abbreviations** | Forbidden | `usrCnt` → `userCount`, `prodInfo` → `productInfo`, `memInfo` → `memberInfo` |
+| **Ad-hoc abbreviations** | Spell out in full | `usrCnt` → `userCount`, `prodInfo` → `productInfo`, `memInfo` → `memberInfo` |
 
 An abbreviation qualifies as industry-standard only if it appears in the same form across external sources — official documentation, language specs, widely-used libraries. Internal company shorthand is a domain term, not an industry standard.
 
@@ -27,7 +27,7 @@ If an abbreviation has two or more plausible readings, expand it (`userId`, `pro
 - **New identifiers** — default to spelled-out names for variables, functions, and types. Industry-standard abbreviations are allowed.
 - **User-facing explanations** — when referencing an established domain term, expand it on first use ("X (what it means in this domain)"), then the short form is fine.
 - **Documentation and comments** — disambiguate collision-prone abbreviations with a qualifier.
-- **Editing existing code** — do NOT bulk-rename established abbreviations to spell them out. Codebase consistency outweighs the rule.
+- **Editing existing code** — leave established abbreviations as they are rather than bulk-renaming them to spell them out. Codebase consistency outweighs the rule.
 
 ## Rules
 

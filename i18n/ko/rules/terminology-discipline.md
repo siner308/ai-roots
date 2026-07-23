@@ -8,7 +8,7 @@
 |----------|-----------|----------|
 | **Industry-standard abbreviations** | 그대로 쓴다 | `env`, `prod`, `dev`, `repo`, `svc`, `db`, `api`, `url`, `id`, `auth`, `config`, `ctx`, `req`, `res` |
 | **Established domain terms** | 약어는 유지하되 첫 등장 시 풀어쓴다 | 코드베이스나 팀 어휘에 이미 자리 잡은 프로젝트 고유 약어 |
-| **Ad-hoc abbreviations** | 금지 | `usrCnt` → `userCount`, `prodInfo` → `productInfo`, `memInfo` → `memberInfo` |
+| **Ad-hoc abbreviations** | 전부 풀어쓴다 | `usrCnt` → `userCount`, `prodInfo` → `productInfo`, `memInfo` → `memberInfo` |
 
 약어가 industry-standard로 인정받으려면 외부 자료 — 공식 문서, 언어 명세, 널리 쓰이는 라이브러리 — 에서 같은 형태로 나타나야 한다. 사내 줄임말은 industry standard가 아니라 도메인 용어다.
 
@@ -27,7 +27,7 @@
 - **New identifiers** — 변수·함수·타입은 기본적으로 풀어쓴 이름을 쓴다. industry-standard 약어는 허용한다.
 - **User-facing explanations** — 정착된 도메인 용어를 처음 언급할 때 풀어쓴다("X (이 도메인에서 무슨 뜻인지)"), 그 뒤로는 짧은 형태로 써도 된다.
 - **Documentation and comments** — 충돌 가능한 약어는 한정어로 구분한다.
-- **Editing existing code** — 정착된 약어를 풀어쓰겠다고 대량으로 rename하지 마라. 코드베이스 일관성이 이 규칙보다 우선이다.
+- **Editing existing code** — 정착된 약어는 있는 그대로 둔다. 풀어쓰려고 대량 rename하는 것보다 코드베이스 일관성이 우선이다.
 
 ## 규칙
 
