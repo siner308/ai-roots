@@ -1,3 +1,8 @@
+---
+name: memory-minimalism
+description: "Apply when about to save a memory entry, or deciding whether a fact belongs in memory versus a version-controlled surface (rule file, CLAUDE.md, project doc). Covers why memory diverges silently across devices, the when-NOT-to-use list, the decision order, and the cases where memory is still appropriate. Trigger before writing to the memory directory or when the user asks you to remember something."
+---
+
 # Memory Minimalism
 
 The auto memory system stores entries on a single device's filesystem. It does not sync across machines, projects, or working contexts. When the same user works from multiple devices, alternates between main and side projects, or improves shared rule repositories from different environments, memory entries diverge silently — what was saved in one session is invisible in the next, and the asymmetry is undetectable from inside any single session.

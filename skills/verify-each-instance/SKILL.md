@@ -1,3 +1,8 @@
+---
+name: verify-each-instance
+description: "Apply when work is repetitive and pattern-matching tempts you to stamp every item the same way — porting or replicating from a source (codebase, schema, document, dataset), batch edits or find-replace across many sites, or triaging/classifying/reviewing a list where the first few set an expectation. Covers treating recurrence as a hypothesis to verify per case, building from the source's actual facts rather than a generic template, and surfacing the instances that differ."
+---
+
 # Verify Each Instance — Recurrence Is a Hypothesis, Not a License
 
 When work looks repetitive — the same shape over and over, a familiar pattern, "just like the last N" — there is a pull to switch to autopilot: apply the template, stamp every item the same way, stop checking. Resist it. A perceived pattern is a hypothesis to confirm per case, not a conclusion that lets you skip the check.

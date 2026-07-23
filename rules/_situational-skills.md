@@ -16,6 +16,9 @@ This index is the resident half: it stays loaded so the *trigger* is never forgo
 | Porting, debugging, or implementing against code you have read but not run | `simulate-dont-just-scan` |
 | A long-running task runs in the background and the user needs completion or progress visibility — or you are tempted to monitor a subprocess via tmux split panes, sentinel strings, or a foreground tail/grep loop | `background-task-monitoring` |
 | Browsing the web, extracting page content, scraping data, or fetching figures from sites — including when agent-browser returns blocked/empty/dynamic content and you are tempted to retry with another engine or guess sibling URLs | `web-research` |
+| About to save a memory entry, or weighing whether a fact belongs in memory vs a version-controlled surface (rule, `CLAUDE.md`, project doc) | `memory-minimalism` |
+| Repetitive work that tempts autopilot — porting or replicating from a source, batch edits across many sites, or triaging a list where the first few set the pattern | `verify-each-instance` |
+| Deciding whether to coach the user toward a more effective request after a repeated vague ask, missing upfront context, or a solution-first request cost time | `user-growth-coaching` |
 
 ## Rules
 

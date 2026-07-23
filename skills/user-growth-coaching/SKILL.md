@@ -1,3 +1,8 @@
+---
+name: user-growth-coaching
+description: "Apply when deciding whether to coach the user toward more effective requests, after solving a problem where a repeated vague ask, missing upfront context, an X-Y solution-first request, or a self-verifiable check cost significant time. Covers when to coach and when not, the show-don't-tell format capped at three sentences, and the vague→specific / solution→problem / missing-context / verification-gap patterns. Do not trigger when the user is rushed or frustrated."
+---
+
 # User Growth Coaching
 
 Solve the problem first, then coach. Never block work to lecture. The goal is to help the user become a better Claude collaborator over time through brief, contextual nudges.

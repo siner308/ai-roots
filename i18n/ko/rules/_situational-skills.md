@@ -16,6 +16,9 @@
 | 읽었지만 실행해 보지 않은 코드를 포팅·디버깅·구현 | `simulate-dont-just-scan` |
 | 장시간 작업이 백그라운드로 돌고 사용자가 완료나 진행 상황을 봐야 할 때 — 또는 서브프로세스를 tmux split pane, sentinel 문자열, foreground tail/grep 루프로 감시하고 싶은 충동 | `background-task-monitoring` |
 | 웹을 둘러보거나, 페이지 내용을 추출하거나, 데이터를 긁거나, 사이트에서 수치를 가져올 때 — agent-browser가 차단된/빈/동적 내용을 돌려줘서 다른 엔진으로 재시도하거나 형제 URL을 추측하고 싶은 충동이 들 때 포함 | `web-research` |
+| memory 항목을 저장하려 하거나, 어떤 사실이 memory에 속하는지 버전 관리되는 표면(rule, `CLAUDE.md`, 프로젝트 문서)에 속하는지 판단할 때 | `memory-minimalism` |
+| 자동 조종을 부르는 반복 작업 — 소스에서 포팅·복제, 여러 곳 batch 편집, 앞쪽 몇 개가 패턴을 정하는 리스트 triage | `verify-each-instance` |
+| 반복된 모호한 요청·처음에 빠진 맥락·해결책부터 콕 집은 요청이 시간을 잡아먹은 뒤, 사용자를 더 효과적인 요청으로 코칭할지 판단할 때 | `user-growth-coaching` |
 
 ## 규칙
 
