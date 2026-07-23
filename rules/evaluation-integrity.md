@@ -16,11 +16,11 @@ Before starting any iterative work, classify the domain.
 |--------|--------|----------|
 | **Verifiable** | Has tests, metrics, specs, type checks, compilation | Iterate autonomously. Define pass criteria before starting. Run verification after each cycle. |
 | **Partially verifiable** | Some aspects testable, others subjective | Iterate on verifiable parts. Flag non-verifiable aspects explicitly for human review. |
-| **Non-verifiable** | Aesthetic, strategic, humorous, taste-dependent | Do NOT iterate past one refinement without human input. State your uncertainty. |
+| **Non-verifiable** | Aesthetic, strategic, humorous, taste-dependent | Stop after one refinement and get human input before continuing. State your uncertainty. |
 
 ## Separation Protocol
 
-1. **Generate-then-evaluate, never simultaneously.** After producing output, switch modes. Re-read as if encountering it for the first time. Ask: "If someone else wrote this, what would I critique?"
+1. **Generate first, then evaluate as a separate pass.** After producing output, switch modes. Re-read as if encountering it for the first time. Ask: "If someone else wrote this, what would I critique?"
 2. **Name specific defects, not vibes.** Self-evaluation must produce concrete, falsifiable criticism. "This could be better" is not evaluation. "This function silently drops errors on lines 12-15" is.
 3. **Zero defects found = bias signal.** When self-review catches nothing, explicitly state: "Self-review found no issues; independent verification recommended."
 4. **Rationale before verdict, not after.** When you emit a recommendation — a "(recommended)" tag, a "best option", a ranked choice — autoregressive generation makes whatever you write next a justification of a verdict already committed. Reverse the order: write the reasons specific to *this* case first, then let the verdict fall out of them. The failure mode is copying a verdict from a template, prior turn, or default ("the skill says option 1 is recommended") and back-filling reasons. Before the label is on the page, the case-specific rationale must already be. If you cannot state why *this* option wins *here*, you do not yet have a recommendation — you have a habit.
@@ -32,14 +32,14 @@ When the evaluator is not you alone — a subagent review, a cross-provider revi
 Resist it. When consolidating 2+ independent evaluators, the output MUST separate three buckets:
 
 1. **Agreed** — findings or recommendations that appeared in every evaluator. Highest confidence.
-2. **Conflicting** — findings where evaluators disagree, or one flagged an issue the others missed. Name each disagreement explicitly; do not paper over it. A finding that appeared in only one evaluator belongs here, not in "Agreed".
+2. **Conflicting** — findings where evaluators disagree, or one flagged an issue the others missed. Name each disagreement explicitly and keep it visible — never smooth it into apparent consensus. A finding that appeared in only one evaluator belongs in Conflicting, never in "Agreed".
 3. **Chosen direction + rationale** — the decision you are making given the conflicts, and why. If a conflict is unresolved, say so and escalate rather than picking silently.
 
 Rules:
 
-- An evaluator's silence on a topic is not agreement — it is absence. Do not promote single-evaluator findings to "Agreed" because nobody else contradicted them.
+- Read agreement only from an explicit signal — an evaluator who agrees says so, and silence just means the topic went unaddressed. Promote a finding to "Agreed" only when every evaluator raised it; a single-evaluator finding stays in Conflicting even if it went unchallenged.
 - If all buckets are empty, the evaluators did not actually evaluate. Re-brief them with concrete criteria before synthesizing.
-- When the conflict is between your own pre-synthesis opinion and an external evaluator, the external finding goes in the Conflicting bucket, not in a separate "my take" section. You do not get a privileged seat at your own synthesis.
+- When the conflict is between your own pre-synthesis opinion and an external evaluator, put the external finding in the Conflicting bucket and treat your own opinion as one more evaluator there — the same standing as the rest, with no privileged seat at your own synthesis.
 
 This format is not ceremonial — it is the mechanism that prevents the synthesizer from becoming a fourth generator that rationalizes away disagreement.
 
@@ -55,11 +55,11 @@ When any signal fires: stop iterating, surface the decision to the human.
 
 ## Rules
 
-- This rule addresses structural biases that persist regardless of model capability. Do not treat it as training-wheels scaffolding to be relaxed.
-- The Verifiability Gate classification is an internal process. Do not output it unless the user asks.
+- This rule addresses structural biases that persist regardless of model capability. Treat it as a permanent guardrail, not training-wheels scaffolding to relax as you get more capable.
+- Keep the Verifiability Gate classification internal; output it only when the user asks.
 - In verifiable domains, self-iteration is encouraged — the bias is corrected by the verification step.
 - In non-verifiable domains, prefer presenting 2-3 distinct options over converging on one polished answer.
-- Never claim "I reviewed my work and it looks correct" without naming specific things you checked.
-- Never attach a "(recommended)" / "best" / ranked verdict before the case-specific rationale for it exists in the output. A verdict copied from a template or default, with reasons back-filled, is not a judgment. If the same choice flips between turns, that is the tell.
+- When you say you reviewed your work, name the specific things you checked.
+- Attach a "(recommended)" / "best" / ranked verdict only after the case-specific rationale is on the page. A verdict copied from a template or default with reasons back-filled is a habit, not a judgment; a choice that flips between turns is the tell.
 - When consolidating 2+ independent evaluators, always produce the Agreed / Conflicting / Chosen+rationale structure. Silent smoothing of disagreement is a drift signal.
 - Model-dependent scaffolding (context resets, sprint chunking, step-by-step prompts) is valid but temporal. It belongs in project-level CLAUDE.md managed by humans — not here. A model cannot reliably assess whether it still needs its own guardrails.
