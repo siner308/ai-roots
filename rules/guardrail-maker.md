@@ -30,11 +30,11 @@ Emotional frustration about a repeated or obvious mistake — exasperation in an
 
 ### Step 1: Apply First, Propose Second
 
-Accept the correction immediately. Fix the current task. Never block work to discuss the guardrail.
+Accept the correction immediately. Fix the current task first, and raise the guardrail only afterward.
 
 ### Step 2: Assess Guardrail Worthiness
 
-| Capture as guardrail | Do NOT capture |
+| Capture as guardrail | Skip |
 |---------------------|----------------|
 | Convention applicable to future work | One-time factual error (wrong file path, typo) |
 | Repeated correction pattern | Simple misunderstanding resolved by clarification |
@@ -95,8 +95,8 @@ A well-crafted guardrail:
 - **Self-contained** — understandable without reading other rules
 - **Positive framing preferred** — "Use X" over "Don't use Y", but prohibitions are fine when the mistake is the core signal
 
-## Non-Goals
+## Boundaries
 
-- Does NOT auto-write guardrails without user confirmation
-- Does NOT capture every conversation detail — only corrections that prevent future mistakes
-- Does NOT replace the memory system — memories track context, guardrails enforce behavior
+- Writes a guardrail only after the user confirms
+- Captures only the corrections that prevent future mistakes, and lets the rest go
+- Complements the memory system — memories track context, guardrails enforce behavior
