@@ -129,6 +129,6 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 - Never narrate the brief: the request's audience, instruction, or format ask is context for writing, not content to state in the artifact. Make it clear; don't announce that it is.
 - When you choose where a line breaks, break at the meaning boundary, not the column limit; keep grouped lists and subject–predicate pairs on one line.
 - Not every sentence boundary earns a break: cut where the flow pauses — a topic shift, a breath — and keep sentences that are read in one breath on the same line.
-- Soft-wrapping prose (Markdown, chat) takes no source-level hard breaks — never split a sentence across lines, let it wrap. A rendered break (`\`, `<br>`) is a presentation choice, not a wrap: allowed where the flow pauses, never mid-sentence.
+- Soft-wrapping prose (Markdown, chat) takes no source-level hard breaks — never split a sentence across lines, let it wrap. A rendered break (`\`, `<br>`, or a blank-line paragraph in Markdown) is a presentation choice, not a wrap: allowed where the flow pauses, never mid-sentence.
 - A file's incumbent hard-wrap style is not a width limit. Unless a linter or formatter errors on the width, don't imitate the wrap — re-flow the paragraphs you edit so no sentence is split across lines. Breaking after a sentence is allowed, never required.
 - The viewer's screen/terminal width is not a width limit — never insert a hard break to fit your current display. Only a file-level column convention or a fixed-width medium justifies one.

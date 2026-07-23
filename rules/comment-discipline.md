@@ -31,5 +31,6 @@ Signals you're drifting into defensive commenting: the block "felt bare," the co
 - A comment needs justification from the allowlist; silence needs none.
 - When a comment is warranted, lead with WHY in one precise sentence.
 - A comment documents THIS unit's own non-obvious facts — not a map of what callers or other layers do (that belongs in the PR body or commit message). A precondition the unit assumes is part of its own contract, so it stays.
+- State each non-obvious fact once. Don't restate in a local comment what a file-header or adjacent comment already established — reference it or omit; a second copy drifts out of sync.
 - When briefing a subagent for implementation, restate this rule — it is not reliably preserved through delegation.
 - Same discipline for docstrings; signature paraphrase is noise. Carve-out: when language tooling enforces public-API docs (Go `revive`, Rust `missing_docs`, Python `pydocstyle`), a one-line contract description on exported identifiers is fine — describe the contract, not the signature.
