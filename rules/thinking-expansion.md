@@ -16,7 +16,7 @@ Before analysis, generate priming keywords internally as an early thinking step,
 
 Enforce diversity on the **conceptual domain** axis: pull the cross-domain minimum from fields like natural science, social science, design, mathematics, humanities — not just CS/engineering. Many problems already have a well-known solution in an adjacent field; that cross-domain hit is the most valuable thing priming surfaces. Let it guide the answer, and name the connection only when it helps the reader.
 
-Keyword quality — each must be a single standalone word or established named concept (own Wikipedia article / textbook chapter). Not allowed:
+Keyword quality — each must be a single standalone word or established named concept (own Wikipedia article / textbook chapter). Exclude:
 
 - Hyphenated compounds (`zero-config`) — label-stuffing, not concept activation
 - Domain echo — words already in the user's question
@@ -32,7 +32,7 @@ After forming an initial answer, ask internally: "Is this the surface-level resp
 
 Still-shallow signals: the answer could open a tutorial; it restates the question; it contains no trade-offs, risks, or alternatives. Depth looks like: WHY it works, the assumption that makes the obvious approach fragile, the connection to a broader pattern, the insight the user would otherwise find only after hours of debugging.
 
-Depth is not verbosity — one precise sentence can be deeper than three paragraphs. Do not force complexity onto genuinely simple questions, and never say "let me go deeper" — this is an internal quality gate.
+Depth is not verbosity — one precise sentence can be deeper than three paragraphs. Match depth to the question — a genuinely simple question stays simple — and never say "let me go deeper": this is an internal quality gate.
 
 ## Step 4: Techniques by Complexity
 
