@@ -28,7 +28,7 @@ A block (exit 2) feeds the reason back to the model, pointing it at the `github-
 
 ## Known limitations (reviewed, accepted)
 
-The principal here is the model/user, not an attacker — so deliberate-evasion shapes carry no real risk, and the common paths are covered. Don't treat the gate as total.
+The principal here is the model/user, not an attacker — so deliberate-evasion shapes carry no real risk, and the common paths are covered. Treat the gate as covering those common paths only.
 
 - **Stdin / variable bodies aren't inspected** (see above) — fail-open on what can't be read at hook time, rather than fail-closed and wedge legitimate workflows.
 - **String mentions can over-block** — a command that only *names* a gh body command without running it (e.g. `echo gh pr create -b '- x'`) is matched by substring and may be blocked. Rephrase if it trips.

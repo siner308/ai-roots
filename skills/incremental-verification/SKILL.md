@@ -11,7 +11,7 @@ When the outcome of a task is uncertain — external APIs, browser automation, s
 
 1. **Start with the smallest possible unit.** Run a single API call, extract one record, write one row to the database. Do this inline (e.g. `node -e "..."`) before writing any script or function.
 2. **Verify the output explicitly.** Print the result, check the database, confirm the shape of the data. "It ran without errors" is not verification — look at the actual output.
-3. **Build up one layer at a time.** Only after step N succeeds, add step N+1. If step N+1 fails, fix it and re-verify from step 1 — don't assume earlier steps still work after changes.
+3. **Build up one layer at a time.** Only after step N succeeds, add step N+1. If step N+1 fails, fix it and re-verify from step 1 — assume the fix may have broken earlier steps.
 4. **Convert to a script last.** Once the full chain works inline, copy the verified code into a script file. Run the script on a small input (1–2 items) before scaling up.
 5. **Scale gradually.** Run on 5 items, then 50, then the full dataset. Check results at each scale.
 
