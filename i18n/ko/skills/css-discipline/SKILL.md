@@ -10,7 +10,7 @@ description: "CSS를 편집·작성·리뷰할 때 적용 — 스타일시트, s
 
 이건 CSS가 존재하는 모든 곳에 적용된다: vanilla, React, Next.js, Svelte, Vue, raw HTML. 프레임워크별 바인딩(Tailwind 클래스명, scoped 스타일, CSS Modules)은 프로젝트 supplement에 둔다.
 
-**언제 규범인가.** R1–R9는 스타일시트, scoped 스타일, 인라인 `style=""`, CSS에 인접한 JS를 편집할 때 지켜야 할 작성 제약이다. 스타일을 건드리지 않는 작업에서는 배경 지식으로만 다루고 — 규칙을 어긴다는 이유만으로 손대지 않은 CSS를 리팩터링하지 마라.
+**언제 규범인가.** R1–R9는 스타일시트, scoped 스타일, 인라인 `style=""`, CSS에 인접한 JS를 편집할 때 지켜야 할 작성 제약이다. 스타일을 건드리지 않는 작업에서는 배경 지식으로만 다루고 — 손대지 않은 CSS는 규칙을 어기더라도 그대로 둬라.
 
 ## 핵심 축
 
@@ -102,7 +102,7 @@ CSS 기본값(`visible`)이 대부분의 레이아웃에 맞는다. clipping이 
 
 기존 집합 밖의 값이 정말로 필요할 때:
 
-1. 호출부에서 멈춰라. `!important`, bracket utility, 리터럴로 손 뻗지 마라.
+1. `!important`, bracket utility, 리터럴로 손 뻗는 대신 호출부에서 멈춰라.
 2. 집합을 식별한다(spacing, color, motion, z-index).
 3. prior-decision 로그를 확인한다 — 이미 다뤄진 필요일 수 있다.
 4. 토큰 레이어에 추가한다. 값이 아니라 의도로 이름 짓는다(`--spacing-card-inset`).

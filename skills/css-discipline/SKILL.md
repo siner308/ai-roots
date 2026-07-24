@@ -9,7 +9,7 @@ Write CSS so the cascade and box model are predictable. Most "tricky" CSS bugs �
 
 This applies everywhere CSS exists: vanilla, React, Next.js, Svelte, Vue, raw HTML. Framework-specific bindings (Tailwind class names, scoped styles, CSS Modules) live in the project's supplement.
 
-**When normative.** R1–R9 are authoring constraints when editing stylesheets, scoped styles, inline `style=""`, or CSS-adjacent JS. In tasks that do not touch styles, treat them as background knowledge — do not refactor untouched CSS just because it violates a rule.
+**When normative.** R1–R9 are authoring constraints when editing stylesheets, scoped styles, inline `style=""`, or CSS-adjacent JS. In tasks that do not touch styles, treat them as background knowledge — leave untouched CSS as it is even when it breaks a rule.
 
 ## Core axes
 
@@ -101,7 +101,7 @@ The user controls two variables: device (viewport) and typography preference. Re
 
 When you genuinely need a value outside an existing set:
 
-1. Pause at the call site. Do not reach for `!important`, a bracket utility, or a literal.
+1. Pause at the call site instead of reaching for `!important`, a bracket utility, or a literal.
 2. Identify the set (spacing, color, motion, z-index).
 3. Check the prior-decision log — the need may already be covered.
 4. Add to the token layer. Name for intent (`--spacing-card-inset`), not value.

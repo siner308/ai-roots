@@ -5,7 +5,7 @@ description: "Apply when browsing the web, extracting page content, scraping dat
 
 # Web Research Protocol
 
-**Default tool for web browsing is `agent-browser`, not WebSearch/WebFetch.** Use agent-browser proactively for any task that involves visiting websites, extracting data, or interacting with web pages. Don't wait for WebSearch to fail first.
+**Default tool for web browsing is `agent-browser`, not WebSearch/WebFetch.** Use agent-browser proactively for any task that involves visiting websites, extracting data, or interacting with web pages. Reach for it from the start, ahead of WebSearch.
 
 **But the inverse is also a trap:** when a page is bot-blocked or fully dynamic, `agent-browser` cannot win by trying harder. The moment you see block signals, stop escalating the browser engine and switch to a search-based tool — see "Block-signal → search fallback" below. This is the single most common way web research stalls.
 
