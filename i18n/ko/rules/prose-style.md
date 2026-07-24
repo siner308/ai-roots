@@ -23,8 +23,6 @@
 
 ### 예시
 
-이 표는 시간이 지나며 쌓인다 — 실제로 거슬렸던 표현이 나올 때마다 ❌/✅ 쌍을 추가하고, 어느 언어에서 나왔는지 태그를 달아라. 번역투는 언어마다 다르다: `묵음 dedup`은 한국어에서만 망가져 보이고(영어 용어를 그대로 직역한 것), 그래서 예시는 언어를 가로질러 번역하지 않고 그게 거슬리는 언어 아래에 정리한다.
-
 | Lang | ❌ | ✅ |
 |------|----|----|
 | EN | utilization of caching for latency reduction | cache it so requests come back faster |

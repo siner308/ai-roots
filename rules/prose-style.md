@@ -23,8 +23,6 @@ The internal thinking rule (`thinking-expansion`) deliberately pulls in domain t
 
 ### Examples
 
-These accumulate over time — add a ❌/✅ pair whenever a phrasing actually grated, tagged with the language it appeared in. Translationese is language-specific: `묵음 dedup` only reads as broken in Korean (a literal mistranslation of an English term), so examples are filed under the language where they bite, not translated across.
-
 | Lang | ❌ | ✅ |
 |------|----|----|
 | EN | utilization of caching for latency reduction | cache it so requests come back faster |
