@@ -20,7 +20,7 @@ CRITICAL: When creating or editing PRs (gh pr create, gh pr edit, PR body compos
 - Bullet points: ALWAYS use `- ` (ASCII dash + space). NEVER use •, ·, * or other Unicode bullets
 - Task lists: ALWAYS use `- [ ]` / `- [x]` (dash + space + bracket). Bare `[ ]` without a `- ` prefix will NOT render as checkboxes
 - Code references: ALWAYS wrap in backticks (`componentName`, `fileName.ts`). Backticks must survive shell escaping — verify in the final output
-- Do not use raw HTML when Markdown suffices
+- Reach for raw HTML only where Markdown cannot express it
 - Use GFM table syntax (pipes + alignment) for tables
 
 ### Links and References — STRICT
@@ -35,7 +35,7 @@ The PR body is at most **three lines**. This is a ceiling, not a default — a b
 
 - No `## Summary`, `## Test plan`, `## References`, TL;DR, or any other ceremony section. Deeper context belongs in commit messages or review comments, not the body.
 - A line may be a sentence, a `- ` bullet, or a verified `[text](url)` link — but three lines total. Never include a guessed URL; open any link and confirm it contains what you cite before adding it.
-- Open with the problem or motivation, then the change. Never lead with the fix before the reader knows the problem.
+- Open with the problem or motivation, then the change, so the reader has the problem before the fix.
 
 **Only exception — the repo's PR template** (`.github/pull_request_template.md` or `.github/PULL_REQUEST_TEMPLATE/`): the template's structure wins, but the cap moves inside it — at most three lines per section you fill. Omit sections that don't apply rather than writing "N/A" filler, and never add sections the template doesn't define. The formatting rules (ASCII bullets, backtick code refs, API delivery) still apply inside it.
 
