@@ -20,7 +20,7 @@ Cross-provider 위임은 세 가지 목적에 쓰인다:
 
 Codex 작업은 두 갈래로 들어온다. 요청된 방식에 맞춰 진입점을 고른다.
 
-**리뷰 → 항상 `/review` 스킬.** 리뷰 부류 작업은 모두 `/review`(`skills/review/SKILL.md`)를 쓴다: 하나의 공유 산출물을 결정한 뒤 Claude subagent와 Codex 실행을 그 산출물에 병렬로 띄우고 evaluation-integrity.md §Multi-advisor synthesis에 따라 종합한다. 리뷰의 단일 진입점이다 — `codex review`나 `/codex:review`를 직접 부르지 마라.
+**리뷰 → 항상 `/review` 스킬.** 리뷰 부류 작업은 모두 `/review`(`skills/review/SKILL.md`)를 쓴다: 하나의 공유 산출물을 결정한 뒤 Claude subagent와 Codex 실행을 그 산출물에 병렬로 띄우고 evaluation-integrity.md §Multi-advisor synthesis에 따라 종합한다. 리뷰의 단일 진입점이다 — 항상 이걸 거치고, `codex review`나 `/codex:review`를 직접 부르지 않는다.
 
 **그 외 → "이거 codex로 해줘" 자연어 위임.** intent에 맞춰 신뢰 가능한 호출로 매핑한다. 세 경로 모두 codex-cli 0.128에서 검증됨:
 
@@ -55,7 +55,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 | 무인 장시간 구현(workspace + 리서치) | `codex --search -a never exec --sandbox workspace-write -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
 | 명시적 no-sandbox 실행(사용자가 명시적으로 요청할 때만) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
 
-편의를 위해 더 넓은 모드를 고르지 마라. 리서치에는 쓰기 권한이 필요 없다. 이미지 생성에는 ecosystem capability가 필요하지, no-sandbox 접근이 필요한 게 아니다. 의존성 설치, 외부 CLI, 사설 네트워크 호출은 별개의 요구사항이고 brief에 명시해야 한다.
+필요에 맞는 가장 좁은 모드를 고른다. 리서치에는 쓰기 권한이 필요 없다. 이미지 생성에는 ecosystem capability가 필요하지, no-sandbox 접근이 필요한 게 아니다. 의존성 설치, 외부 CLI, 사설 네트워크 호출은 별개의 요구사항이고 brief에 명시해야 한다.
 
 모든 호출은 모델을 리터럴로 박는다(`-m gpt-5.6-sol`) — 공유 변수도, config 파일도, 설치 시점 간접화도 없이, 의도적으로. 중복이 곧 설계다: 각 명령이 자기완결적이고, `grep`이 모든 사본을 찾아낸다. 모델 교체는 리터럴을 repo 전체(모든 스킬 + 한국어 미러)에서 한 번에 검색·치환하는 commit 하나로 끝난다. `~/.codex/config.toml`은 codex 자신의 파일이고 사용자의 인터랙티브 세션에만 관여한다; 스킬은 그 파일을 읽지도 쓰지도 않는다.
 
@@ -65,7 +65,7 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 
 **보안 민감 변경에는 adversarial 리뷰.** authentication, authorization, 데이터베이스 쓰기, 네트워크 경계, secret 처리, trust 경계를 건드리는 모든 동작 변경 뒤에는 `/review`를 호출한다. read-only 읽기나 순수 내부 리팩터링은 트리거하지 않는다. 리뷰어 페르소나 — 회의적, 보안 우선, 발견을 P0–P3로 분류, 높은 커버리지에서 critical 이슈가 없을 때만 `VERDICT: SAFE`를 반환 — 는 agents/adversarial-reviewer.md(`~/.claude/agents/`에 설치됨)에 있고, 스킬이 stdin으로 `codex exec --json --sandbox read-only`에 파이프한다(`--json` 이벤트 스트림 덕에 Claude가 codex 진행을 실시간으로 본다; `/review` 스킬 참조).
 
-**Capability routing은 첫 턴에 발동한다.** 이미지 생성, TTS, 그 외 OpenAI 전용 도구 필요는 즉시 Codex로 라우팅한다. 결과물이 이미지나 오디오 산출물일 때 텍스트 기반 우회(ASCII 아트, 손으로 짠 SVG)에 턴을 낭비하지 마라.
+**Capability routing은 첫 턴에 발동한다.** 이미지 생성, TTS, 그 외 OpenAI 전용 도구 필요는 즉시 Codex로 라우팅한다. 결과물이 이미지나 오디오 산출물이면 텍스트 기반 우회(ASCII 아트, 손으로 짠 SVG) 대신 Codex로 만든다.
 
 ## Three-Turn Rescue 프로토콜
 
@@ -126,7 +126,7 @@ Bash(run_in_background: true, command: "codex exec ... -- - < '$PROMPT' 2>&1 | t
 - three-turn 상한은 forcing function이지 단단한 천장이 아니다. Turn 3에서 확실한 돌파가 나오면 끝내고, 아니면 escalate한다.
 - 토큰 아끼려고 보안 민감 경로에서 `/review`를 건너뛰지 마라.
 - Codex rescue를 호출할 때 ruled-out 가설을 포함해서 Codex가 같은 작업을 다시 하지 않게 하라.
-- Codex 발견을 **독립적 증거**로 다뤄라: Claude 결론과의 불일치는 조사하고, Claude 혼자에게 재고하라고 물어 해소하지 마라.
+- Codex 발견을 **독립적 증거**로 다뤄라: Claude 결론과의 불일치는 Claude 혼자 재고하게 하는 대신 직접 조사하라.
 - Codex 위임은 model-effort-delegation.md의 플랫폼 내 모델 티어와 직교한다 — 그 티어는 Claude 측 작업에 여전히 적용된다.
 - **매 Codex 라운드마다 stale-revision 검증.** Codex는 같은 파일로 반복 호출되면 이전 호출의 분석을 출력할 때가 있다. 매 round-N 프롬프트에서 Codex가 먼저 현재 revision 식별자(`file head -1`, `git HEAD` short SHA, 또는 고유한 헤더 줄)를 echo하게 하라. 이미 바뀐 파일의 stale 줄 번호를 재현하는 verdict는 신뢰하지 않는다; fresh 세션으로 재시도하라(`codex resume` 아님).
 - **프로젝트 CLAUDE.md가 이 기본값을 강화할 수 있다** — 예: PR당 두 리뷰어 규칙. 프로젝트별 강화가 최소치를 덮어쓴다; 최소치는 프로젝트가 침묵하는 곳에 적용된다.

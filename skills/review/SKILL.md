@@ -85,7 +85,7 @@ command cat > "$ARTIFACT" <<'EOF'
 EOF
 ```
 
-**Empty artifact.** If the captured file is empty (the inline text was blank) or a file-backed artifact resolves to no readable file, report "nothing to review" and stop — same as an empty code target. Never spawn evaluators on nothing.
+**Empty artifact.** If the captured file is empty (the inline text was blank) or a file-backed artifact resolves to no readable file, report "nothing to review" and stop — same as an empty code target. Spawn evaluators only when there is something to review.
 
 ## 2. Review lens (by KIND)
 

@@ -19,7 +19,7 @@ The first two motivate reliability routing; the third motivates capability routi
 
 Codex work arrives two ways. Match the entry point to how it was requested.
 
-**Review → the `/review` skill, always.** For any review-class work use `/review` (`skills/review/SKILL.md`): it resolves one shared artifact, runs a Claude subagent and a Codex run in parallel on it, and synthesizes per evaluation-integrity.md §Multi-advisor synthesis. This is the single review entry point — do not reach for `codex review` or `/codex:review` directly.
+**Review → the `/review` skill, always.** For any review-class work use `/review` (`skills/review/SKILL.md`): it resolves one shared artifact, runs a Claude subagent and a Codex run in parallel on it, and synthesizes per evaluation-integrity.md §Multi-advisor synthesis. This is the single review entry point — always go through it, not `codex review` or `/codex:review` directly.
 
 **Anything else → a natural-language "delegate this to Codex" request.** Map it to a reliable invocation by intent. All three paths are verified on codex-cli 0.128:
 
@@ -54,7 +54,7 @@ codex review [REVIEW FLAGS]    # read-only by design; does not accept --sandbox 
 | Unattended long implementation (workspace + research) | `codex --search -a never exec --sandbox workspace-write -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
 | Explicit no-sandbox run (only when user explicitly asks) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -m gpt-5.6-sol -c model_reasoning_effort=xhigh` |
 
-Do not pick a broader mode for convenience. Research does not need write access. Image generation needs ecosystem capability, not no-sandbox access. Dependency installation, external CLIs, and private network calls are separate requirements that must be named in the brief.
+Pick the narrowest mode that fits the need. Research does not need write access. Image generation needs ecosystem capability, not no-sandbox access. Dependency installation, external CLIs, and private network calls are separate requirements that must be named in the brief.
 
 Every invocation pins the model as a literal (`-m gpt-5.6-sol`) — deliberately, with no shared variable, config file, or install-time indirection. Duplication is the design: each command is self-contained, and `grep` finds every copy. A model bump is one repo-wide search-and-replace of the literal (all skills plus the Korean mirror) in a single commit. `~/.codex/config.toml` belongs to codex itself and governs only the user's interactive sessions; skills never read or write it.
 
@@ -64,7 +64,7 @@ Every invocation pins the model as a literal (`-m gpt-5.6-sol`) — deliberately
 
 **Adversarial review on security-sensitive changes.** After every behavioral change touching authentication, authorization, database writes, network boundaries, secret handling, or trust boundaries, invoke `/review`. Read-only reads or pure internal refactors do not trigger. The reviewer persona — skeptical, security-first, classifies findings P0–P3, returns `VERDICT: SAFE` only when no critical issues surface at high coverage — lives in agents/adversarial-reviewer.md (installed to `~/.claude/agents/`) and is piped via stdin to `codex exec --json --sandbox read-only` by the skill (the `--json` event stream lets Claude watch codex's progress live; see the `/review` skill).
 
-**Capability routing fires on turn one.** Image generation, TTS, or other OpenAI-exclusive tool needs route to Codex immediately. Do not waste turns on text-based workarounds (ASCII art, hand-coded SVG) when the deliverable is an image or audio artifact.
+**Capability routing fires on turn one.** Image generation, TTS, or other OpenAI-exclusive tool needs route to Codex immediately. When the deliverable is an image or audio artifact, produce it through Codex rather than spending turns on text-based workarounds (ASCII art, hand-coded SVG).
 
 ## Three-Turn Rescue Protocol
 
@@ -125,7 +125,7 @@ Two-reviewer review is also valuable *before* code is written, when the artifact
 - Three-turn cap is a forcing function, not a hard ceiling. If Turn 3 produces a confirmed breakthrough, finish; otherwise escalate.
 - Never skip `/review` on security-sensitive paths to save tokens.
 - When invoking a Codex rescue, include ruled-out hypotheses so Codex does not redo the same work.
-- Treat Codex findings as **independent evidence**: investigate disagreements with Claude's conclusion; do not resolve them by asking Claude alone to reconsider.
+- Treat Codex findings as **independent evidence**: investigate disagreements with Claude's conclusion rather than resolving them by asking Claude alone to reconsider.
 - Codex delegation is orthogonal to the in-platform model tiers in model-effort-delegation.md — those still apply to Claude-side work.
 - **Stale-revision verification on every Codex round.** Codex sometimes outputs analysis from a previous invocation when called repeatedly on the same file. In every round-N prompt, ask Codex to first echo the current revision identifier (`file head -1`, `git HEAD` short SHA, or a unique header line). Verdicts that reproduce stale line numbers from a since-changed file are untrusted; retry with a fresh session (not `codex resume`).
 - **Project CLAUDE.md may strengthen these defaults** — e.g., per-PR two-reviewer rule. Project-specific strengthening overrides the minimum; the minimum applies where the project is silent.

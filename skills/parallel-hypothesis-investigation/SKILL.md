@@ -16,7 +16,7 @@ Parallel investigation only pays off when the work decomposes cleanly. Two axes 
 | **Layer (hypothesis)** | Root cause is uncertain; could lie in several distinct layers | "Test whether the cause is in <layer>" |
 | **Criterion (evaluation)** | Output must pass multiple independent judgment criteria | "Judge the output against <criterion> only" |
 
-The layer axis is for *finding* something; the criterion axis is for *judging* something. Review and advisor-style work is usually criterion-axis; debugging is usually layer-axis. A single task can use both sequentially — first find the cause (layer), then judge the fix (criterion) — but do not mix them in a single parallel batch.
+The layer axis is for *finding* something; the criterion axis is for *judging* something. Review and advisor-style work is usually criterion-axis; debugging is usually layer-axis. A single task can use both sequentially — first find the cause (layer), then judge the fix (criterion) — but keep each axis to its own parallel batch.
 
 For criterion-axis synthesis output format, see evaluation-integrity.md §Multi-advisor synthesis.
 
@@ -38,7 +38,7 @@ For criterion-axis synthesis output format, see evaluation-integrity.md §Multi-
 - Give each agent enough context to make judgment calls, not just follow instructions
 - Specify the exact directories, files, or functions to start from
 - State the hypothesis being tested (layer-axis) or the criterion being judged (criterion-axis), not just "investigate X"
-- For criterion-axis agents, explicitly forbid cross-criterion commentary — a security reviewer should not argue about UX, or the criteria collapse back into one blurred review
+- For criterion-axis agents, explicitly confine each agent to its assigned criterion — a security reviewer judges security, not UX. Cross-criterion commentary collapses the criteria back into one blurred review
 - Ask for concise findings, not exhaustive reports
 
 ## Signals this approach is needed
@@ -50,7 +50,7 @@ For criterion-axis synthesis output format, see evaluation-integrity.md §Multi-
 
 ## Rules
 
-- Don't parallelize trivially. If there are only 1–2 obvious places to check, just check them directly.
+- Parallelize only when the work genuinely splits. If there are only 1–2 obvious places to check, just check them directly.
 - Each agent should cover a non-overlapping investigation scope to avoid redundant work.
 - Present synthesized findings as a unified picture with a clear root cause chain, not as disconnected per-agent reports.
 - When multiple agents converge on the same finding from different angles, that's strong signal. When they contradict, investigate the gap.

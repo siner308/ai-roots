@@ -13,7 +13,7 @@ Pick the cheapest mechanism that actually fits the task. Going down the ladder m
 
 ### Rung 1 — Completion notification only (default)
 
-If the only thing the user needs is "tell me when it's done with the result," don't monitor at all. The harness already notifies when a `run_in_background: true` Bash completes. Kick off the task, continue with other work, and react to the completion event when it fires.
+If the only thing the user needs is "tell me when it's done with the result," skip monitoring entirely. The harness already notifies when a `run_in_background: true` Bash completes. Kick off the task, continue with other work, and react to the completion event when it fires.
 
 ```
 Bash(command: "...", run_in_background: true)
@@ -98,5 +98,5 @@ A 5-minute Codex review should not be interval-polled (Rung 3); with `--json` it
 - Default to Rung 1 (completion notification only). Polling is not the default anymore.
 - Escalate to Rung 2 when phase-level progress has real user value.
 - Reach for Rung 3 only when no native completion or stream signal exists.
-- User-visible live streaming is a tee problem, not a monitoring problem — don't conflate them.
+- User-visible live streaming is a tee problem, not a monitoring problem — keep the two separate.
 - Never rebuild the tmux/sentinel/foreground-grep wrapper; the background-Bash completion notification is the wake signal.
