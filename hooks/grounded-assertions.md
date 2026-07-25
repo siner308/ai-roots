@@ -33,6 +33,8 @@ On `Stop` it reads the turn's final assistant message from the transcript and, p
 
 ## Known limitations (reviewed, accepted)
 
-The gate is a volume heuristic, not a claim detector: a long response with zero factual claims still gets audited (the audit then costs one short "nothing to fix" round), and a short response full of confident guesses slips under it.
+The gate is a volume heuristic, not a claim detector: a long response with zero factual claims still gets audited (the audit then costs one short round that restates the answer), and a short response full of confident guesses slips under it.
+
+The audit closes by answering the user's question again rather than reporting on itself. Its reply lands at the bottom of the screen, below the response it audited, so a bare "nothing to fix" would leave the actual answer scrolled out of view — and saying nothing at all would leave the block message as the last thing visible, which reads as a failed turn.
 The audit round itself is not re-audited — a claim introduced during the audit escapes; one loop is the deliberate ceiling.
 Same-context audit means the generator reviews itself; the claim-by-evidence structure narrows but does not eliminate that bias (heavier cross-checking belongs to `/review`).

@@ -25,7 +25,7 @@ Audit the response you just wrote, claim by claim. A material claim is a factual
 2. No evidence, but verifiable right now with a tool -> verify now and correct the claim to match what you find.
 3. No evidence and not verifiable in-session -> restore an uncertainty marker ("appears to", "unverified"; in Korean output: "~로 보입니다", "확인 필요").
 
-If nothing needs fixing, say so in one line and finish. Do not rewrite or restyle the rest of the response."""
+Close by answering the user's question again in one or two sentences — the conclusion they asked for, not a report on this audit. Your reply is the last thing on their screen, so ending on "checked, nothing to fix" buries the answer above the fold; ending on the answer itself keeps it in view. When a claim did change, state the correction and then the corrected conclusion. Do not rewrite or restyle the rest of the response."""
 
 
 def gate_setting():
