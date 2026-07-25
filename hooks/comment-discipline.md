@@ -17,6 +17,7 @@ When an added comment spans multiple lines, the same block also asks the model t
 ## What it skips
 
 - **Pre-existing comments** — only lines the edit newly adds are flagged (the old text is diffed out), so untouched comments never trigger it.
+- **Re-joining a comment it just flagged** — merging a mid-phrase break yields a line matching neither original, which exact-line diffing would read as new text and block a second time. An edit whose comment words are all present in the text it replaces passes, so complying with the line-break instruction ends the exchange instead of restarting it.
 - **Non-code files** — Markdown, text, config: no firing. It keys off code file extensions (Go, TS/JS, Python, Rust, Java, and the rest of the C-style family).
 - **Shebangs** and **comment markers inside strings** (e.g. a `https://` URL) — by design it matches whole comment lines, not trailing tokens, to keep false positives low.
 

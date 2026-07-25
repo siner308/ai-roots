@@ -5,6 +5,7 @@ Detects comment lines newly added by the edit and, when found, demands a per-lin
 A resident prose rule competes with everything else in context and loses; this fires only on edits that actually add comments, so it re-primes the rule exactly when it matters.
 It emits decision:"block" so the verdict is a prompt the model must answer, not background context it can skim past — an earlier additionalContext version proved too easy to ignore.
 """
+import collections
 import json
 import sys
 
@@ -34,6 +35,10 @@ def is_comment_line(line, ext):
 
 def comment_lines(text, ext):
     return [raw.strip() for raw in text.splitlines() if is_comment_line(raw, ext)]
+
+
+def comment_words(lines):
+    return collections.Counter(w for line in lines for w in line.split())
 
 
 def has_multiline_comment(text, ext):
@@ -80,6 +85,10 @@ def main():
             old.remove(line)
         else:
             added.append(line)
+
+    # Re-joining a comment this hook flagged for a mid-phrase break produces a line matching neither original, so exact-line diffing would report the author's own fix as new text and block a second time.
+    if added and comment_words(added) <= comment_words(old):
+        return 0
 
     if not added:
         return 0
