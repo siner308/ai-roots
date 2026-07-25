@@ -11,6 +11,8 @@ import json
 import re
 import sys
 
+from hook_lang import localize
+
 TERMINAL = re.compile(r'[.!?:;…。！？](["\')\]`*_」』]*)$')
 NEW_BLOCK = re.compile(r'^\s*(#|[-*+]\s|\d+\.\s|>|\||```|~~~|---\s*$)')
 STRUCTURAL = re.compile(r'^\s*(#|\||```|~~~|---\s*$)')
@@ -141,7 +143,7 @@ def main():
 
     print(json.dumps({
         "decision": "block",
-        "reason": "prose-discipline:\n\n" + "\n\n".join(parts),
+        "reason": localize("prose-discipline:\n\n" + "\n\n".join(parts)),
     }))
     return 0
 

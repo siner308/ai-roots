@@ -8,6 +8,8 @@ It emits decision:"block" so the verdict is a prompt the model must answer, not 
 import json
 import sys
 
+from hook_lang import localize
+
 # Full-line comment openers per language family.
 # Trailing comments are NOT matched on purpose — `"http://..."` and `url // x` produce too many false positives, and the dominant over-commenting habit is whole comment lines (explanatory lines above code, doc comments, docstrings) anyway.
 C_STYLE = {".go", ".c", ".cc", ".cpp", ".h", ".hpp", ".java", ".js", ".jsx",
@@ -112,7 +114,7 @@ def main():
         )
     print(json.dumps({
         "decision": "block",
-        "reason": msg,
+        "reason": localize(msg),
     }))
     return 0
 

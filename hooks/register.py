@@ -14,6 +14,8 @@ import shutil
 import sys
 import time
 
+SUPPORT_MODULES = ["hook_lang.py"]
+
 
 def relink(src, dst):
     if os.path.islink(dst):
@@ -35,10 +37,16 @@ def main():
         relink(src, dst)
         print(f"linked hook: {src} -> {dst}")
 
+    # Not hooks, so absent from the manifest — but they must sit beside the scripts that import them, and the prune below reaps any repo-owned link it does not recognize.
+    for support in SUPPORT_MODULES:
+        src, dst = os.path.join(hooks_src, support), os.path.join(hooks_dst, support)
+        relink(src, dst)
+        print(f"linked hook support: {src} -> {dst}")
+
     # Only links resolving into the repo are removed — never a user's own.
     # Record what we pruned so the settings cleanup can key on provenance, not on a bare missing-file test that would also reap a user's own dead registration.
     repo = os.path.dirname(os.path.abspath(hooks_src))
-    managed = {e["script"] for e in manifest}
+    managed = {e["script"] for e in manifest} | set(SUPPORT_MODULES)
     pruned_scripts = set()
     for name in sorted(os.listdir(hooks_dst)):
         link = os.path.join(hooks_dst, name)

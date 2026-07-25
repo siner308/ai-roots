@@ -11,6 +11,8 @@ import os
 import re
 import sys
 
+from hook_lang import localize
+
 SENTENCE_END = re.compile(r'[.!?…。！？](?=\s|$)')
 SENTENCE_GATE = 8
 STATE_PATH = os.path.expanduser("~/.claude/.ai-roots/fact-check")
@@ -108,7 +110,7 @@ def main():
     text = last_assistant_text(data.get("transcript_path", ""))
     if sentence_count(text) < gate:
         return 0
-    print(json.dumps({"decision": "block", "reason": AUDIT}))
+    print(json.dumps({"decision": "block", "reason": localize(AUDIT)}))
     return 0
 
 
