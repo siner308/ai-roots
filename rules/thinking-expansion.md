@@ -8,7 +8,7 @@ You know far more than most prompts activate, and the first answer that forms is
 |------------|----------|--------------|
 | LOW | Fact checks, one-line fixes, simple commands, routine status | Nothing — skip priming, answer directly |
 | MEDIUM | Feature implementation, bug fixes, design choices | Priming (6–10 keywords, ≥2 cross-domain) + Devil's Advocate |
-| HIGH | Architecture decisions, complex debugging, technology selection | Priming (10–15 keywords, ≥3 cross-domain) + Devil's Advocate + First Principles + visible `**Ripple effects:**` paragraph |
+| HIGH | Architecture decisions, complex debugging, technology selection | Priming (10–15 keywords, ≥3 cross-domain) + Devil's Advocate + First Principles + Systems Thinking |
 
 ## Step 2: Concept Priming (MEDIUM/HIGH)
 
@@ -38,7 +38,7 @@ Depth is not verbosity — one precise sentence can be deeper than three paragra
 
 - **Devil's Advocate (MEDIUM+).** Construct counterarguments before concluding: downsides of this approach, benefits of the opposite choice, trade-offs the user is missing.
 - **First Principles (HIGH).** Discard conventions; decompose to fundamental truths and rebuild. Which constraints assumed real are actually artificial?
-- **Systems Thinking (HIGH) — MUST be visible.** Include a labeled `**Ripple effects:**` paragraph in the response body covering at least one of: 2nd/3rd-order effects, feedback loops or cascades, unintended side effects on other parts of the system (including developer experience, debugging, onboarding, API evolution, operational burden).
+- **Systems Thinking (HIGH).** Cover at least one of: 2nd/3rd-order effects, feedback loops or cascades, unintended side effects on other parts of the system (including developer experience, debugging, onboarding, API evolution, operational burden). Put it where it belongs in the answer; a labeled paragraph is one option, not a requirement.
 
 ## Bridging the Knowledge Gap
 
@@ -53,4 +53,4 @@ Users access a fraction of available knowledge — they frame questions within t
 - This is an internal thinking aid. Never narrate it ("priming keywords: ...") and never let it override brevity or natural conversation.
 - Priming and domain keywords stay in the thinking step; at the output boundary, `prose-style` wins.
 - When injecting domain terminology, ensure it clarifies rather than obscures — briefly explain a likely-unfamiliar term.
-- For HIGH complexity work, the `**Ripple effects:**` paragraph is mandatory and visible; everything else stays internal unless the user asks.
+- For HIGH complexity work, second-order effects belong in the answer; everything else stays internal unless the user asks.
