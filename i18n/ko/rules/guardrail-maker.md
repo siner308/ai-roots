@@ -68,16 +68,6 @@ Guardrail proposal: "[one-line rule]" — save to [location]?
 
 ## 배치 결정
 
-| Signal | Location | Rationale |
-|--------|----------|-----------|
-| 상시 원칙 (사실상 매 턴을 깎음) | `ai-roots/rules/` | `~/.claude/rules/ai-roots/`로 심링크됨, 매 세션 상주 |
-| 상황별 원칙이나 교훈 (특정 작업 맥락에서만 적용) | `ai-roots/skills/<name>/SKILL.md` + `rules/_situational-skills.md`의 트리거 행 | lazy 로딩 skill — 트리거가 걸릴 때만 본문이 context에 들어와 상주 세트를 작게 유지 |
-| 프로젝트별 컨벤션 | Project `CLAUDE.md` | 프로젝트 단위로 로드됨 |
-| 프로젝트별, 독립 주제 | Project `.claude/rules/` | 모듈식, CLAUDE.md가 비대해지는 걸 막음 |
-| 기존 규칙을 업데이트 | 기존과 같은 파일 | 파편화를 막음 |
-
-**Always-on rules vs situational skills:** 규칙이 `rules/`에 속하려면 사실상 매 턴 사고나 출력을 깎아야 한다 (어떻게 추론·작성·명명·주석하는지). 특정 작업 유형이 나올 때만 적용된다면 — CSS, PR, Codex, 병렬화, 또는 구체적인 디버깅 교훈 — `skills/<name>/SKILL.md` 아래 skill로 만들고 `rules/_situational-skills.md`에 트리거 행을 추가하라. "X 해봤는데 Z 때문에 Y가 더 낫더라" 류 교훈은 본질상 상황별이라, 이제는 상주 규칙이 아니라 skill이다. 상시 → rule, 상황별 → skill.
-
 **Writing location:** `~/.claude/rules/ai-roots`는 이 저장소의 `rules/` 디렉터리로 가는 심링크다. `readlink -f ~/.claude/rules/ai-roots`로 실제 repo 경로를 풀고, 상주 규칙은 git이 추적하는 실제 트리(`rules/...`)에 써라 — 절대 `~/.claude/rules/ai-roots/...`에 직접 쓰지 마라. 심링크는 헷갈리기 쉽고 정본은 git repo이기 때문이다. 상황별 skill은 같은 repo의 `skills/<name>/SKILL.md`에 두고(각각 `name`과 트리거 중심 `description`을 담은 YAML frontmatter가 필요하다), `install.sh`를 다시 돌리면 `~/.claude/skills/`로 심링크된다.
 
 scope가 불확실하면, 이 규칙이 다른 프로젝트에도 적용되는지 사용자에게 물어라.
