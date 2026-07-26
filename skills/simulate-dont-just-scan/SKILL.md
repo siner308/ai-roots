@@ -1,6 +1,6 @@
 ---
 name: simulate-dont-just-scan
-description: "Apply when porting, debugging, or implementing against code you have read but not executed — to mentally run the code with concrete inputs and predict the actual runtime output, DOM, response, data shape, or side effect, rather than assuming that reading the source equals understanding its behavior."
+description: "Apply whenever you port, translate, or rewrite code between languages or frameworks, or answer a question about what existing code does at runtime — before presenting the result, run it in your head on concrete inputs and state what it actually returns, including the edge inputs where the two versions diverge. Reading the source is not the same as knowing its behavior."
 ---
 
 # Simulate, Don't Just Scan

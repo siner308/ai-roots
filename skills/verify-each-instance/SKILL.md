@@ -1,6 +1,6 @@
 ---
 name: verify-each-instance
-description: "Apply when work is repetitive and pattern-matching tempts you to stamp every item the same way — porting or replicating from a source (codebase, schema, document, dataset), batch edits or find-replace across many sites, or triaging/classifying/reviewing a list where the first few set an expectation. Covers treating recurrence as a hypothesis to verify per case, building from the source's actual facts rather than a generic template, and surfacing the instances that differ."
+description: "Apply whenever a request hands you three or more items to process the same way — a list of fields, env vars, endpoints, records, files, or test cases to document, convert, migrate, classify, or review; a batch edit or find-replace across many sites; or porting a set of things from a source (codebase, schema, document, dataset). The count is the trigger, before you judge whether the items look uniform. Covers treating recurrence as a hypothesis to check per item, building each from the source's actual facts rather than a template, and calling out the ones that differ."
 ---
 
 # Verify Each Instance — Recurrence Is a Hypothesis, Not a License

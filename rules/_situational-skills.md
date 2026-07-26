@@ -13,11 +13,11 @@ This index is the resident half: it stays loaded so the *trigger* is never forgo
 | A problem has multiple plausible causes across layers, or output must pass multiple independent judgment criteria | `parallel-hypothesis-investigation` |
 | Delegating to the OpenAI Codex CLI — rescue debugging, cross-provider review, current-docs research, or bounded implementation (Codex on `PATH`) | `codex-delegation` |
 | Task outcome is uncertain — external API, browser automation, shell escaping, unfamiliar library, data pipeline | `incremental-verification` |
-| Porting, debugging, or implementing against code you have read but not run | `simulate-dont-just-scan` |
+| Porting or rewriting code between languages/frameworks, or answering what existing code does at runtime | `simulate-dont-just-scan` |
 | A long-running task runs in the background and the user needs completion or progress visibility — or you are tempted to monitor a subprocess via tmux split panes, sentinel strings, or a foreground tail/grep loop | `background-task-monitoring` |
 | Browsing the web, extracting page content, scraping data, or fetching figures from sites — including when agent-browser returns blocked/empty/dynamic content and you are tempted to retry with another engine or guess sibling URLs | `web-research` |
 | About to save a memory entry, or weighing whether a fact belongs in memory vs a version-controlled surface (rule, `CLAUDE.md`, project doc) | `memory-minimalism` |
-| Repetitive work that tempts autopilot — porting or replicating from a source, batch edits across many sites, or triaging a list where the first few set the pattern | `verify-each-instance` |
+| A request hands you three or more items to process the same way — fields, env vars, endpoints, records, files, test cases — or a batch edit across many sites. The count triggers it, not how uniform the items look | `verify-each-instance` |
 | Deciding whether to coach the user toward a more effective request after a repeated vague ask, missing upfront context, or a solution-first request cost time | `user-growth-coaching` |
 
 ## Rules
