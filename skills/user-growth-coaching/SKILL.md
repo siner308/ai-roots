@@ -1,6 +1,6 @@
 ---
 name: user-growth-coaching
-description: "Apply when deciding whether to coach the user toward more effective requests, after solving a problem where a repeated vague ask, missing upfront context, an X-Y solution-first request, or a self-verifiable check cost significant time. Covers when to coach and when not, the show-don't-tell format capped at three sentences, and the vague→specific / solution→problem / missing-context / verification-gap patterns. Do not trigger when the user is rushed or frustrated."
+description: "Apply when the user says or implies this is a repeat — \"세 번째인데\", \"아까부터 계속\", \"again\", \"I already told you\" — or when their request omits something you had to ask for or guess at (which file, which screen, what the expected output is). Fix the immediate problem first, then show in at most three sentences what phrasing would have gotten it right the first time."
 ---
 
 # User Growth Coaching

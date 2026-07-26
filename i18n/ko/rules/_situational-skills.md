@@ -12,13 +12,13 @@
 | sequential vs subagent vs team, inline vs subagent, foreground vs background 선택 | `parallel-execution-modes` |
 | 문제 원인이 여러 계층에 걸쳐 그럴듯한 후보가 여럿이거나, 출력이 여러 독립 판단 기준을 통과해야 할 때 | `parallel-hypothesis-investigation` |
 | OpenAI Codex CLI 위임 — rescue 디버깅, cross-provider 리뷰, 최신 문서 리서치, 범위가 정해진 구현 (Codex가 `PATH`에 있을 때) | `codex-delegation` |
-| 작업 결과가 불확실 — 외부 API, 브라우저 자동화, 셸 escaping, 낯선 라이브러리, 데이터 파이프라인 | `incremental-verification` |
+| 여기서 볼 수 없는 대상을 상대로 코드를 쓸 때 — 외부 API, browser, 까다로운 shell 따옴표, 낯선 library, 데이터 pipeline | `incremental-verification` |
 | 언어·프레임워크 사이로 코드를 포팅·재작성하거나, 기존 코드가 런타임에 뭘 하는지 답할 때 | `simulate-dont-just-scan` |
 | 장시간 작업이 백그라운드로 돌고 사용자가 완료나 진행 상황을 봐야 할 때 — 또는 서브프로세스를 tmux split pane, sentinel 문자열, foreground tail/grep 루프로 감시하고 싶은 충동 | `background-task-monitoring` |
 | 웹을 둘러보거나, 페이지 내용을 추출하거나, 데이터를 긁거나, 사이트에서 수치를 가져올 때 — agent-browser가 차단된/빈/동적 내용을 돌려줘서 다른 엔진으로 재시도하거나 형제 URL을 추측하고 싶은 충동이 들 때 포함 | `web-research` |
 | memory 항목을 저장하려 하거나, 어떤 사실이 memory에 속하는지 버전 관리되는 표면(rule, `CLAUDE.md`, 프로젝트 문서)에 속하는지 판단할 때 | `memory-minimalism` |
 | 요청이 같은 방식으로 처리할 항목을 셋 이상 건넬 때 — 필드, 환경변수, endpoint, 레코드, 파일, 테스트 케이스 — 또는 여러 곳에 걸친 batch 편집. 항목이 균일해 보이는지가 아니라 개수가 트리거다 | `verify-each-instance` |
-| 반복된 모호한 요청·처음에 빠진 맥락·해결책부터 콕 집은 요청이 시간을 잡아먹은 뒤, 사용자를 더 효과적인 요청으로 코칭할지 판단할 때 | `user-growth-coaching` |
+| 사용자가 반복임을 말하거나 내비칠 때("또", "세 번째인데"), 또는 요청에 빠진 게 있어 되묻거나 짐작해야 했을 때 | `user-growth-coaching` |
 
 ## 규칙
 

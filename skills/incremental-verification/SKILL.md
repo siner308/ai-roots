@@ -1,6 +1,6 @@
 ---
 name: incremental-verification
-description: "Apply when a task outcome is uncertain — external APIs, browser automation, shell escaping, unfamiliar libraries, or data pipelines. Break the work into the smallest verifiable steps and confirm each step's actual output before building the next, instead of writing a full script and running it at scale."
+description: "Apply whenever you write code that talks to something you cannot see from here — an external API, a browser, a shell command with tricky quoting, an unfamiliar library, or a data pipeline. Run the smallest piece first and look at its real output before building the next piece on top of it; do not write the whole script and run it at scale."
 ---
 
 # Incremental Verification for Uncertain Work
