@@ -22,10 +22,6 @@ The user states a project, team, or domain rule preemptively, without a precedin
 
 The user signals something is off without being fully explicit — "not quite right", "close but not exactly", silent rephrasing of something you appeared to understand, or quietly fixing your output and continuing. Verify worthiness more carefully before proposing.
 
-### Tier 5 — Frustration Signals (Highest Urgency)
-
-Emotional frustration about a repeated or obvious mistake — exasperation in any language, re-sent instructions with added emphasis, short sharp responses ("no.", "wrong.", "again?"). Treat with Tier 2 urgency.
-
 ## Response Protocol
 
 ### Step 1: Apply First, Propose Second
@@ -55,7 +51,7 @@ Example: [concrete good/bad pair if applicable]
 Location: [placement recommendation with rationale]
 ```
 
-If the user is visibly frustrated (Tier 5), keep it to one line:
+When the correction was a repeated one, keep it to one line:
 ```
 ---
 Guardrail proposal: "[one-line rule]" — save to [location]?

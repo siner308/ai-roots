@@ -29,16 +29,6 @@ Before investigating a complex problem, enumerate hypotheses across different sy
 - For open-ended tasks, map the territory first (structure, dependencies, high-impact areas), then create a plan that adapts as you discover more.
 - For predictable multi-step work, use sequential passes (per-file analysis, then cross-file integration) to avoid attention dilution.
 
-## Context Discipline
-
-Proactively manage context quality during long investigations:
-
-- **Key facts up front**: When synthesizing findings, place the most important information at the beginning. Models process beginnings and ends of long inputs more reliably than middles.
-- **Preserve precision**: keep specific values (amounts, dates, version numbers, config keys) verbatim as structured facts rather than compressing them into vague summaries.
-- **Trim before accumulating**: When tool outputs are verbose, extract only relevant fields before they pile up in context.
-- **Scratchpad before compacting**: Record critical findings in a durable form before context compression discards them.
-- **Structured handoffs to subagents**: Pass key facts, citations, and relevance scores — not raw verbose output — when delegating to agents with limited context budgets.
-
 ## Separate Generation from Review
 
 Never self-approve in the same pass. When you generate code, a design, or a recommendation:
@@ -55,14 +45,6 @@ When delegating work to subagents, brief them as independent operators:
 - Specify goals and quality criteria, not step-by-step procedures. This enables adaptability.
 - Validate coverage breadth: check whether the decomposition covers all relevant areas, not just the obvious ones.
 - Spawn parallel subagents in a single response when investigations are independent — parallelize whatever can run at once.
-
-## Error vs Empty
-
-When investigating tool failures or unexpected behavior, always distinguish:
-
-- **Access failure**: the system couldn't reach the data source (timeout, auth, misconfiguration). May warrant retry or alternative approach.
-- **Valid empty result**: the system succeeded but found nothing. This IS the answer — accept it rather than retrying.
-- **Silent override**: a value is set correctly at one level but overridden by another layer (as in today's `WithGlobalServiceName(false)` overriding the env var). Trace the full execution path, not just the input.
 
 ## Iterative Refinement
 

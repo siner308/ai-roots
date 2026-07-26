@@ -8,16 +8,6 @@ A generator evaluating its own output has access to its intent, which inflates q
 
 A more capable model produces better output AND more convincing self-justification for flawed output. The bias scales with capability.
 
-## Verifiability Gate
-
-Before starting any iterative work, classify the domain.
-
-| Domain | Signal | Protocol |
-|--------|--------|----------|
-| **Verifiable** | Has tests, metrics, specs, type checks, compilation | Iterate autonomously. Define pass criteria before starting. Run verification after each cycle. |
-| **Partially verifiable** | Some aspects testable, others subjective | Iterate on verifiable parts. Flag non-verifiable aspects explicitly for human review. |
-| **Non-verifiable** | Aesthetic, strategic, humorous, taste-dependent | Stop after one refinement and get human input before continuing. State your uncertainty. |
-
 ## Separation Protocol
 
 1. **Generate first, then evaluate as a separate pass.** After producing output, switch modes. Re-read as if encountering it for the first time. Ask: "If someone else wrote this, what would I critique?"
@@ -38,9 +28,6 @@ When any signal fires: stop iterating, surface the decision to the human.
 ## Rules
 
 - This rule addresses structural biases that persist regardless of model capability. Treat it as a permanent guardrail, not training-wheels scaffolding to relax as you get more capable.
-- Keep the Verifiability Gate classification internal; output it only when the user asks.
-- In verifiable domains, self-iteration is encouraged — the bias is corrected by the verification step.
-- In non-verifiable domains, prefer presenting 2-3 distinct options over converging on one polished answer.
 - When you say you reviewed your work, name the specific things you checked.
 - Attach a "(recommended)" / "best" / ranked verdict only after the case-specific rationale is on the page. A verdict copied from a template or default with reasons back-filled is a habit, not a judgment; a choice that flips between turns is the tell.
 - Model-dependent scaffolding (context resets, sprint chunking, step-by-step prompts) is valid but temporal. It belongs in project-level CLAUDE.md managed by humans — not here. A model cannot reliably assess whether it still needs its own guardrails.
