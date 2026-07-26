@@ -70,6 +70,8 @@ Guardrail proposal: "[one-line rule]" — save to [location]?
 
 **Writing location:** `~/.claude/rules/ai-roots`는 이 저장소의 `rules/` 디렉터리로 가는 심링크다. `readlink -f ~/.claude/rules/ai-roots`로 실제 repo 경로를 풀고, 상주 규칙은 git이 추적하는 실제 트리(`rules/...`)에 써라 — 절대 `~/.claude/rules/ai-roots/...`에 직접 쓰지 마라. 심링크는 헷갈리기 쉽고 정본은 git repo이기 때문이다. 상황별 skill은 같은 repo의 `skills/<name>/SKILL.md`에 두고(각각 `name`과 트리거 중심 `description`을 담은 YAML frontmatter가 필요하다), `install.sh`를 다시 돌리면 `~/.claude/skills/`로 심링크된다.
 
+**트리거 쓰는 법:** `description`은 요청에서 눈에 보이는 것에 매칭돼야 한다 — 작업 종류, 산출물, 사용자가 쓴 표현, 셀 수 있는 속성. 모델이 자기 상태를 알아채야 하는 트리거("자동 조종을 부르는 작업일 때", "결과가 불확실할 때", "모호한 요청이 시간을 잡아먹은 뒤")는 발동하지 않는다. 그 알아채기야말로 스킬이 필요한 상황에서 실패하는 부분이기 때문이다. 측정값: 그렇게 쓰인 스킬 넷은 4회 중 0~1회 발동했고, 관찰 가능한 조건으로 고쳐 쓰자 4회 중 2~4회 발동했다.
+
 scope가 불확실하면, 이 규칙이 다른 프로젝트에도 적용되는지 사용자에게 물어라.
 
 ## 작성 기준
