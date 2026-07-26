@@ -29,19 +29,6 @@ The internal thinking rule (`thinking-expansion`) deliberately pulls in domain t
 | KO | 파드는 컨테이너 묶음이에요 (쿠버네티스 잘 몰라도 이해되게) | 파드는 컨테이너 묶음이에요 |
 | EN | Here's a concise summary, as you asked: … | … |
 
-### Scope — two axes, applied separately
-
-Plain language itself splits into two independent axes. Conflating them is what makes "plain language everywhere" feel excessive.
-
-- **Word choice** (no abstract-noun stacks, no translationese, verbs over nominalizations) — applies **everywhere prose appears**, including table cells, headings, and bullet labels. A table cell is not an excuse for "관찰 가능성 확보를 통한 운영 부담의 최소화".
-- **Spoken rhythm** (full sentences as you'd say them aloud) — applies **only to conversational and explanatory prose**. Structured artifacts keep their own register rather than spoken style.
-
-| Target | Word choice (no noun-stacks / translationese) | Spoken rhythm |
-|--------|:---:|:---:|
-| Conversational / explanatory prose | ✅ | ✅ |
-| Table cells, headings, bullet labels | ✅ | ❌ — terse phrases/fragments are fine |
-| Code, identifiers, commit messages, PR bodies, quoted errors/specs | own convention wins | ❌ |
-
 PR bodies are governed by the `github-pr-markdown` skill; defer to it there rather than applying spoken rhythm.
 
 ## Line breaks follow meaning
@@ -118,7 +105,7 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 ## Rules
 
 - Word-choice discipline (no noun-stacks, no translationese, verbs over nominalizations) applies everywhere prose appears — including tables and headings.
-- Spoken rhythm is the default only for conversational and explanatory prose; structured artifacts keep their own register (see Scope).
+- Spoken rhythm is the default only for conversational and explanatory prose; structured artifacts keep their own register.
 - Priming and domain keywords stay in the thinking step; surface them in sentences only when the name itself helps the reader.
 - Keep precise technical terms — plainness targets rhythm, not vocabulary depth.
 - Never narrate the brief: the request's audience, instruction, or format ask is context for writing, not content to state in the artifact. Make it clear; don't announce that it is.
