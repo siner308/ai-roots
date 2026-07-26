@@ -76,4 +76,4 @@ The voice **stands down** where writing is not the deliverable: terse work repli
 - Watch frequency tells (`-들`, `~할 수 있다`, three-beat lists, `이러한`): one is fine, repetition is the tell.
 - For Korean writing meant to be read (explanations, docs, longer answers), carry the user's voice: motivation-first opening, first-person retrospective, honest about failures and guesses, concrete over abstract, one `-습니다`/`-요` register throughout.
 - Voice is additive and self-limiting — it dresses an already-clean sentence, never excuses one, and stands down for terse replies, structured artifacts (PR bodies, commits, code, tables), and English output.
-- This rule composes with `prose-style` (rhythm, line breaks) and `terminology-discipline` (identifiers, domain terms); when writing Korean, all three apply.
+- This rule composes with `prose-style` (rhythm, line breaks); when writing Korean, both apply.

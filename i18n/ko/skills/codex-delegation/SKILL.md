@@ -20,7 +20,7 @@ Cross-provider 위임은 세 가지 목적에 쓰인다:
 
 Codex 작업은 두 갈래로 들어온다. 요청된 방식에 맞춰 진입점을 고른다.
 
-**리뷰 → 항상 `/review` 스킬.** 리뷰 부류 작업은 모두 `/review`(`skills/review/SKILL.md`)를 쓴다: 하나의 공유 산출물을 결정한 뒤 Claude subagent와 Codex 실행을 그 산출물에 병렬로 띄우고 evaluation-integrity.md §Multi-advisor synthesis에 따라 종합한다. 리뷰의 단일 진입점이다 — 항상 이걸 거치고, `codex review`나 `/codex:review`를 직접 부르지 않는다.
+**리뷰 → 항상 `/review` 스킬.** 리뷰 부류 작업은 모두 `/review`(`skills/review/SKILL.md`)를 쓴다: 하나의 공유 산출물을 결정한 뒤 Claude subagent와 Codex 실행을 그 산출물에 병렬로 띄우고 `review` 스킬 §4 Synthesis에 따라 종합한다. 리뷰의 단일 진입점이다 — 항상 이걸 거치고, `codex review`나 `/codex:review`를 직접 부르지 않는다.
 
 **그 외 → "이거 codex로 해줘" 자연어 위임.** intent에 맞춰 신뢰 가능한 호출로 매핑한다. 세 경로 모두 codex-cli 0.128에서 검증됨:
 

@@ -1,6 +1,6 @@
 ---
 name: review
-description: "[ai-roots] 무엇이든 리뷰하는 두 평가자 리뷰 — 코드 변경, Claude가 방금 만든 plan·설계, 문서, config, 그 외 리뷰 가능한 무엇이든. 자연어 요청에서 산출물 종류를 판별하고, 두 평가자가 동일하게 접근할 하나의 구체적 산출물(git diff, 파일, 또는 temp 파일로 고정한 인라인 텍스트)로 결정한 뒤, 그 동일한 산출물에 대해 Claude Code subagent와 Codex를 종류별 기준으로 병렬 실행하고 rules/evaluation-integrity.md §Multi-advisor synthesis의 Agreed / Conflicting / Chosen-direction 포맷으로 종합한다. 대기 중인 코드, plan, 문서, 그 외 산출물의 리뷰를 요청하고 Claude와 Codex가 둘 다 있을 때 사용한다."
+description: "[ai-roots] 무엇이든 리뷰하는 두 평가자 리뷰 — 코드 변경, Claude가 방금 만든 plan·설계, 문서, config, 그 외 리뷰 가능한 무엇이든. 자연어 요청에서 산출물 종류를 판별하고, 두 평가자가 동일하게 접근할 하나의 구체적 산출물(git diff, 파일, 또는 temp 파일로 고정한 인라인 텍스트)로 결정한 뒤, 그 동일한 산출물에 대해 Claude Code subagent와 Codex를 종류별 기준으로 병렬 실행하고 Agreed / Conflicting / Chosen-direction 포맷으로 종합한다. 대기 중인 코드, plan, 문서, 그 외 산출물의 리뷰를 요청하고 Claude와 Codex가 둘 다 있을 때 사용한다."
 ---
 
 # /review (ai-roots)
@@ -194,7 +194,7 @@ Agent 호출과 백그라운드 Bash 호출을 같은 응답에서 띄워 동시
 
 ## 4. 종합
 
-`rules/evaluation-integrity.md` §Multi-advisor synthesis를 적용한다. 출력은 세 버킷으로 반드시 나눈다:
+출력은 세 버킷으로 반드시 나눈다:
 
 1. **Agreed** — 두 평가자에 모두 나온 발견. 신뢰도 최고.
 2. **Conflicting** — 한 평가자만 짚었거나, 심각도/원인/수정에서 갈린 발견. 한 평가자만의 발견은 Agreed가 아니라 여기. 침묵은 동의가 아니다.

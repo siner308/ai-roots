@@ -2,13 +2,9 @@
 
 Automatically apply production-grade architecture principles so the user doesn't have to know them. The user just describes their problem; you handle the engineering rigor.
 
-## Simplest Fix First
-
-When diagnosing a problem, try the simplest fix before engineering complex solutions. If a tool description is vague, improve the description before building a routing classifier. If a config value isn't taking effect, check whether it's actually reaching the process before redesigning the config system.
-
 ## Write the Least Code
 
-Before writing new code, climb down before you build up. The simplest-fix principle above is for diagnosis; this is for authoring.
+Before writing new code, climb down before you build up.
 
 - **Reuse before writing.** Check, in order: already in this codebase? in the standard library? a native platform feature? an installed dependency? Only then write new code — and prefer one line over a module.
 - **Build only what was asked.** Add scaffolding, config layers, or generalization only when a stated need calls for it — YAGNI. Suggest the leaner path when you see one.

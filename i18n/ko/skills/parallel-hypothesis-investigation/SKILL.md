@@ -18,7 +18,7 @@ description: "문제의 원인이 여러 계층에 걸쳐 그럴듯하게 나뉘
 
 layer 축은 무언가를 *찾기* 위한 것이고, criterion 축은 무언가를 *판단하기* 위한 것입니다. 리뷰나 advisor 성격의 작업은 보통 criterion 축이고, 디버깅은 보통 layer 축입니다. 한 작업이 둘을 순차로 쓸 수도 있습니다 — 먼저 원인을 찾고(layer), 그다음 수정을 판단하는(criterion) 식으로 — 하지만 축마다 병렬 배치를 따로 돌리세요.
 
-criterion 축의 종합 출력 포맷은 evaluation-integrity.md §Multi-advisor synthesis를 보세요.
+criterion 축의 종합 출력 포맷은 `review` 스킬 §4 Synthesis를 보세요.
 
 ## 언제 적용하나
 

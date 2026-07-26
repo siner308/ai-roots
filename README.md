@@ -46,7 +46,6 @@ This keeps the always-loaded set a fraction of the full corpus while preserving 
 |------|-------------|
 | `rules/prose-style.md` | Plain spoken-rhythm language (no noun-stacks, no translationese, verbs over nominalizations) and line breaks that fall at meaning boundaries, not the column limit |
 | `rules/korean-style.md` | Natural Korean output: the AI-Korean tells (comma habits, transliterated loanwords, translationese, sentence rhythm), judged by ear rather than token-matching |
-| `rules/terminology-discipline.md` | Spell out domain terms; expand established abbreviations on first use; disambiguate collision-prone ones |
 | `rules/comment-discipline.md` | Default to no comments; a comment or docstring is never mandatory. Write one only when it's on a closed allowlist (non-obvious WHY). Enforced by the `comment-discipline.py` `PostToolUse` hook |
 
 ### Trigger index

@@ -19,7 +19,7 @@ The first two motivate reliability routing; the third motivates capability routi
 
 Codex work arrives two ways. Match the entry point to how it was requested.
 
-**Review → the `/review` skill, always.** For any review-class work use `/review` (`skills/review/SKILL.md`): it resolves one shared artifact, runs a Claude subagent and a Codex run in parallel on it, and synthesizes per evaluation-integrity.md §Multi-advisor synthesis. This is the single review entry point — always go through it, not `codex review` or `/codex:review` directly.
+**Review → the `/review` skill, always.** For any review-class work use `/review` (`skills/review/SKILL.md`): it resolves one shared artifact, runs a Claude subagent and a Codex run in parallel on it, and synthesizes per the `review` skill §4 Synthesis. This is the single review entry point — always go through it, not `codex review` or `/codex:review` directly.
 
 **Anything else → a natural-language "delegate this to Codex" request.** Map it to a reliable invocation by intent. All three paths are verified on codex-cli 0.128:
 

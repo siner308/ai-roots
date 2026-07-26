@@ -44,7 +44,6 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 |------|------|
 | `rules/prose-style.md` | 평이한 구어체 언어(명사 쌓기 금지, 번역투 금지, 명사화보다 동사)와 컬럼 한계가 아니라 의미 경계에서 끊는 줄넘김 |
 | `rules/korean-style.md` | 자연스러운 한국어 출력: AI 한국어 티(쉼표 습관, 음차 외래어, 번역투, 문장 리듬)를 토큰 맞추기가 아니라 귀로 판단 |
-| `rules/terminology-discipline.md` | 도메인 용어는 풀어쓰기; 정착된 약어는 첫 등장 시 확장; 충돌 가능한 약어는 한정어로 구분 |
 | `rules/comment-discipline.md` | 주석은 기본적으로 쓰지 않는다 — 주석/docstring은 필수가 아니며, 닫힌 허용 목록(비자명한 WHY)에 해당할 때만 작성. `comment-discipline.py` `PostToolUse` hook으로 강제 |
 
 ### 트리거 인덱스

@@ -18,7 +18,7 @@ Parallel investigation only pays off when the work decomposes cleanly. Two axes 
 
 The layer axis is for *finding* something; the criterion axis is for *judging* something. Review and advisor-style work is usually criterion-axis; debugging is usually layer-axis. A single task can use both sequentially — first find the cause (layer), then judge the fix (criterion) — but keep each axis to its own parallel batch.
 
-For criterion-axis synthesis output format, see evaluation-integrity.md §Multi-advisor synthesis.
+For criterion-axis synthesis output format, see the `review` skill §4 Synthesis.
 
 ## When to apply
 

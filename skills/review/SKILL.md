@@ -1,6 +1,6 @@
 ---
 name: review
-description: "[ai-roots] Two-evaluator review of any artifact — code changes, a plan or design Claude just produced, a document, a config, or anything reviewable. From a natural-language request it determines the artifact kind, resolves ONE concrete shared artifact (a git diff, a file, or inline text captured to a temp file), then spawns a Claude Code subagent and a Codex run in parallel on that same artifact with kind-appropriate criteria, and synthesizes findings using the Agreed / Conflicting / Chosen-direction format from rules/evaluation-integrity.md §Multi-advisor synthesis. Use whenever the user asks to review pending code, a plan, a document, or any other artifact and both Claude and Codex are available."
+description: "[ai-roots] Two-evaluator review of any artifact — code changes, a plan or design Claude just produced, a document, a config, or anything reviewable. From a natural-language request it determines the artifact kind, resolves ONE concrete shared artifact (a git diff, a file, or inline text captured to a temp file), then spawns a Claude Code subagent and a Codex run in parallel on that same artifact with kind-appropriate criteria, and synthesizes findings using the Agreed / Conflicting / Chosen-direction format. Use whenever the user asks to review pending code, a plan, a document, or any other artifact and both Claude and Codex are available."
 ---
 
 # /review (ai-roots)
@@ -194,7 +194,7 @@ Spawn the Agent call and the background Bash invocation in the same response so 
 
 ## 4. Synthesis
 
-Apply `rules/evaluation-integrity.md` §Multi-advisor synthesis. The output MUST separate three buckets:
+The output MUST separate three buckets:
 
 1. **Agreed** — findings that appeared in BOTH evaluators. Highest confidence.
 2. **Conflicting** — findings flagged by only one evaluator, or where evaluators disagree on severity / cause / fix. Single-evaluator findings belong here, not in Agreed. Silence is not agreement.
