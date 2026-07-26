@@ -10,8 +10,6 @@
 
 - **Abstract-noun stacks** — `-tion`/`-성`/`-화` 명사를 조사나 전치사로 엮은 사슬. EN: "the minimization of operational burden through the acquisition of observability". KO: "관찰 가능성 확보를 통한 운영 부담의 최소화". 둘 다 문장인 척하는 추상명사 네 개다.
 - **Translated-English rhythm** — 동사면 될 자리에 "~을 통한", "~에 대한", "~의 관점에서"를 쌓는 것. 영어를 직역한 것처럼 읽히면, 네가 실제로 할 법한 말로 다시 써라.
-- **Gratuitous concept citation** — 평이한 문장이 같은 요점을 전달하는데도 원칙 이름(Goodhart's Law, backpressure, idempotency)을 갖다 붙이는 것. 개념 이름은 그 이름 자체가 독자에게 값할 때만 인용하고, 장식으로 쓰지 마라.
-- **Density theater** — 정보 있어 *보이려고* 전문용어를 욱여넣는 것. 단어 밀도가 높다고 정보 밀도가 높은 건 아니다.
 - **Narrating the brief** — 시킨 내용을 글에 그대로 옮겨 적는 것: 대상("초보도 이해되게"), 지시("요청하신 대로", "간결하게"), 형식 요구. 누구에게·어떻게 쓰라는 건 글을 쓰는 맥락이지 글에 담을 내용이 아니다 — 글은 그냥 명료하게 *쓰여* 있으면 되지, 명료하다고 *선언*하지 않는다. 강한 AI 티다: 사람이 같은 문서를 쓸 때 자기가 받은 주문을 라벨처럼 붙이는 일은 없다.
 
 ### 대신 할 것

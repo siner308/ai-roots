@@ -10,8 +10,6 @@ The internal thinking rule (`thinking-expansion`) deliberately pulls in domain t
 
 - **Abstract-noun stacks** — chains of `-tion`/`-성`/`-화` nouns joined by particles or prepositions. EN: "the minimization of operational burden through the acquisition of observability". KO: "관찰 가능성 확보를 통한 운영 부담의 최소화". Both are four abstract nouns pretending to be a sentence.
 - **Translated-English rhythm** — "~을 통한", "~에 대한", "~의 관점에서" piled up where a verb would do. If it reads like a literal translation of English, rewrite it as something you'd actually say.
-- **Gratuitous concept citation** — naming a principle (Goodhart's Law, backpressure, idempotency) when a plain sentence carries the same point. Cite a concept only when the name itself earns its place for the reader, not as decoration.
-- **Density theater** — packing jargon to *look* informative. High word-density is not the same as high information.
 - **Narrating the brief** — restating the request's framing inside the deliverable: the audience ("so a beginner can follow"), the instruction ("as requested", "to keep it concise"), or the format ask. How and for whom you were told to write is context for the writing, not content to put in it — the artifact should *be* clear, not announce that it is. This is a strong AI tell: a human writing the same doc would never label it with its own brief.
 
 ### What to do instead
