@@ -1,7 +1,7 @@
 # Grounded Assertions Hook
 
 A `Stop` hook that runs when a turn is about to end.
-When the final response is substantial enough to carry factual claims, it blocks once and asks for a claim-by-claim audit: every material assertion must either point to evidence gathered this session, get verified with a tool right now, or get its uncertainty marker restored.
+When the final response is substantial enough to carry factual claims, it blocks and asks for a claim-by-claim audit: every material assertion must either point to evidence gathered this session, get verified with a tool right now, or get its uncertainty marker restored. A second round then checks that whatever the audit turned up was actually applied, not merely described.
 
 ## Why it exists
 
@@ -21,11 +21,15 @@ On `Stop` it reads the turn's final assistant message from the transcript and, p
 2. **Verifiable now** — verified with a tool before the turn ends, and corrected to match.
 3. **Neither** — its uncertainty marker is restored ("appears to"; in Korean, "~로 보입니다").
 
-`stop_hook_active` caps the loop at one audit round per turn, and the instruction ends with "do not rewrite the rest" so the audit round cannot regenerate the response wholesale.
+Sorting a claim is only half of it: when the check shows the *work* is wrong — the code, the file, the command, the plan, not the sentence describing it — the audit has to fix the work in that turn, or ask the single question the fix turns on. Without that clause the audit satisfies itself by describing broken work accurately, which is the failure this hook was extended to close.
+
+A second round enforces exactly that. Past the first block the hook stops consulting the sentence gate — an audit reply is short by construction, so the gate would silence the follow-up every time — and asks two things about the round just written: is anything it named as wrong still unapplied, and do the claims *it* introduced survive the same three-way sort. A per-turn counter caps the loop (`MAX_ROUNDS`, default 2, raise it with `AI_ROOTS_FACT_CHECK_ROUNDS`), and the instruction says to change what is wrong and leave the rest, so a round cannot regenerate the response wholesale.
+
+The counter lives in `~/.claude/.ai-roots/fact-check-rounds`, keyed by session id plus the uuid of the user message that opened the turn — hook feedback lands in the transcript as an `isMeta` user entry, so it never counts as a new turn and never resets the count. A turn whose count cannot be read while `stop_hook_active` is set bails out instead of blocking, which pins the worst case at the old one-round behavior rather than a loop.
 
 ## What it skips
 
-- Turns whose final message is under the sentence gate — short conversational answers never trigger it.
+- Turns whose final message is under the sentence gate — short conversational answers never trigger it. The gate decides the first round only; once a turn is under audit the follow-up round is not length-gated.
 - Fenced code blocks, which do not count toward the gate.
 - Sidechain (subagent) transcript entries.
 - Anything when `/fact-check off` was run (state in `~/.claude/.ai-roots/fact-check`, read live each turn) or `AI_ROOTS_FACT_CHECK=0` is set — with no configuration the hook is on and the gate does the tuning.
@@ -33,8 +37,8 @@ On `Stop` it reads the turn's final assistant message from the transcript and, p
 
 ## Known limitations (reviewed, accepted)
 
-The gate is a volume heuristic, not a claim detector: a long response with zero factual claims still gets audited (the audit then costs one short round that restates the answer), and a short response full of confident guesses slips under it.
+The gate is a volume heuristic, not a claim detector: a long response with zero factual claims still gets audited, and a short response full of confident guesses slips under it. An audited turn costs two short rounds now, since the follow-up fires whether or not the audit found anything.
 
 The audit closes by answering the user's question again rather than reporting on itself. Its reply lands at the bottom of the screen, below the response it audited, so a bare "nothing to fix" would leave the actual answer scrolled out of view — and saying nothing at all would leave the block message as the last thing visible, which reads as a failed turn.
-The audit round itself is not re-audited — a claim introduced during the audit escapes; one loop is the deliberate ceiling.
+The follow-up round re-audits the audit, but nothing re-audits the follow-up — a claim introduced there still escapes. The ceiling moved out one round; it did not go away.
 Same-context audit means the generator reviews itself; the claim-by-evidence structure narrows but does not eliminate that bias (heavier cross-checking belongs to `/review`).
