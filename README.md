@@ -28,18 +28,15 @@ This keeps the always-loaded set a fraction of the full corpus while preserving 
 | `rules/evaluation-integrity.md` | Self-evaluation bias prevention — verifiability classification, generation/evaluation separation, drift detection |
 | `rules/claude-architect-principles.md` | Auto-apply architect-grade problem solving — enforcement matching, context discipline, generation/review separation |
 | `rules/grounded-assertions.md` | Never state an inference as fact — verify look-up-able claims before asserting them, keep the uncertainty marker otherwise, and sweep every conclusion-bearing draft at finalization |
-| `rules/verify-each-instance.md` | A recurring pattern is a hypothesis, not a license — check each instance against its own facts instead of stamping the template |
 
 ### User Growth
 | File | Description |
 |------|-------------|
-| `rules/user-growth-coaching.md` | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
 
 ### Knowledge Capture
 | File | Description |
 |------|-------------|
 | `rules/guardrail-maker.md` | Auto-detect user corrections as tacit knowledge and propose persistent guardrails to prevent recurring mistakes |
-| `rules/memory-minimalism.md` | Prefer version-controlled rules/docs over the device-local memory system; memory only for strictly personal, non-shareable context |
 
 ### Output Conventions
 | File | Description |
@@ -60,6 +57,9 @@ Body enters context only when invoked via the Skill tool. The trigger column mir
 | Skill | Trigger | Description |
 |-------|---------|-------------|
 | `skills/css-discipline/` | Editing/writing/reviewing CSS or framework styling | Close four commonly abused CSS axes — cascade (`!important`), box model, unit soup, style location |
+| `skills/verify-each-instance/` | A request hands you three or more items to process the same way | A recurring pattern is a hypothesis, not a license — check each instance against its own facts instead of stamping the template |
+| `skills/user-growth-coaching/` | The user signals a repeat, or the request omitted something you had to guess | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
+| `skills/memory-minimalism/` | About to save a memory entry, or weighing memory vs a version-controlled surface | Prefer version-controlled rules/docs over the device-local memory system; memory only for strictly personal, non-shareable context |
 | `skills/github-pr-markdown/` | Composing or editing a PR body/title | Enforce GitHub-flavored Markdown conventions for PRs, plus the safe API-PATCH body delivery |
 | `skills/model-effort-delegation/` | Deciding executor/model/effort before delegating | Threshold-based model/effort/subagent selection — delegate specified work to weaker models, keep judgment on Opus |
 | `skills/parallel-execution-modes/` | Choosing sequential vs subagent vs team, inline vs background | Pick the parallelism mode by task independence and communication needs |
@@ -69,12 +69,15 @@ Body enters context only when invoked via the Skill tool. The trigger column mir
 | `skills/simulate-dont-just-scan/` | Porting/debugging code you read but did not run | Mentally execute code to predict actual runtime output before acting |
 | `skills/background-task-monitoring/` | Long background task needs completion/progress visibility, or tempted to monitor via tmux/sentinel/tail | Pick the cheapest visibility mechanism — completion notification first, event streams second, polling last; includes the tmux-sentinel post-mortem |
 | `skills/web-research/` | Browsing/scraping the web, or a page comes back blocked/empty | agent-browser engine selection, and the block-signal → search fallback (a block on live rendering is bypassed by reading the index, not by a bigger browser) |
+| `skills/fact-check/` | Turning the claim audit on/off or tuning its gate | `/fact-check` — toggles the grounded-assertions Stop hook and its sentence gate |
+| `skills/push-gate/` | Turning the per-push confirmation on/off for a repo | `/push-gate` — toggles the push-gate hook for the current repository |
+| `skills/hook-lang/` | Choosing the language hook messages are relayed in | `/hook-lang` — sets `~/.claude/.ai-roots/lang`; hooks stay English-source and append a relay instruction |
 
 ## Skill — `/review` (ai-roots)
 
 A skill installed under `~/.claude/skills/review/` and invoked as `/review`. Because the skill is not packaged as a Claude Code plugin, the call name carries no `ai-roots:` prefix; the ai-roots origin is signaled by the `[ai-roots]` tag at the start of the skill description, which lets you distinguish it from other `review`-named skills (e.g., Claude Code's built-in `/review`).
 
-It performs a **two-evaluator review of any artifact** — code changes, a plan, a document, a config. From the natural-language request it resolves ONE concrete shared artifact (for code, by default the current branch's changes against its base — the PR diff plus local uncommitted edits; "vs main", "the last commit", "uncommitted", and path mentions narrow it). A Claude Code subagent (`adversarial-reviewer` persona) and a `codex exec --json --sandbox read-only` run evaluate the same artifact in parallel, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format from `rules/evaluation-integrity.md` §Multi-advisor synthesis.
+It performs a **two-evaluator review of any artifact** — code changes, a plan, a document, a config. From the natural-language request it resolves ONE concrete shared artifact (for code, by default the current branch's changes against its base — the PR diff plus local uncommitted edits; "vs main", "the last commit", "uncommitted", and path mentions narrow it). A Claude Code subagent (`adversarial-reviewer` persona) and a `codex exec --json --sandbox read-only` run evaluate the same artifact in parallel, and their findings are synthesized using the Agreed / Conflicting / Chosen-direction format.
 
 | File | Description |
 |------|-------------|

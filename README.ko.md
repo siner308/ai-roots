@@ -31,13 +31,11 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 ### 사용자 성장
 | 파일 | 설명 |
 |------|------|
-| `rules/user-growth-coaching.md` | 문제 해결 후 사용자의 질문 방식을 교정하는 코칭 — 모호한 요청 패턴을 구체적 요청으로 유도 |
 
 ### 지식 포착
 | 파일 | 설명 |
 |------|------|
 | `rules/guardrail-maker.md` | 사용자의 교정을 암묵지로 자동 감지하고, 같은 실수를 반복하지 않도록 가드레일 생성을 제안 |
-| `rules/memory-minimalism.md` | 기기 로컬 memory보다 버전 관리되는 rules/docs를 우선; memory는 순수 개인용·공유 불가 맥락에만 |
 
 ### 출력 컨벤션
 | 파일 | 설명 |
@@ -58,6 +56,8 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 | Skill | 트리거 | 설명 |
 |-------|--------|------|
 | `skills/css-discipline/` | CSS·프레임워크 스타일 편집/작성/리뷰 | CSS에서 흔히 남용되는 4가지 축을 닫는다 — 캐스케이드(`!important`), 박스 모델, 단위 혼란, 스타일 위치 |
+| `skills/user-growth-coaching/` | 사용자가 반복임을 내비치거나, 요청에 빠진 걸 짐작해야 했을 때 | 문제 해결 후 사용자의 질문 방식을 교정하는 코칭 — 모호한 요청 패턴을 구체적 요청으로 유도 |
+| `skills/memory-minimalism/` | memory 저장 직전, 또는 memory와 버전 관리 파일 중 어디에 둘지 판단할 때 | 기기 로컬 memory보다 버전 관리되는 rules/docs를 우선; memory는 순수 개인용·공유 불가 맥락에만 |
 | `skills/github-pr-markdown/` | PR 본문/제목 작성·수정 | GitHub PR용 GFM 마크다운 컨벤션 강제 + gh CLI 손상을 피하는 API-PATCH 본문 전달 |
 | `skills/model-effort-delegation/` | 위임 전 executor/모델/effort 결정 | 임계치 기반 모델/effort/subagent 선택 — 명세된 구현은 약한 모델에 위임, 판단은 Opus에 집중 |
 | `skills/parallel-execution-modes/` | 순차/서브에이전트/팀, 인라인/백그라운드 선택 | 작업 독립성과 통신 필요도로 병렬 실행 모드 선택 |
@@ -67,12 +67,15 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 | `skills/simulate-dont-just-scan/` | 읽었지만 실행 안 한 코드 포팅/디버깅 | 실제 실행 결과를 머릿속으로 시뮬레이션한 뒤 행동 |
 | `skills/background-task-monitoring/` | 장시간 백그라운드 작업의 완료·진행 가시성, 또는 tmux/sentinel/tail로 감시하려는 충동 | 가장 저렴한 가시성 메커니즘 선택 — 완료 알림 우선, 이벤트 스트림 다음, 폴링은 최후; tmux-sentinel post-mortem 포함 |
 | `skills/web-research/` | 웹 브라우징/스크래핑, 또는 페이지가 차단/빈 응답으로 올 때 | agent-browser 엔진 선택과 차단 신호 → 검색 fallback (라이브 렌더링에 걸린 차단은 더 센 브라우저가 아니라 인덱스 읽기로 우회) |
+| `skills/fact-check/` | 주장 감사를 켜고 끄거나 게이트를 조정할 때 | `/fact-check` — grounded-assertions Stop hook과 문장 수 게이트를 토글 |
+| `skills/push-gate/` | 레포별 push 확인 게이트를 켜고 끌 때 | `/push-gate` — 현재 레포의 push-gate hook을 토글 |
+| `skills/hook-lang/` | hook 메시지를 전달할 언어를 고를 때 | `/hook-lang` — `~/.claude/.ai-roots/lang` 설정. hook은 영어 원본을 유지하고 전달 지시만 덧붙인다 |
 
 ## Skill — `/review` (ai-roots)
 
 `~/.claude/skills/review/` 아래 설치되며 호출명은 `/review`입니다. 이 스킬은 Claude Code 플러그인으로 패키징되어 있지 않아 호출명에 `ai-roots:` 접두사가 붙지 않습니다. 다른 `review` 계열 스킬(예: Claude Code 빌트인 `/review`)과 구분할 수 있도록 스킬 설명 맨 앞에 `[ai-roots]` 태그가 붙어 있습니다.
 
-**임의의 아티팩트에 대한 두 평가자 리뷰**를 수행합니다 — 코드 변경, plan, 문서, config. 자연어 요청에서 하나의 공유 아티팩트를 결정합니다(코드는 기본이 현재 브랜치와 base 사이의 변경 — PR diff + 로컬 uncommitted 변경 — 이고, "vs main", "마지막 commit", "uncommitted", 경로 언급으로 좁힙니다). Claude Code subagent (`adversarial-reviewer` 페르소나)와 `codex exec --json --sandbox read-only` 실행이 동일한 아티팩트를 병렬로 평가하고, 두 결과를 `rules/evaluation-integrity.md` §Multi-advisor synthesis의 Agreed / Conflicting / Chosen-direction 포맷으로 종합합니다.
+**임의의 아티팩트에 대한 두 평가자 리뷰**를 수행합니다 — 코드 변경, plan, 문서, config. 자연어 요청에서 하나의 공유 아티팩트를 결정합니다(코드는 기본이 현재 브랜치와 base 사이의 변경 — PR diff + 로컬 uncommitted 변경 — 이고, "vs main", "마지막 commit", "uncommitted", 경로 언급으로 좁힙니다). Claude Code subagent (`adversarial-reviewer` 페르소나)와 `codex exec --json --sandbox read-only` 실행이 동일한 아티팩트를 병렬로 평가하고, 두 결과를 Agreed / Conflicting / Chosen-direction 포맷으로 종합합니다.
 
 | 파일 | 설명 |
 |------|------|
