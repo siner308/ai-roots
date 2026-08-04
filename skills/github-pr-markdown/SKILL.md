@@ -50,6 +50,17 @@ The body describes what the merged diff does and why, read from the reviewer's s
 
 Language-level AI tells (noun-stacks, translationese, over-hedging, em-dash add-ons) are governed by `prose-style` and `korean-style`; apply those to the body too.
 
+### Korean bodies — 공손체
+
+A Korean PR body ends its sentences in `-습니다`, not the `-다` 평서체 that generated text defaults to — a PR is addressed to whoever reviews it, and `-다` reads as machine output to them. `korean-style` stands its *voice* down for PR bodies (describe the diff, not the journey); the register still holds.
+
+Only sentences are affected: a bullet that is a noun phrase (`- [ ] apikey 모드 토큰 수 렌더링 확인`) stays as it is, and the title keeps its short noun-phrase or imperative form.
+
+| ❌ | ✅ |
+|----|----|
+| 실패 원인이 보이도록 HTTP status와 body 앞 512바이트를 남긴다 | 실패 원인이 보이도록 HTTP status와 body 앞 512바이트를 남깁니다 |
+| 토큰 수가 비어 보이는 문제를 고쳤다 | 토큰 수가 비어 보이는 문제를 고쳤습니다 |
+
 | Failure | ❌ | ✅ |
 |---|----|----|
 | Describes the journey, not the diff | Summary explains "parses the body for the code instead of branching on status" — behavior the base branch already had, and the rationale for an approach that was reverted | What the diff ships: "surface the HTTP status and first 512 bytes of the body so the failure cause is visible" |
