@@ -12,6 +12,7 @@ This index is the resident half: it stays loaded so the *trigger* is never forgo
 | Choosing sequential vs subagent vs team, or inline vs subagent, or foreground vs background | `parallel-execution-modes` |
 | A problem has multiple plausible causes across layers, or output must pass multiple independent judgment criteria | `parallel-hypothesis-investigation` |
 | Delegating to the OpenAI Codex CLI — rescue debugging, cross-provider review, current-docs research, or bounded implementation (Codex on `PATH`) | `codex-delegation` |
+| The request asks to draw, generate, or make an image, or names a missing `.png`/`.jpg`/`.webp` asset to create (Codex on `PATH`) | `codex-imagegen` |
 | Writing code against something you cannot see from here — external API, browser, tricky shell quoting, unfamiliar library, data pipeline | `incremental-verification` |
 | Porting or rewriting code between languages/frameworks, or answering what existing code does at runtime | `simulate-dont-just-scan` |
 | A long-running task runs in the background and the user needs completion or progress visibility — or you are tempted to monitor a subprocess via tmux split panes, sentinel strings, or a foreground tail/grep loop | `background-task-monitoring` |

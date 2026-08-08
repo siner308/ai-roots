@@ -12,6 +12,7 @@
 | sequential vs subagent vs team, inline vs subagent, foreground vs background 선택 | `parallel-execution-modes` |
 | 문제 원인이 여러 계층에 걸쳐 그럴듯한 후보가 여럿이거나, 출력이 여러 독립 판단 기준을 통과해야 할 때 | `parallel-hypothesis-investigation` |
 | OpenAI Codex CLI 위임 — rescue 디버깅, cross-provider 리뷰, 최신 문서 리서치, 범위가 정해진 구현 (Codex가 `PATH`에 있을 때) | `codex-delegation` |
+| 요청이 그림을 그리거나 이미지를 만들어 달라고 하거나, 아직 없는 `.png`/`.jpg`/`.webp` 자산을 지목할 때 (Codex가 `PATH`에 있을 때) | `codex-imagegen` |
 | 여기서 볼 수 없는 대상을 상대로 코드를 쓸 때 — 외부 API, browser, 까다로운 shell 따옴표, 낯선 library, 데이터 pipeline | `incremental-verification` |
 | 언어·프레임워크 사이로 코드를 포팅·재작성하거나, 기존 코드가 런타임에 뭘 하는지 답할 때 | `simulate-dont-just-scan` |
 | 장시간 작업이 백그라운드로 돌고 사용자가 완료나 진행 상황을 봐야 할 때 — 또는 서브프로세스를 tmux split pane, sentinel 문자열, foreground tail/grep 루프로 감시하고 싶은 충동 | `background-task-monitoring` |

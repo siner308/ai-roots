@@ -65,6 +65,7 @@ Body enters context only when invoked via the Skill tool. The trigger column mir
 | `skills/parallel-execution-modes/` | Choosing sequential vs subagent vs team, inline vs background | Pick the parallelism mode by task independence and communication needs |
 | `skills/parallel-hypothesis-investigation/` | A problem has multiple plausible causes or criteria | Decompose into layered hypotheses or judgment criteria and investigate with parallel agents |
 | `skills/codex-delegation/` | Delegating to the OpenAI Codex CLI | Cross-provider policy — `/review` triggers, three-turn rescue protocol, mode/flag cheatsheet, capability routing |
+| `skills/codex-imagegen/` | A request asks to draw/generate an image, or names a missing raster asset | Drive Codex's bundled `imagegen` from a Claude session — wraps the two flags that fail silently when missing, defaults to non-photorealistic |
 | `skills/incremental-verification/` | Task outcome uncertain (API, browser, shell, pipeline) | Break uncertain work into smallest verifiable steps — inline test first, script later, scale gradually |
 | `skills/simulate-dont-just-scan/` | Porting/debugging code you read but did not run | Mentally execute code to predict actual runtime output before acting |
 | `skills/background-task-monitoring/` | Long background task needs completion/progress visibility, or tempted to monitor via tmux/sentinel/tail | Pick the cheapest visibility mechanism — completion notification first, event streams second, polling last; includes the tmux-sentinel post-mortem |
