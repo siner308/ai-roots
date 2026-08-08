@@ -16,6 +16,8 @@ python ~/.claude/skills/codex-imagegen/scripts/generate.py "what the image shoul
 
 `--out` takes any path — absolute, or relative to `--workspace` (which defaults to the current directory). Missing directories are created, so a fresh output folder needs no setup.
 
+Every image gets a `<name>.gen.json` sidecar holding the prompt, the style constraints, and the model. On disk a generated image is indistinguishable from a photograph, so this is what lets you say months later which is which — and what a catalog or credit line reads from.
+
 The script prints the written path and its size, and exits non-zero when the file did not appear. `--dry-run` prints the prompt without spending a call. `--style` replaces the default style constraint (pass `""` to drop it), `--extra` adds one constraint line, `--model` overrides the Codex model.
 
 ## Why the script and not a raw codex call

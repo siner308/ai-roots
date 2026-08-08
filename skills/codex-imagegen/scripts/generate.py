@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -69,7 +70,24 @@ def main() -> int:
         print(f"generation failed: {target} was not created\n{tail}", file=sys.stderr)
         return 1
 
-    print(f"{target} ({target.stat().st_size:,} bytes)")
+    sidecar = target.with_suffix(target.suffix + ".gen.json")
+    sidecar.write_text(
+        json.dumps(
+            {
+                "generated": True,
+                "description": args.description,
+                "style": args.style,
+                "extra": args.extra,
+                "prompt": prompt,
+                "model": args.model,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n"
+    )
+
+    print(f"{target} ({target.stat().st_size:,} bytes), prompt at {sidecar.name}")
     return 0
 
 
