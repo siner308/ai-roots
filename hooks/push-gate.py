@@ -4,8 +4,10 @@
 A push publishes commits to a shared remote — it is the outward-facing moment of the git workflow, and a broad Bash allowlist or permissive session mode can let it through silently.
 This hook forces a per-push human decision (permissionDecision "ask") so verification happens before publication, and hard-denies force pushes, which rewrite already-reviewed history.
 Per-repo opt-out: `git config ai-roots.push-gate off` skips the ask for that repo (the force-push deny stays), restoring Claude Code's normal permission flow.
+The opt-out is read from the repo each push targets — resolving `git -C dir` and a preceding `cd` in the same command — not from the session's working directory, so a gate-off repo never waives the gate for pushes into other repos.
 """
 import json
+import os
 import re
 import subprocess
 import sys
@@ -18,6 +20,8 @@ PUSH_RE = re.compile(
 FORCE_RE = re.compile(r"(^|\s)(--force(-with-lease(=\S+)?)?|-f)(\s|$)")
 DRY_RE = re.compile(r"(^|\s)(--dry-run|-n)(\s|$)")
 SEP_RE = re.compile(r"[|;&\n]")
+CD_RE = re.compile(r"(?:^|[|;&\n])\s*cd\s+(?:--\s+)?([^\s;|&]+)")
+GIT_C_RE = re.compile(r"\s-C\s+([^\s;|&]+)")
 
 
 def decide(decision, reason):
@@ -41,6 +45,16 @@ def gate_off(cwd):
         return False
 
 
+def target_dir(cmd, match, cwd):
+    base = cwd or "."
+    cds = CD_RE.findall(cmd, 0, match.start())
+    if cds:
+        base = os.path.join(base, os.path.expanduser(cds[-1].strip("'\"")))
+    for d in GIT_C_RE.findall(cmd, match.start(), match.end()):
+        base = os.path.join(base, os.path.expanduser(d.strip("'\"")))
+    return base
+
+
 def main():
     try:
         data = json.load(sys.stdin)
@@ -50,10 +64,12 @@ def main():
         return 0
     cmd = data.get("tool_input", {}).get("command", "")
     segments = []
+    dirs = []
     for match in PUSH_RE.finditer(cmd):
         segment = cmd[match.start():]
         sep = SEP_RE.search(segment)
         segments.append(segment[:sep.start()] if sep else segment)
+        dirs.append(target_dir(cmd, match, data.get("cwd")))
     if not segments:
         return 0
     if any(FORCE_RE.search(s) for s in segments):
@@ -63,7 +79,7 @@ def main():
         return 0
     if all(DRY_RE.search(s) for s in segments):
         return 0
-    if gate_off(data.get("cwd")):
+    if all(gate_off(d) for d in dirs):
         return 0
     decide("ask",
            "git push는 커밋을 원격에 공개합니다. 이 push에 대한 명시적 지시와 "

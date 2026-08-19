@@ -29,7 +29,7 @@ Inside a Claude Code session, the `push-gate` skill wraps this: `/push-gate` tog
 
 With the gate off the hook passes the push through without a decision rather than force-allowing it, so Claude Code's normal permission flow still applies: a permissive session mode pushes silently, while default mode still shows the standard Bash prompt. The force-push `deny` holds regardless of the toggle — protecting reviewed history is not a per-repo preference.
 
-The toggle is read from the session's working directory, so a `git -C dir push` into a *different* repo is judged by the session repo's setting, not the target's.
+The toggle is read from the repo each push targets: the hook resolves `git -C dir` flags and a preceding `cd` in the same command, so a push into a *different* repo is judged by that repo's setting, and a gate-off session repo never waives the gate for pushes elsewhere. When the target directory can't be resolved (an unexpanded variable, an unparsable path), the gate falls back to asking.
 
 ## Known limitations (reviewed, accepted)
 
