@@ -1,7 +1,7 @@
 ---
 name: push-gate
 description: "[ai-roots] 현재 리포지토리의 push별 확인 게이트를 토글한다. 사용자가 push 게이트를 켜거나 끄자고 할 때, 프롬프트 없이 push되게(autopilot) 해달라고 할 때, 게이트 상태를 물을 때 사용 — /push-gate (토글), /push-gate on, /push-gate off, /push-gate status."
-allowed-tools: "Bash(case *), Bash(git config *)"
+allowed-tools: "Bash(~/.claude/skills/push-gate/scripts/push-gate.sh *)"
 ---
 
 # /push-gate (ai-roots)
@@ -10,7 +10,7 @@ allowed-tools: "Bash(case *), Bash(git config *)"
 
 아래 토글은 skill 확장 시점에 이미 실행되었다 — 이 문단 다음 줄이 그 출력이고, 그것이 결과다. 추가 명령을 실행하지 말고, 결과를 사용자의 언어로 한 문장으로 보고한다.
 
-!`case "$ARGUMENTS" in off) git config ai-roots.push-gate off && echo "push-gate: off";; on) git config --unset ai-roots.push-gate; echo "push-gate: on";; "") if [ "$(git config --get ai-roots.push-gate)" = "off" ]; then git config --unset ai-roots.push-gate; echo "push-gate: on (toggled)"; else git config ai-roots.push-gate off && echo "push-gate: off (toggled)"; fi;; status) echo "push-gate: $(git config --get ai-roots.push-gate || echo on)";; *) echo "unknown subcommand: $ARGUMENTS (expected on|off|status)";; esac`
+!`~/.claude/skills/push-gate/scripts/push-gate.sh "$ARGUMENTS"`
 
 각 결과의 의미:
 

@@ -1,7 +1,7 @@
 ---
 name: fact-check
 description: "[ai-roots] Tune or toggle the grounded-assertions Stop-hook audit. Use when the user asks to turn the claim audit on or off, change its sentence gate, or check whether it is active — /fact-check (status), /fact-check on, /fact-check off, /fact-check <number> (set the gate)."
-allowed-tools: "Bash(case *)"
+allowed-tools: "Bash(~/.claude/skills/fact-check/scripts/fact-check.sh *)"
 ---
 
 # /fact-check (ai-roots)
@@ -10,7 +10,7 @@ Controls the `grounded-assertions` Stop hook via `~/.claude/.ai-roots/fact-check
 
 The command below already executed during skill expansion — the line after this paragraph is its output, and it is the result. Do not run any further commands; report the outcome to the user in one sentence, in the user's language.
 
-!`case "$ARGUMENTS" in off) mkdir -p "$HOME/.claude/.ai-roots" && echo off > "$HOME/.claude/.ai-roots/fact-check" && echo "fact-check: off";; on) rm -f "$HOME/.claude/.ai-roots/fact-check"; echo "fact-check: on (gate 8, default)";; "") if [ -f "$HOME/.claude/.ai-roots/fact-check" ]; then v=$(cat "$HOME/.claude/.ai-roots/fact-check"); if [ "$v" = "off" ]; then echo "fact-check: off"; else echo "fact-check: on (gate $v)"; fi; else echo "fact-check: on (gate 8, default)"; fi;; *[!0-9]*) echo "unknown subcommand: $ARGUMENTS (expected on|off|<number>)";; *) mkdir -p "$HOME/.claude/.ai-roots" && echo "$ARGUMENTS" > "$HOME/.claude/.ai-roots/fact-check" && echo "fact-check: on (gate $ARGUMENTS)";; esac`
+!`~/.claude/skills/fact-check/scripts/fact-check.sh "$ARGUMENTS"`
 
 Meaning of each outcome:
 

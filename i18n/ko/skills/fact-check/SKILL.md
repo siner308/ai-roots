@@ -1,7 +1,7 @@
 ---
 name: fact-check
 description: "[ai-roots] grounded-assertions Stop hook audit를 조절하거나 끄고 켠다. claim audit를 켜거나 끄거나, 문장 gate를 바꾸거나, 활성 여부를 확인해달라는 요청에 사용 — /fact-check (상태), /fact-check on, /fact-check off, /fact-check <숫자> (gate 설정)."
-allowed-tools: "Bash(case *)"
+allowed-tools: "Bash(~/.claude/skills/fact-check/scripts/fact-check.sh *)"
 ---
 
 # /fact-check (ai-roots)
@@ -10,7 +10,7 @@ allowed-tools: "Bash(case *)"
 
 아래 명령은 skill 확장 시점에 이미 실행됐다 — 이 문단 다음 줄이 그 출력이고, 그게 결과다. 추가 명령을 실행하지 말고 결과를 사용자의 언어로 한 문장으로 보고하라.
 
-!`case "$ARGUMENTS" in off) mkdir -p "$HOME/.claude/.ai-roots" && echo off > "$HOME/.claude/.ai-roots/fact-check" && echo "fact-check: off";; on) rm -f "$HOME/.claude/.ai-roots/fact-check"; echo "fact-check: on (gate 8, default)";; "") if [ -f "$HOME/.claude/.ai-roots/fact-check" ]; then v=$(cat "$HOME/.claude/.ai-roots/fact-check"); if [ "$v" = "off" ]; then echo "fact-check: off"; else echo "fact-check: on (gate $v)"; fi; else echo "fact-check: on (gate 8, default)"; fi;; *[!0-9]*) echo "unknown subcommand: $ARGUMENTS (expected on|off|<number>)";; *) mkdir -p "$HOME/.claude/.ai-roots" && echo "$ARGUMENTS" > "$HOME/.claude/.ai-roots/fact-check" && echo "fact-check: on (gate $ARGUMENTS)";; esac`
+!`~/.claude/skills/fact-check/scripts/fact-check.sh "$ARGUMENTS"`
 
 각 결과의 의미:
 

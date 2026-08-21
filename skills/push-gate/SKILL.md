@@ -1,7 +1,7 @@
 ---
 name: push-gate
 description: "[ai-roots] Toggle the per-push confirmation gate for the current repository. Use when the user asks to turn the push gate on or off, allow pushes without prompts (autopilot), or check whether the gate is active — /push-gate (toggle), /push-gate on, /push-gate off, /push-gate status."
-allowed-tools: "Bash(case *), Bash(git config *)"
+allowed-tools: "Bash(~/.claude/skills/push-gate/scripts/push-gate.sh *)"
 ---
 
 # /push-gate (ai-roots)
@@ -10,7 +10,7 @@ Controls the `push-gate` PreToolUse hook for the **current repository** via `ai-
 
 The toggle below already executed during skill expansion — the line after this paragraph is its output, and it is the result. Do not run any further commands; report the outcome to the user in one sentence, in the user's language.
 
-!`case "$ARGUMENTS" in off) git config ai-roots.push-gate off && echo "push-gate: off";; on) git config --unset ai-roots.push-gate; echo "push-gate: on";; "") if [ "$(git config --get ai-roots.push-gate)" = "off" ]; then git config --unset ai-roots.push-gate; echo "push-gate: on (toggled)"; else git config ai-roots.push-gate off && echo "push-gate: off (toggled)"; fi;; status) echo "push-gate: $(git config --get ai-roots.push-gate || echo on)";; *) echo "unknown subcommand: $ARGUMENTS (expected on|off|status)";; esac`
+!`~/.claude/skills/push-gate/scripts/push-gate.sh "$ARGUMENTS"`
 
 Meaning of each outcome:
 

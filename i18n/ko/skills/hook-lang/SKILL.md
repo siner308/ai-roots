@@ -1,7 +1,7 @@
 ---
 name: hook-lang
 description: "[ai-roots] hook 메시지를 전달할 언어를 설정한다. 사용자가 hook·차단 메시지를 자기 언어로 받고 싶다고 하거나 현재 설정을 물을 때 사용 — /hook-lang (상태), /hook-lang ko, /hook-lang en."
-allowed-tools: "Bash(case *)"
+allowed-tools: "Bash(~/.claude/skills/hook-lang/scripts/hook-lang.sh *)"
 ---
 
 # /hook-lang (ai-roots)
@@ -10,7 +10,7 @@ hook이 판정을 전달할 언어를 `~/.claude/.ai-roots/lang`으로 설정한
 
 아래 명령은 skill 확장 중에 이미 실행됐다 — 이 문단 다음 줄이 그 출력이고 그게 결과다. 추가로 명령을 실행하지 말고, 결과를 사용자 언어로 한 문장으로 전달한다.
 
-!`case "$ARGUMENTS" in en) mkdir -p "$HOME/.claude/.ai-roots" && echo en > "$HOME/.claude/.ai-roots/lang" && echo "hook-lang: en";; ko) mkdir -p "$HOME/.claude/.ai-roots" && echo ko > "$HOME/.claude/.ai-roots/lang" && echo "hook-lang: ko";; "") if [ -f "$HOME/.claude/.ai-roots/lang" ]; then echo "hook-lang: $(cat "$HOME/.claude/.ai-roots/lang")"; else echo "hook-lang: en (default)"; fi;; *) echo "unsupported language: $ARGUMENTS (expected en|ko)";; esac`
+!`~/.claude/skills/hook-lang/scripts/hook-lang.sh "$ARGUMENTS"`
 
 각 결과의 뜻:
 
@@ -23,5 +23,5 @@ hook이 판정을 전달할 언어를 `~/.claude/.ai-roots/lang`으로 설정한
 
 - 설정은 `~/.claude/.ai-roots/lang`에 있다 — 이 기기 전역이고 세션이 바뀌어도 남으며 커밋되지 않는다.
 - 메시지 자체가 아니라 *전달* 지시를 바꾼다. 영어 본문은 그대로 나오고 그 뒤에 다시 쓰라는 지시가 붙는다. 이미 사용자 언어로 쓰인 hook(`push-gate`, `gh-markdown-style`)은 영향받지 않는다.
-- 언어를 추가하려면 `hooks/hook_lang.py`의 `RELAY`에 항목 하나, 여기에 case 하나를 더한다.
+- 언어를 추가하려면 `hooks/hook_lang.py`의 `RELAY`에 항목 하나, `scripts/hook-lang.sh`에 case 하나를 더한다.
 - 모델 없이 하려면 프롬프트에 `! echo ko > ~/.claude/.ai-roots/lang`을 입력하면 같은 변경이 적용된다.
