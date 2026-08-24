@@ -107,7 +107,54 @@ When you genuinely need a value outside an existing set:
 4. Add to the token layer. Name for intent (`--spacing-card-inset`), not value.
 5. Land token + first consumer in one atomic commit.
 
-If the token layer does not yet exist, declare it first: survey existing literals, cluster into an intentional scale, land as its own commit. Until then, treat R1–R9 as aspirations.
+If the token layer does not yet exist, declare it first: survey existing literals, cluster into an intentional scale, land as its own commit. Until then, treat R1–R14 as aspirations.
+
+## R10 — Model tokens in three layers
+
+Keep **primitive** tokens (raw palette, spacing scale, font families), **semantic** tokens (surface, text, border, focus, danger), and **component** tokens (card inset, dialog radius, chart grid) separate. Components consume semantic or component tokens, not a palette value chosen at the call site.
+
+Use a machine-readable token source when tokens cross tools or platforms. The Design Tokens Community Group format is useful as an interchange shape; it is a Community Group specification, not a W3C Recommendation. Do not claim standards status it does not have.
+
+*Why.* A palette rename should not require deciding which 400 callers meant “quiet border” and which meant “disabled text.” Semantic indirection gives that decision one home.
+
+## R11 — Make layout ownership explicit
+
+One container owns each spatial relationship. A repeated row set owns its `padding` and `gap`; a comparison owns its column definition; a focus frame derives from the same box that renders the subject. Do not calculate the parent frame, child rows, and highlight bounds from separate literals.
+
+- Use grid for two-dimensional track relationships and flex for one-dimensional distribution.
+- When a flex or grid child is intended to shrink, set the appropriate `min-inline-size: 0` or `min-block-size: 0` on that child. Do not add it as a ritual; it is a shrink contract.
+- Prefer `gap` over child margins. A final child must not carry a trailing spacing value that the parent does not understand.
+- Put an aspect ratio on the owner when the ratio is part of the component contract; do not let a child image silently define the parent's height.
+
+*Why.* Layout drift happens when three elements independently encode the same relationship. A single geometry source lets content, frames, and responsive states move together.
+
+## R12 — Treat clipping and containment as boundaries, not fixes
+
+`contain: layout`, `contain: paint`, and `contain: content` change more than performance: they create formatting and stacking boundaries, and paint containment clips descendants. Add containment only where the component is intentionally independent and its visible bounds are part of the contract.
+
+- Use `overflow: clip` for an intentional crop; use `overflow: auto` for an intentional scroll.
+- Do not use clipping or containment to hide a row-count, intrinsic-size, or alignment mistake.
+- When an overlay must escape a component, do not put `paint` containment on the ancestor that should permit the escape.
+
+*Why.* Containment can make a broken layout appear tidy while changing the containing block and z-order that later features rely on.
+
+## R13 — Make responsiveness local and writing-mode safe
+
+Use container queries when a component changes because of its own available space; use viewport queries only when the whole page changes because of the viewport. A size query needs an explicit container context and brings containment effects, so name the container and document the threshold's component meaning.
+
+Use logical properties (`inline-size`, `padding-inline`, `inset-inline-start`, `block-size`) for document UI that may be localized or used in right-to-left writing. Physical `left`, `top`, `width`, and `height` remain legitimate in fixed-coordinate renderers, canvases, SVG artboards, game scenes, and video compositions; name that project carve-out rather than pretending it is responsive document layout.
+
+For nested component alignment, prefer a shared grid or `subgrid` where browser support and the product baseline allow it. Do not recreate inherited column widths with hand-maintained child offsets.
+
+*Why.* A component's width is usually not the viewport's width, and a document's inline start is not always its left edge.
+
+## R14 — Preserve user preferences and content integrity
+
+Motion that is decorative or optional must have a reduced-motion path in document UI through `prefers-reduced-motion`. Do not turn off a state change that is the only way to understand the interface; replace travel with an immediate, readable state.
+
+Text containers must declare their shrink, wrap, truncate, or scroll outcome before long localized content arrives. Test the actual longest known label, not a placeholder. The default is wrapping with a stable component height policy; ellipsis is a product decision, not a CSS bandage.
+
+*Why.* Accessibility and localization failures are layout failures discovered too late; a content contract makes them reviewable before translation and real data arrive.
 
 ## Enforcement signals (review heuristics)
 
@@ -119,6 +166,10 @@ Starting points for investigation, not automatic rejections. Carve-outs above (R
 - Raw numeric z-index.
 - JS writing `element.style.width` / `.style.height` (except via `setProperty('--*', value)`).
 - Utility-framework arbitrary-value brackets (`-\[.*\]`) without a documented carve-out.
+- Repeated child `margin-*` used to simulate a parent's gap.
+- A focus outline, mask, or overlay whose coordinates duplicate rather than derive from its target component.
+- `contain: paint` or `overflow: hidden` added without a named crop or boundary contract.
+- Viewport media query used where the component is embedded in a variable-width parent.
 
 Framework-specific greps (Tailwind prefixes, Svelte file targeting, `.module.css` patterns) live in the project supplement.
 
