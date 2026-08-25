@@ -1,6 +1,6 @@
 # Situational Skills Index
 
-어떤 규칙은 특정 작업 맥락에서만 쓰인다 (CSS, PR, Codex, 병렬화, 디버깅 교훈). 상시 떠 있는 rule 세트를 작게 유지하려고, 이런 규칙의 본문은 `ai-roots/skills/<name>/` 아래 skill로 옮겨 Skill 도구로 필요할 때 로드한다. 기본적으로는 한 줄짜리 description만 context에 남는다.
+어떤 규칙은 특정 작업 맥락에서만 쓰인다 (CSS, PR, Codex, 병렬화, 디버깅 교훈). 상시 떠 있는 rule 세트를 작게 유지하려고, 이런 규칙의 본문은 `ai-roots/skills/<name>/` 아래 skill로 옮겨, harness가 호출할 때 로드한다. 기본적으로는 한 줄짜리 description만 context에 남는다.
 
 이 인덱스가 상주하는 절반이다: 본문은 lazy하게 로드되더라도 *트리거*만은 잊히지 않도록 항상 떠 있다. 어떤 행의 조건이 성립하면, 해당 작업에 손대기 **전에** 그 skill을 호출하라 — 권고가 아니라 구속력 있는 규칙으로 다뤄라. lazy 로딩은 context 최적화일 뿐, 규칙의 우선순위를 낮추지 않는다.
 
@@ -20,6 +20,8 @@
 | memory 항목을 저장하려 하거나, 어떤 사실이 memory에 속하는지 버전 관리되는 표면(rule, `CLAUDE.md`, 프로젝트 문서)에 속하는지 판단할 때 | `memory-minimalism` |
 | 요청이 같은 방식으로 처리할 항목을 셋 이상 건넬 때 — 필드, 환경변수, endpoint, 레코드, 파일, 테스트 케이스 — 또는 여러 곳에 걸친 batch 편집. 항목이 균일해 보이는지가 아니라 개수가 트리거다 | `verify-each-instance` |
 | 사용자가 반복임을 말하거나 내비칠 때("또", "세 번째인데"), 또는 요청에 빠진 게 있어 되묻거나 짐작해야 했을 때 | `user-growth-coaching` |
+
+다른 provider를 부르려고 있는 행이 둘 있다: `codex-delegation`과 `codex-imagegen`은 일을 Codex CLI로 넘긴다. Codex가 아닌 harness에서만 걸린다 — Codex 안에서는 일이 이미 거기 있으니 직접 하면 된다.
 
 ## 규칙
 

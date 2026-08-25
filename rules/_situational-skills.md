@@ -1,6 +1,6 @@
 # Situational Skills Index
 
-Some rules apply only in specific task contexts (CSS, PRs, Codex, parallelism, a debugging lesson). To keep the always-resident rule set small, their full bodies were moved into skills under `ai-roots/skills/<name>/` and load on demand via the Skill tool. Only their one-line descriptions sit in context by default.
+Some rules apply only in specific task contexts (CSS, PRs, Codex, parallelism, a debugging lesson). To keep the always-resident rule set small, their full bodies were moved into skills under `ai-roots/skills/<name>/` and load on demand when the harness invokes them. Only their one-line descriptions sit in context by default.
 
 This index is the resident half: it stays loaded so the *trigger* is never forgotten even though the *body* is lazy. When a row's condition holds, invoke that skill **before** acting on the matching work — treat it as a binding rule, not a suggestion. Lazy loading is a context optimization; it does not lower the rule's priority.
 
@@ -20,6 +20,8 @@ This index is the resident half: it stays loaded so the *trigger* is never forgo
 | About to save a memory entry, or weighing whether a fact belongs in memory vs a version-controlled surface (rule, `CLAUDE.md`, project doc) | `memory-minimalism` |
 | A request hands you three or more items to process the same way — fields, env vars, endpoints, records, files, test cases — or a batch edit across many sites. The count triggers it, not how uniform the items look | `verify-each-instance` |
 | The user says or implies this is a repeat ("again", "세 번째인데"), or their request omitted something you had to ask for or guess | `user-growth-coaching` |
+
+Two rows exist to reach a *different* provider: `codex-delegation` and `codex-imagegen` hand work to the Codex CLI. They fire only in a harness that is not Codex — inside Codex the work is already there, so do it directly.
 
 ## Rules
 

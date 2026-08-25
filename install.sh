@@ -1,6 +1,7 @@
 #!/bin/bash
 # ai-roots installer
 # Symlinks rules into ~/.claude/rules/ai-roots/, each skill subfolder into ~/.claude/skills/<skill-name>, each agent file into ~/.claude/agents/, and each hook script into ~/.claude/hooks/.
+# Also syncs Codex when it is present: rules are merged into $CODEX_HOME/AGENTS.md as a marker block, skills are symlinked into $CODEX_HOME/skills/.
 # Hook *scripts* are linked here, but their registration lives in ~/.claude/settings.json — see README.
 
 set -e
@@ -118,6 +119,40 @@ prune_orphans "$AGENTS_DST"
 # It is idempotent and backs settings.json up before writing.
 if [ -f "$HOOKS_SRC/manifest.json" ]; then
   python3 "$HOOKS_SRC/register.py" "$HOOKS_SRC" "$HOME"
+fi
+
+# --- Codex CLI ---
+# Codex reads $CODEX_HOME/AGENTS.md as its global instructions (verified: a canary instruction placed there is honored),
+# and loads skills from $CODEX_HOME/skills/<skill-name>/SKILL.md. It does not scan ~/.claude, so both need their own install.
+# Rules are concatenated into a marker block rather than symlinked, because Codex reads one file, not a directory.
+CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+if [ -d "$CODEX_HOME" ] || command -v codex >/dev/null 2>&1; then
+  mkdir -p "$CODEX_HOME/skills"
+  AGENTS_MD="$CODEX_HOME/AGENTS.md"
+  [ -f "$AGENTS_MD" ] && cp "$AGENTS_MD" "$AGENTS_MD.bak.$(date +%Y%m%d%H%M%S)"
+  python3 "$SCRIPT_DIR/codex/sync-agents-md.py" "$RULES_SRC" "$AGENTS_MD"
+
+  # These skills toggle Claude-side hooks, so in Codex they would only offer to edit a harness that is not running.
+  CODEX_SKIP_SKILLS=" fact-check hook-lang push-gate "
+  for skill_dir in "$SKILLS_SRC"/*/; do
+    [ -d "$skill_dir" ] || continue
+    skill_name="$(basename "$skill_dir")"
+    [ -f "$skill_dir/SKILL.md" ] || continue
+    case "$CODEX_SKIP_SKILLS" in
+      *" $skill_name "*) continue ;;
+    esac
+    skill_target="$CODEX_HOME/skills/$skill_name"
+    if [ -L "$skill_target" ]; then
+      rm "$skill_target"
+    elif [ -e "$skill_target" ]; then
+      BACKUP="$skill_target.bak.$(date +%Y%m%d%H%M%S)"
+      echo "backing up: $skill_target -> $BACKUP"
+      mv "$skill_target" "$BACKUP"
+    fi
+    ln -s "${skill_dir%/}" "$skill_target"
+  done
+  prune_orphans "$CODEX_HOME/skills"
+  echo "synced codex: $AGENTS_MD + $CODEX_HOME/skills"
 fi
 
 # Source the update checker from the user's interactive shell rc so a new terminal offers updates (oh-my-zsh style).

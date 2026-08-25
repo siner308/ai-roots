@@ -54,6 +54,21 @@ Use this map to find where a writing concern lives before changing it.
 A blank enforcement cell means the concern is rule-only: it can't be detected statically, so it rides on the resident rule.
 When a criterion changes, the rule is the source of truth; a hook that also restates that criterion (`comment-discipline`, `prose-discipline`) has to be updated alongside it, or the two drift — the known cost of keeping the hook message self-contained instead of a bare pointer.
 
+## Codex
+
+`install.sh` also targets the Codex CLI when `$CODEX_HOME` (default `~/.codex`) exists or `codex` is on `PATH`; otherwise it skips the whole section silently.
+
+Codex reads one global instruction file, not a rules directory, so the rules cannot be symlinked the way Claude's are.
+`codex/sync-agents-md.py` concatenates `rules/*.md` into a marker block in `$CODEX_HOME/AGENTS.md`, backing the file up first and preserving anything the user wrote outside the markers.
+Re-running is idempotent — the block is replaced, not appended.
+Skills are symlinked per folder into `$CODEX_HOME/skills/<skill-name>`, the same layout Codex's own loader expects.
+
+Three skills stay Claude-only: `fact-check`, `hook-lang`, and `push-gate` toggle Claude-side hooks, so in Codex they would only offer to edit a harness that is not running.
+The list lives in `CODEX_SKIP_SKILLS` in `install.sh`.
+
+This is why the rules avoid naming a specific harness. A rule that says "load it via the Skill tool" or writes into `~/.claude/...` is wrong in half the places it now ships, so `_situational-skills` and `guardrail-maker` describe the surface generically and let the installer decide where it lands.
+`codex/` holds installer code, so it has no Korean mirror.
+
 ## Staying up to date
 
 `shell/ai-roots-update.sh` is sourced from the user's interactive shell rc (`install.sh` adds an idempotent marker block to `~/.zshrc`/`~/.bashrc`, backed up first).
