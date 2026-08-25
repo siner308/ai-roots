@@ -46,6 +46,7 @@ Use this map to find where a writing concern lives before changing it.
 | Doc conciseness | `prose-style` | `prose-discipline.py` (sentence gate) | — |
 | Plain language, noun-stacks, translationese | `prose-style` | — (not statically detectable) | — |
 | Korean naturalness + voice (loanwords, translationese, rhythm; first-person, motivation-first, honest) | `korean-style` | — (chat: rule-only) | — |
+| English naturalness (stock lexicon, em-dash pileups, `not just X, it's Y`, connective padding; spoken register) | `english-style` | — (chat: rule-only) | — |
 | Ungrounded assertions (hedge-stripping) | `grounded-assertions` | `grounded-assertions.py` (Stop, sentence gate) | — |
 | PR body format and delivery | — | `gh-markdown-style.py` (delivery only) | `github-pr-markdown` |
 | Hook message language | — | `hook_lang.py` (relay instruction) | `hook-lang` |

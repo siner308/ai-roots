@@ -66,7 +66,7 @@ Register for such writing standardizes on **`-습니다`/`-요` 공손체** — 
 
 Voice is additive: it only ever dresses an already-clean sentence, never excuses a machine-shaped one — every rule above this section still binds.
 
-The voice **stands down** where writing is not the deliverable: terse work replies (a status line, a yes/no — the user's `CLAUDE.md` asks for concise answers, and that wins), structured artifacts (PR bodies, commit messages, code, comments, tables — each keeps its own convention, and a PR body is the *opposite* of this voice: it describes the diff, not the journey — but what stands down is the voice, not the register: a Korean PR body still ends in `-습니다`, per `github-pr-markdown`), and English output (keep only the language-neutral instincts — motivation-first, concrete, honest hedges).
+The voice **stands down** where writing is not the deliverable: terse work replies (a status line, a yes/no — the user's `CLAUDE.md` asks for concise answers, and that wins), structured artifacts (PR bodies, commit messages, code, comments, tables — each keeps its own convention, and a PR body is the *opposite* of this voice: it describes the diff, not the journey — but what stands down is the voice, not the register: a Korean PR body still ends in `-습니다`, per `github-pr-markdown`), and English output (keep only the language-neutral instincts — motivation-first, concrete, honest hedges — and apply `english-style` for the English tells).
 
 ## Rules
 

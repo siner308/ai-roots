@@ -99,6 +99,7 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 ## Relationship to other rules
 
 - `korean-style` is the Korean-specific extension of this rule: it names the AI-Korean tells (comma habits, transliterated loanwords, translationese, sentence rhythm) with concrete ❌/✅ examples. When writing Korean, apply both — this rule for cross-language rhythm, that one for the Korean-only tells.
+- `english-style` is the same extension for English: it names the AI-English tells (stock lexicon, em-dash pileups, the `not just X, it's Y` frame, connective padding) with the same ❌/✅ treatment, and carries the spoken-register guidance for transcripts and scripts. When writing English, apply both.
 - `thinking-expansion` activates vocabulary for thinking. This rule keeps that vocabulary out of the output unless it genuinely helps the reader. When the two pull in opposite directions, this rule wins at the output boundary.
 - The repo's own `CLAUDE.md` forbids mid-sentence hard breaks in Markdown (let it soft-wrap). The line-break section here covers the other side: when a hard break is unavoidable, where it should fall.
 
