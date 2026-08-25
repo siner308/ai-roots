@@ -66,6 +66,10 @@ Skills are symlinked per folder into `$CODEX_HOME/skills/<skill-name>`, the same
 Three skills stay Claude-only: `fact-check`, `hook-lang`, and `push-gate` toggle Claude-side hooks, so in Codex they would only offer to edit a harness that is not running.
 The list lives in `CODEX_SKIP_SKILLS` in `install.sh`.
 
+A rule can also ship a different body to Codex. `codex/rule-overrides/<same-name>.md` replaces `rules/<same-name>.md` in the generated block, and the block comments say which file each section came from.
+`english-style` uses this: blind judging preferred the rewrite-directive approach over the rule-based one for English prose, so Codex gets the directives and Claude keeps the rule.
+Reach for an override only with a measurement behind it — two bodies for one concern is a maintenance cost, and the default is one rule everywhere.
+
 This is why the rules avoid naming a specific harness. A rule that says "load it via the Skill tool" or writes into `~/.claude/...` is wrong in half the places it now ships, so `_situational-skills` and `guardrail-maker` describe the surface generically and let the installer decide where it lands.
 `codex/` holds installer code, so it has no Korean mirror.
 

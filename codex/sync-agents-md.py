@@ -4,6 +4,9 @@
 Codex reads one file, not a rules directory, so the rules are concatenated rather
 than symlinked. Anything the user wrote outside the markers is preserved.
 
+A rule with a same-named file in codex/rule-overrides/ ships that file instead,
+for the cases where the Claude-side rule measurably loses on Codex.
+
 usage: sync-agents-md.py <rules-dir> <agents-md-path>
 """
 
@@ -18,11 +21,13 @@ Edit them there, not here — anything written between the markers is overwritte
 """
 
 
-def build_block(rules_dir: Path) -> str:
+def build_block(rules_dir: Path, overrides: Path) -> str:
     parts = [BEGIN, "", HEADER]
     for rule in sorted(rules_dir.glob("*.md")):
-        parts.append(f"\n---\n\n<!-- rules/{rule.name} -->\n")
-        parts.append(rule.read_text().strip())
+        override = overrides / rule.name
+        src, origin = (override, f"codex/rule-overrides/{rule.name}") if override.is_file() else (rule, f"rules/{rule.name}")
+        parts.append(f"\n---\n\n<!-- {origin} -->\n")
+        parts.append(src.read_text().strip())
         parts.append("")
     parts.append(END)
     return "\n".join(parts) + "\n"
@@ -45,9 +50,13 @@ def main() -> int:
     if not rules_dir.is_dir():
         print(f"error: rules source not found: {rules_dir}", file=sys.stderr)
         return 1
+    overrides = Path(__file__).resolve().parent / "rule-overrides"
     existing = target.read_text() if target.exists() else ""
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(splice(existing, build_block(rules_dir)))
+    target.write_text(splice(existing, build_block(rules_dir, overrides)))
+    for f in sorted(overrides.glob("*.md")) if overrides.is_dir() else []:
+        if not (rules_dir / f.name).exists():
+            print(f"warning: override with no matching rule: {f.name}", file=sys.stderr)
     return 0
 
 
