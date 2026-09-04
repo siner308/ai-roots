@@ -14,7 +14,7 @@
 
 ## 단어 선택
 
-- **닳아버린 어휘.** 기계 문장이 반들반들하게 만들어놓은 단어들이 있다: `delve`, `leverage`, `utilize`, `robust`, `seamless`, `landscape`, `realm`, `testament`, `navigate`(비유적), `underscore`, `pivotal`, `myriad`, `unprecedented`, `game-changer`. ❌ `leverage the existing index` → ✅ `use the index we already have`.
+- **닳아버린 어휘.** 기계 문장이 반들반들하게 만들어놓은 단어들이 있다: `delve`, `leverage`, `utilize`, `foster`, `robust`, `seamless`, `landscape`, `realm`, `testament`, `navigate`(비유적), `underscore`, `pivotal`, `myriad`, `unprecedented`, `game-changer`, 그리고 강조어 `genuinely`와 `importantly`. ❌ `leverage the existing index` → ✅ `use the index we already have`.
 - **명사화.** 동사가 할 일을 `-tion`/`-ment`/`-ity`가 대신 떠맡는 사슬. ❌ `the implementation of caching led to a reduction in latency` → ✅ `caching made it faster`.
 - **크기 없는 크기 형용사.** 숫자가 들어갈 자리에 쓰는 `significant`, `substantial`, `considerable`, `massive`. ❌ `a significant improvement` → ✅ `about 40% faster`.
 - **hedge 겹치기.** ❌ `this could potentially seem to indicate` → ✅ `this probably means` — 또는 아는 사실이면 hedge를 빼라.
@@ -28,13 +28,14 @@
 - **접속어 패딩.** 접속어가 필요 없는 문장을 여는 `Moreover`, `Furthermore`, `Additionally`, `That said`, `Ultimately`. 지우고 뭔가 깨졌는지 보라 — 대개 아무것도 안 깨진다.
 - **목 가다듬기.** `It's important to note that`, `It's worth mentioning`, `Here's the thing`, `The big question is`. ❌ `It's worth noting that the rule only applies to overnight loans.` → ✅ `The rule only applies to overnight loans.`
 - **colon 투척.** ❌ `Three factors: cost, latency, and trust.` → ✅ `It comes down to cost, latency, and trust.`
+- **자문자답.** `Why does this matter? Because…` / `The fix? A smaller batch.` 독자가 묻지 않은 질문을 던지고 바로 다음 숨에 답한다. ❌ `So what changed? The vents now close at 26°C.` → ✅ `The vents now close at 26°C.`
 
 ## 리듬과 구조
 
 - **단조로운 문장 길이.** 기계 문장은 길이가 엇비슷한 문장을 이어 쓴다. 길이를 흔들어라 — 긴 문장 뒤에 짧은 문장이 떨어지게.
 - **어디서나 세 박자 목록.** `A, B, and C`가 문단마다 반복된다. 패턴을 깨라 — 어떤 데선 두 개, 어떤 데선 절 하나.
 - **문단 대칭.** 모든 문단이 같은 모양(주장, 부연, 함의)이면 그 자체가 tell이다. 하나쯤은 한 문장으로 두어라.
-- **말끔한 마무리.** `In conclusion`, `Time will tell`, `One thing is clear`, `The future of X remains to be seen`. 할 말이 남은 마지막 지점에서 끝내라.
+- **말끔한 마무리.** `In conclusion`, `Time will tell`, `One thing is clear`, `The future of X remains to be seen`, 그리고 위 문단을 되풀이하는 라벨 달린 요약 줄 `Bottom line:`, `In short:`, `The takeaway:`, `The simplest mental model is:`. 할 말이 남은 마지막 지점에서 끝내라.
 
 ## 말하기 register
 
@@ -58,7 +59,7 @@
 
 - 테스트는 귀로 하는 판단(말로 되읽기)이지 token 대조가 아니다. 걸린 단어를 갈아끼우지 말고 문장을 통째로 다시 말하라.
 - 닳은 단어보다 쉬운 단어를, `-tion` 명사화보다 동사를, 크기 형용사보다 숫자를 택한다.
-- 틀 tell을 살펴라 — `not just X, it's Y`, 접속어 패딩, 목 가다듬기, 말끔한 마무리. 하나는 괜찮고 반복이 tell이다.
+- 틀 tell을 살펴라 — `not just X, it's Y`, 접속어 패딩, 목 가다듬기, 자문자답, 말끔한 마무리와 라벨 달린 요약 줄. 하나는 괜찮고 반복이 tell이다.
 - em dash는 한 문단에 하나까지, 문장 길이는 의도적으로 흔든다.
 - 말로 나갈 결과물에서는 줄이고, 말이 여는 방식으로 열고, 종속절 비계를 걷어낸다 — 그리고 모든 주장을 원문이 뒷받침하는 범위 안에 둔다.
 - 이 규칙은 `prose-style`(리듬, 줄바꿈)과 함께 적용된다. 영어를 쓸 땐 둘 다 적용한다.

@@ -23,8 +23,16 @@ This index is the resident half: it stays loaded so the *trigger* is never forgo
 
 Two rows exist to reach a *different* provider: `codex-delegation` and `codex-imagegen` hand work to the Codex CLI. They fire only in a harness that is not Codex — inside Codex the work is already there, so do it directly.
 
+## When a skill and the user disagree
+
+A skill binds within its scope, and the user's explicit instruction in the session outranks it. When the two conflict, follow the user and say which skill line you set aside.
+
+Unclear or conflicting skill guidance makes a model stop early — asking for confirmation, leaving requested work unfinished, or drifting from what was asked. When a skill does that to you, name the skill file, quote the line, and say whether it requires the pause or you read it that way. A silent pause looks like a model failure; a quoted line is something the user can fix.
+
 ## Rules
 
 - When a trigger fires, invoking the matching skill is mandatory, not discretionary.
 - A lazy skill carries the same authority as a resident rule — its body simply loads when needed instead of always.
 - If you find yourself doing one of the triggered activities without having loaded its skill, stop and load it.
+- The user's explicit instruction outranks a skill's; on conflict, follow the user and name the skill line you set aside.
+- When a skill makes you pause, ask for confirmation, leave requested work unfinished, or change direction, name the skill file, quote the exact line, and separate what it requires from how you interpreted it.

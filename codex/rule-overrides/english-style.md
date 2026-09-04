@@ -23,6 +23,17 @@ Work through these on the draft; they overlap on purpose.
 
 6. **Find what has no soul.** Read as someone who has seen thousands of AI-generated texts. Pick the three or four sentences that sound most artificial and rewrite each one as if you were talking to a close friend.
 
+## Words and frames to cut on sight
+
+Each is fine on its own and only reads as machine prose in aggregate, so the six passes miss them.
+
+- Stock words: `delve`, `foster`, `leverage`, `genuinely`, `importantly`, `it's worth noting`.
+- A labeled summary line that repeats the paragraph above it: `Bottom line:`, `In short:`, `The simplest mental model is:`. End on the last real thing instead.
+- The reveal frame `This isn't about X. It's about Y.` and the self-answered question `Question? Answer.` State Y, or the answer, on its own.
+- Vague qualifiers and canned transitions. Use the plain verb or preposition that states the actual relationship.
+
+Cross-language tells — compound labels minted in the session, announcing what you won't do, `X, not Y` against an alternative nobody raised — live in `prose-style` and apply here too.
+
 ## The one thing these passes must not do
 
 Passes 3 and 4 buy naturalness with personality, and personality is delivery — never content.

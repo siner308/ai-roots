@@ -11,6 +11,9 @@
 - **Abstract-noun stacks** — `-tion`/`-성`/`-화` 명사를 조사나 전치사로 엮은 사슬. EN: "the minimization of operational burden through the acquisition of observability". KO: "관찰 가능성 확보를 통한 운영 부담의 최소화". 둘 다 문장인 척하는 추상명사 네 개다.
 - **Translated-English rhythm** — 동사면 될 자리에 "~을 통한", "~에 대한", "~의 관점에서"를 쌓는 것. 영어를 직역한 것처럼 읽히면, 네가 실제로 할 법한 말로 다시 써라.
 - **Narrating the brief** — 시킨 내용을 글에 그대로 옮겨 적는 것: 대상("초보도 이해되게"), 지시("요청하신 대로", "간결하게"), 형식 요구. 누구에게·어떻게 쓰라는 건 글을 쓰는 맥락이지 글에 담을 내용이 아니다 — 글은 그냥 명료하게 *쓰여* 있으면 되지, 명료하다고 *선언*하지 않는다. 강한 AI 티다: 사람이 같은 문서를 쓸 때 자기가 받은 주문을 라벨처럼 붙이는 일은 없다.
+- **Invented compound labels** — 세션 중에 만든 하이픈 명사구를 용어인 것처럼 쓰는 것: `exact-head checks`, `editorial-row layouts`, `묵음 dedup`. 독자는 찾아볼 정의가 없으니, 라벨이 이름 붙이는 척하는 관계를 오히려 가린다. 그 관계를 평범한 동사와 조사로 말하라. 독자가 찾아볼 수 있는 합성어(`read-only`, `no-op`, `dry run`)는 라벨이 아니라 용어다 — 유지하라.
+- **Negative-space narration** — 한 일을 말하기 전에 안 할 일, 그대로 두는 것, 결과를 어떻게 나눌지를 먼저 말하는 것: "일정은 안 건드릴게요", "환기 로직은 그대로예요", "세 묶음으로 나눌게요". 독자가 요청한 건 변경이지 그 둘레에 그린 경계가 아니다. 한 일을 말하라.
+- **Unprompted contrast** — 아무도 Y를 꺼내지 않았는데 쓰는 `X, not Y` / `X—not Y` / `X가 아니라 Y`. 문장이 쓰러뜨릴 대안을 만들어내는 것이다; X를 말하라. 금지하는 잘못을 정확히 이름 붙여야 하는 지시문은 다른 장르이니 대조를 유지한다.
 
 ### 대신 할 것
 
@@ -28,6 +31,9 @@
 | KO | `Create`의 묵음 dedup | `Create`는 중복이 들어와도 에러 없이 조용히 무시해요 |
 | KO | 파드는 컨테이너 묶음이에요 (쿠버네티스 잘 몰라도 이해되게) | 파드는 컨테이너 묶음이에요 |
 | EN | Here's a concise summary, as you asked: … | … |
+| EN | added a dedupe-aware ingest path | ingest now skips a record it has already seen |
+| EN | I won't touch the schedule, and the vent logic stays as is. I'll only change the threshold. | The vents now open at 30°C instead of 28. |
+| EN | This is a threshold problem, not a sensor problem. | The threshold is set too low. |
 
 PR 본문은 `github-pr-markdown` skill이 관장한다. 거기서는 구어체 리듬을 적용하지 말고 그 skill을 따라라.
 
@@ -146,6 +152,7 @@ rendered break는 너비와 무관한 경우다: 독자가 실제로 보게 되�
 - priming과 도메인 키워드는 사고 단계에 머문다. 이름 자체가 독자에게 도움 될 때만 문장에 드러내라.
 - 정확한 전문용어는 유지하라 — 평이함이 겨냥하는 건 리듬이지 어휘 깊이가 아니다.
 - 시킨 내용을 글에 옮겨 적지 마라 — 누구에게·어떻게 쓰라는 건 글을 쓰는 조건이지 글에 담을 내용이 아니다. 그 조건에 맞게 쓰면 될 뿐, 맞췄다고 글에서 밝히지 마라.
+- 독자가 찾아볼 수 있는 말로 이름 붙이고, 한 일 자체를 말하라: 세션 중에 만든 합성 라벨 금지, 그대로 두는 것이나 결과를 어떻게 나눌지 예고 금지, 독자가 꺼내지 않은 대안에 대는 `X, not Y` 금지. 금지하는 잘못을 정확히 이름 붙여야 하는 지시문은 대조를 유지하고, 독자에게 가는 산문은 뺀다.
 - 줄을 어디서 끊을지 정할 때는 컬럼 한계가 아니라 의미 경계에서 끊어라. 그룹 리스트와 주어–술어 쌍은 한 줄에 유지하라.
 - 모든 문장 경계가 끊을 자리는 아니다: 흐름이 멈추는 곳 — 주제 전환, 호흡 지점 — 에서 끊고, 한 호흡으로 이어 읽는 문장들은 같은 줄에 유지하라.
 - soft-wrap 되는 산문(Markdown, 채팅)은 소스 수준의 하드 줄넘김을 넣지 마라 — 문장을 줄 중간에서 쪼개지 말고, 그냥 흘려보내라. rendered break(`\`, `<br>`, 또는 Markdown의 빈 줄 문단)는 감김이 아니라 presentation 선택이다: 흐름이 멈추는 지점에는 허용, 문장 중간에는 금지.

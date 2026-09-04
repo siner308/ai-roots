@@ -14,7 +14,7 @@ Some tells are damning on a single appearance (a "not just X, it's Y" reveal); m
 
 ## Word choice
 
-- **Stock lexicon.** A small set of words has been worn smooth by machine prose: `delve`, `leverage`, `utilize`, `robust`, `seamless`, `landscape`, `realm`, `testament`, `navigate` (figurative), `underscore`, `pivotal`, `myriad`, `unprecedented`, `game-changer`. ❌ `leverage the existing index` → ✅ `use the index we already have`.
+- **Stock lexicon.** A small set of words has been worn smooth by machine prose: `delve`, `leverage`, `utilize`, `foster`, `robust`, `seamless`, `landscape`, `realm`, `testament`, `navigate` (figurative), `underscore`, `pivotal`, `myriad`, `unprecedented`, `game-changer`, and the intensifiers `genuinely` and `importantly`. ❌ `leverage the existing index` → ✅ `use the index we already have`.
 - **Nominalizations.** `-tion`/`-ment`/`-ity` chains where a verb would do the work. ❌ `the implementation of caching led to a reduction in latency` → ✅ `caching made it faster`.
 - **Scale adjectives with no scale.** `significant`, `substantial`, `considerable`, `massive` used where a number belongs. ❌ `a significant improvement` → ✅ `about 40% faster`.
 - **Hedge stacking.** ❌ `this could potentially seem to indicate` → ✅ `this probably means` — or drop the hedge if you actually know.
@@ -28,13 +28,14 @@ Word choice gives a sentence away one word at a time; these give away the whole 
 - **Connective padding.** `Moreover`, `Furthermore`, `Additionally`, `That said`, `Ultimately` opening sentences that need no connective. Cut them and check whether anything broke; usually nothing does.
 - **Throat-clearing.** `It's important to note that`, `It's worth mentioning`, `Here's the thing`, `The big question is`. ❌ `It's worth noting that the rule only applies to overnight loans.` → ✅ `The rule only applies to overnight loans.`
 - **Colon dumps.** ❌ `Three factors: cost, latency, and trust.` → ✅ `It comes down to cost, latency, and trust.`
+- **The self-answered question.** `Why does this matter? Because…` / `The fix? A smaller batch.` A question the reader never asked, answered in the next breath. ❌ `So what changed? The vents now close at 26°C.` → ✅ `The vents now close at 26°C.`
 
 ## Rhythm and structure
 
 - **Monotone sentence length.** Machine prose writes sentences of near-identical length. Vary them; let a short one land after a long one.
 - **Three-beat lists everywhere.** `A, B, and C` repeated paragraph after paragraph. Break the pattern — sometimes two items, sometimes a clause.
 - **Paragraph symmetry.** Every paragraph the same shape (claim, elaboration, implication) is a tell. Let one be a single sentence.
-- **The tidy closer.** `In conclusion`, `Time will tell`, `One thing is clear`, `The future of X remains to be seen`. End on the last real thing you have to say.
+- **The tidy closer.** `In conclusion`, `Time will tell`, `One thing is clear`, `The future of X remains to be seen`, and the labeled summary line that repeats the paragraph above it: `Bottom line:`, `In short:`, `The takeaway:`, `The simplest mental model is:`. End on the last real thing you have to say.
 
 ## Spoken register
 
@@ -58,7 +59,7 @@ Spoken register does not license invention. Adding an opinion, a hesitation, or 
 
 - The test is judgment by ear (read it back as speech), not token-matching; the patterns are smells, not a grep list. Re-say the whole sentence rather than swapping the flagged word.
 - Prefer the plainer word to the stock one, verbs to `-tion` nominalizations, and a number to a scale adjective.
-- Watch the frame tells: `not just X, it's Y`, connective padding, throat-clearing, tidy closers. One is fine, repetition is the tell.
+- Watch the frame tells: `not just X, it's Y`, connective padding, throat-clearing, self-answered questions, tidy closers and labeled summary lines. One is fine, repetition is the tell.
 - Hold em dashes to at most one per paragraph, and vary sentence length deliberately.
 - For spoken deliverables, contract, open the way speech opens, and drop subordinate scaffolding — and keep every claim to what the source supports.
 - This rule composes with `prose-style` (rhythm, line breaks); when writing English, both apply.

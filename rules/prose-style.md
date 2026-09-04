@@ -11,6 +11,9 @@ The internal thinking rule (`thinking-expansion`) deliberately pulls in domain t
 - **Abstract-noun stacks** — chains of `-tion`/`-성`/`-화` nouns joined by particles or prepositions. EN: "the minimization of operational burden through the acquisition of observability". KO: "관찰 가능성 확보를 통한 운영 부담의 최소화". Both are four abstract nouns pretending to be a sentence.
 - **Translated-English rhythm** — "~을 통한", "~에 대한", "~의 관점에서" piled up where a verb would do. If it reads like a literal translation of English, rewrite it as something you'd actually say.
 - **Narrating the brief** — restating the request's framing inside the deliverable: the audience ("so a beginner can follow"), the instruction ("as requested", "to keep it concise"), or the format ask. How and for whom you were told to write is context for the writing, not content to put in it — the artifact should *be* clear, not announce that it is. This is a strong AI tell: a human writing the same doc would never label it with its own brief.
+- **Invented compound labels** — a hyphenated noun phrase minted in the session and then used as if it were a term: `exact-head checks`, `editorial-row layouts`, `묵음 dedup`. The reader has no definition to look up, so the label hides the relationship it pretends to name. Say that relationship with a plain verb and a preposition. A compound the reader can look up (`read-only`, `no-op`, `dry run`) is a term, not a label — keep it.
+- **Negative-space narration** — saying what you won't do, what stays unchanged, or how you will sort the result before saying what you did: "I won't touch the schedule", "the vent logic stays as is", "I'll split this into three groups". The reader asked for the change, not the boundary drawn around it. State the action.
+- **Unprompted contrast** — `X, not Y` / `X—not Y` / `X가 아니라 Y` where nobody raised Y. It manufactures an alternative so the sentence can knock it down; state X. A directive that has to name the exact wrong move it forbids is a different genre and keeps its contrast.
 
 ### What to do instead
 
@@ -28,6 +31,9 @@ The internal thinking rule (`thinking-expansion`) deliberately pulls in domain t
 | KO | `Create`의 묵음 dedup | `Create`는 중복이 들어와도 에러 없이 조용히 무시해요 |
 | KO | 파드는 컨테이너 묶음이에요 (쿠버네티스 잘 몰라도 이해되게) | 파드는 컨테이너 묶음이에요 |
 | EN | Here's a concise summary, as you asked: … | … |
+| EN | added a dedupe-aware ingest path | ingest now skips a record it has already seen |
+| EN | I won't touch the schedule, and the vent logic stays as is. I'll only change the threshold. | The vents now open at 30°C instead of 28. |
+| EN | This is a threshold problem, not a sensor problem. | The threshold is set too low. |
 
 PR bodies are governed by the `github-pr-markdown` skill; defer to it there rather than applying spoken rhythm.
 
@@ -148,6 +154,7 @@ A reader looks for the source at the moment a claim raises doubt. Put the link t
 - Priming and domain keywords stay in the thinking step; surface them in sentences only when the name itself helps the reader.
 - Keep precise technical terms — plainness targets rhythm, not vocabulary depth.
 - Never narrate the brief: the request's audience, instruction, or format ask is context for writing, not content to state in the artifact. Make it clear; don't announce that it is.
+- Name things with words the reader can look up, and state the action itself: no compound label minted in the session, no announcing what stays untouched or how results will be sorted, no `X, not Y` against an alternative the reader never raised. A directive that must name the exact anti-pattern it forbids keeps its contrast; prose to a reader drops it.
 - When you choose where a line breaks, break at the meaning boundary, not the column limit; keep grouped lists and subject–predicate pairs on one line.
 - Not every sentence boundary earns a break: cut where the flow pauses — a topic shift, a breath — and keep sentences that are read in one breath on the same line.
 - Soft-wrapping prose (Markdown, chat) takes no source-level hard breaks — never split a sentence across lines, let it wrap. A rendered break (`\`, `<br>`, or a blank-line paragraph in Markdown) is a presentation choice, not a wrap: allowed where the flow pauses, never mid-sentence.
