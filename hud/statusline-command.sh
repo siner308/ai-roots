@@ -17,16 +17,23 @@ used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
 transcript=$(echo "$input" | jq -r '.transcript_path // empty')
 
 # Effort resolution order:
-#   1. Session-level /effort or /model command (parsed from transcript tail)
-#   2. Persistent effortLevel in settings.json
+#   1. The effort field the transcript stamps on every assistant turn
+#   2. Session-level /effort or /model command, for transcripts predating that field
+#      (its one-off command output scrolls out of the tail window in a long session)
+#   3. Persistent effortLevel in settings.json
 effort=""
 if [ -n "$transcript" ] && [ -f "$transcript" ]; then
-  # Transcript stores ANSI as literal \u001b[...m — strip before matching
   effort=$(tail -500 "$transcript" 2>/dev/null \
-    | sed -E 's/\\u001b\[[0-9;]*m//g' \
-    | grep -oE 'Set effort level to [a-zA-Z]+|with [a-zA-Z]+ effort' \
-    | tail -1 \
-    | sed -E 's/Set effort level to //; s/with ([a-zA-Z]+) effort/\1/')
+    | jq -r -R 'fromjson? | .effort? // empty' 2>/dev/null \
+    | tail -1)
+  if [ -z "$effort" ]; then
+    # Transcript stores ANSI as literal \u001b[...m — strip before matching
+    effort=$(tail -500 "$transcript" 2>/dev/null \
+      | sed -E 's/\\u001b\[[0-9;]*m//g' \
+      | grep -oE 'Set effort level to [a-zA-Z]+|with [a-zA-Z]+ effort' \
+      | tail -1 \
+      | sed -E 's/Set effort level to //; s/with ([a-zA-Z]+) effort/\1/')
+  fi
 fi
 if [ -z "$effort" ] && [ -f "$HOME/.claude/settings.json" ]; then
   effort=$(jq -r '.effortLevel // empty' "$HOME/.claude/settings.json" 2>/dev/null)
