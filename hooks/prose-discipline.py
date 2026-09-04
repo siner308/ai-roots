@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""PostToolUse hook for Edit/Write/MultiEdit on non-code prose files (Markdown).
+"""PostToolUse hook for Edit/Write/MultiEdit on non-code prose files (Markdown, plus HTML for the references check).
 
-Governs prose hygiene in docs: line breaks fall at meaning boundaries, and a substantial prose addition gets a conciseness re-check.
+Governs prose hygiene in docs: line breaks fall at meaning boundaries, a substantial prose addition gets a conciseness re-check, and sources sit with the claims they back.
+The source-placement failure a static check sees most reliably is a references block — a heading named References/Sources/참고 자료/출처 with linked list items under it — so that is flagged on Markdown and HTML alike, and the model decides whether it is a reading list that may stay.
 The comment-side twins of both concerns live in comment-discipline, which fires on every comment an edit adds; this hook is the non-code counterpart, keeping the two media on separate hooks so a code edit and a Markdown edit never double-fire.
 Line-break detection is static because a punctuation-based check is language-agnostic enough for Markdown (a Korean sentence still ends on 다./요.).
 Conciseness cannot be detected statically, so past a sentence-count gate the block delegates the judgment to the model — the same pattern comment-discipline uses for comment necessity.
@@ -19,6 +20,49 @@ STRUCTURAL = re.compile(r'^\s*(#|\||```|~~~|---\s*$)')
 SENTENCE_END = re.compile(r'[.!?…。！？](?=\s|$)')
 
 CONCISE_SENTENCE_GATE = 6
+
+REF_NAMES = r'(?:references?|sources?|links?|citations?|bibliography|참고(?:\s*(?:자료|문헌|링크))?|출처(?:\s*목록)?|자료\s*출처|링크)'
+MD_REF_HEADING = re.compile(r'^\s*#{1,6}\s*\**' + REF_NAMES + r'\**\s*:?\s*$', re.I)
+HTML_REF_HEADING = re.compile(r'<h[1-6][^>]*>\s*' + REF_NAMES + r'\s*:?\s*</h[1-6]>', re.I)
+HTML_HEADING = re.compile(r'<h[1-6]\b', re.I)
+HTML_LINKED_ITEM = re.compile(r'<li\b(?:(?!</li>).)*?<a\s', re.I | re.S)
+LIST_ITEM = re.compile(r'^\s*(?:[-*+]|\d+\.)\s')
+HAS_LINK = re.compile(r'https?://|\]\(|<a\s', re.I)
+TAG = re.compile(r'<[^>]+>')
+
+REF_BLOCK_GATE = 2
+
+
+def reference_blocks(text, html, fence=False):
+    out = []
+    if html:
+        for m in HTML_REF_HEADING.finditer(text):
+            rest = text[m.end():]
+            nxt = HTML_HEADING.search(rest)
+            block = rest[:nxt.start()] if nxt else rest
+            n = len(HTML_LINKED_ITEM.findall(block))
+            if n >= REF_BLOCK_GATE:
+                out.append((TAG.sub("", m.group(0)).strip(), n))
+        return out
+    lines = text.splitlines()
+    for i, raw in enumerate(lines):
+        line = raw.rstrip()
+        if line.startswith("```") or line.startswith("~~~"):
+            fence = not fence
+            continue
+        if fence or not MD_REF_HEADING.match(line):
+            continue
+        n = 0
+        for nxt in lines[i + 1:]:
+            if not nxt.strip():
+                continue
+            if not LIST_ITEM.match(nxt):
+                break
+            if HAS_LINK.search(nxt):
+                n += 1
+        if n >= REF_BLOCK_GATE:
+            out.append((line.strip(), n))
+    return out
 
 
 def midsentence_breaks(text, fence=False):
@@ -106,15 +150,18 @@ def main():
     except Exception:
         return 0
     path = data.get("tool_input", {}).get("file_path", "")
-    if not path.endswith((".md", ".markdown")):
+    html = path.endswith((".html", ".htm"))
+    if not html and not path.endswith((".md", ".markdown")):
         return 0
 
     chunks = added_text(data)
-    breaks = []
+    breaks, refs = [], []
     sentences = 0
     for chunk, fence in chunks:
-        breaks.extend(midsentence_breaks(chunk, fence))
-        sentences += count_sentences(chunk, fence)
+        if not html:
+            breaks.extend(midsentence_breaks(chunk, fence))
+            sentences += count_sentences(chunk, fence)
+        refs.extend(reference_blocks(chunk, html, fence))
     breaks = list(dict.fromkeys(breaks))
 
     parts = []
@@ -137,6 +184,17 @@ def main():
             "neighbor, state the obvious, or hedge. A doc is expected to hold "
             "prose, so trim rather than blank it — but every surviving sentence "
             "should earn its place. If it is already tight, say so and continue."
+        )
+    if refs:
+        listed = "\n".join(f'    "{h}" — {n} linked items' for h, n in refs[:5])
+        parts.append(
+            "sources: this edit adds a references block that sits apart from "
+            f"the claims it backs:\n{listed}\n"
+            "Move each link to the sentence, list item, table cell, or quote "
+            "head it supports, so the source is read where the claim is; link "
+            "evidence elsewhere in the document by anchor, not by a pointer in "
+            "words. Keep the block only if it is a reading list that backs no "
+            "specific claim — say so and continue."
         )
     if not parts:
         return 0

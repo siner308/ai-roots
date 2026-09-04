@@ -28,7 +28,7 @@ A hook's **doc** page (`hooks/<name>.md`) does: mirror it as `i18n/ko/hooks/<nam
 
 `hooks/comment-discipline.py` is a `PostToolUse` hook on `Edit|Write|MultiEdit`: it detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and emits `decision: "block"` demanding a per-line verdict against the `comment-discipline` allowlist, with delete as the default.
 When an added comment spans multiple lines it also asks the model to check that each break falls at a meaning boundary, not mid-phrase — the code-comment side of line-break discipline, judged by the model so it works in any language.
-`hooks/prose-discipline.py` is the non-code counterpart on the same event: on Markdown it flags mid-sentence hard breaks and, past a sentence-count gate, asks for a conciseness pass. The two never double-fire — code edits hit `comment-discipline`, Markdown edits hit `prose-discipline`.
+`hooks/prose-discipline.py` is the non-code counterpart on the same event: on Markdown it flags mid-sentence hard breaks and, past a sentence-count gate, asks for a conciseness pass; on Markdown and HTML it flags a references block bunched under a heading and asks for each link to move to its claim. The two never double-fire — code edits hit `comment-discipline`, Markdown and HTML edits hit `prose-discipline`.
 Both enforce what a resident prose rule alone couldn't.
 `hooks/grounded-assertions.py` is a `Stop` hook: when a turn's final message passes a sentence-count gate, it blocks and demands a claim-by-claim audit — evidenced claims stay untouched, verifiable ones get verified now, the rest get their uncertainty markers restored, and a defect in the work itself gets fixed rather than described. A follow-up round then checks that the audit applied what it found; a per-turn counter caps the loop at `MAX_ROUNDS` (default 2). It is the enforcement layer for the `grounded-assertions` rule; `/fact-check` (skill) toggles it or tunes the gate, and `AI_ROOTS_FACT_CHECK=0` is the emergency off switch.
 
@@ -44,6 +44,7 @@ Use this map to find where a writing concern lives before changing it.
 | Code-comment line breaks | `prose-style` | `comment-discipline.py` (multi-line comments) | — |
 | Markdown line breaks | `prose-style` | `prose-discipline.py` | — |
 | Doc conciseness | `prose-style` | `prose-discipline.py` (sentence gate) | — |
+| Source placement (link at the claim, not a trailing references block) | `prose-style` | `prose-discipline.py` (references heading, Markdown + HTML) | — |
 | Plain language, noun-stacks, translationese | `prose-style` | — (not statically detectable) | — |
 | Korean naturalness + voice (loanwords, translationese, rhythm; first-person, motivation-first, honest) | `korean-style` | — (chat: rule-only) | — |
 | English naturalness (stock lexicon, em-dash pileups, `not just X, it's Y`, connective padding; spoken register) | `english-style` | — (chat: rule-only) | — |

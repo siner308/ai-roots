@@ -1,6 +1,6 @@
 # Prose Style
 
-How writing reaches the reader comes down to two separate choices: the *words* inside a sentence, and *where the lines are cut*. Both can quietly turn clear thinking into machine-looking output, and they fail in different ways — so this rule covers both.
+How writing reaches the reader comes down to three separate choices: the *words* inside a sentence, *where the lines are cut*, and *where the source of a claim sits*. Each can quietly turn clear thinking into machine-looking output, and they fail in different ways — so this rule covers all three.
 
 The internal thinking rule (`thinking-expansion`) deliberately pulls in domain terminology and cross-domain keywords to broaden retrieval — but those words are for *thinking*, not for *output*. They leak into sentences easily, producing dense noun-stacks and translated-English phrasing that read as machine output rather than human speech. This rule is the output-side counterweight: no matter how much terminology the thinking step activated, the prose that reaches the user stays plain, and it breaks where the meaning pauses.
 
@@ -96,11 +96,49 @@ Within the top tier, not every sentence boundary earns a break. A period marks a
 
 Each line is now one complete sentence instead of trailing off mid-phrase into the next.
 
+## Sources sit where the claim is
+
+A reader looks for the source at the moment a claim raises doubt. Put the link there — in the sentence, list item, table cell, or quote head that makes the claim — and the doubt is answered where it arose. A references block at the end of the document answers it somewhere else: the reader leaves the claim, scans a list, guesses which entry backs which sentence, and comes back. One list for the whole document also hides gaps, because nobody can tell which claims are sourced and which are not.
+
+### How to attach a source
+
+- **A sentence or list item** ends with the link that backs it: `The dome closes when humidity passes 85% — [operations manual](url).` When one item makes several claims, each claim carries its own link.
+- **A quotation** names its source at the head, before the quoted text, so the reader knows whose words follow.
+- **A table** links in the cell that carries the claim — an identifier column linking to each row's record, or a source column — or in the caption when one source covers the whole table. A source named only in the prose under the table leaves every row unsourced.
+- **Evidence elsewhere in the same document** (a screenshot, an appendix, a captured page) gets an `id` and is linked by anchor: `[capture](#fig-closures)`. A pointer in words (`see the capture in section 4`) is a references block in disguise — the reader still has to go looking.
+- **A source with no deep link** (a record behind a search form, one URL for every query) gets the nearest stable page linked and the path stated in words: `[Registry](url) → Search → building name → record`. Say what the link does not reach; a home-page link presented as a citation misleads.
+
+### What this leaves alone
+
+- Footnotes with inline markers (`[^3]` at the claim, the note at the end). The marker sits at the point of use; where the note renders is the format's choice.
+- A closing reading list of material that backs no specific claim. It is a reading list, not a citation, and it must not be the only place the document's sources appear.
+
+### Example
+
+❌ sources bunched at the end, and one pointer in words:
+
+```
+- The dome closes when humidity passes 85%.
+- Three closures last month were logged as weather, not faults (see the capture in section 4).
+
+## References
+- https://example.org/ops-manual
+- https://example.org/log/2026-08
+```
+
+✅ each source sits with its claim, and the capture is an anchor:
+
+```
+- The dome closes when humidity passes 85% — [operations manual](https://example.org/ops-manual).
+- Three closures last month were logged as weather, not faults — [August log](https://example.org/log/2026-08), [capture](#fig-closures).
+```
+
 ## Relationship to other rules
 
 - `korean-style` is the Korean-specific extension of this rule: it names the AI-Korean tells (comma habits, transliterated loanwords, translationese, sentence rhythm) with concrete ❌/✅ examples. When writing Korean, apply both — this rule for cross-language rhythm, that one for the Korean-only tells.
 - `english-style` is the same extension for English: it names the AI-English tells (stock lexicon, em-dash pileups, the `not just X, it's Y` frame, connective padding) with the same ❌/✅ treatment, and carries the spoken-register guidance for transcripts and scripts. When writing English, apply both.
 - `thinking-expansion` activates vocabulary for thinking. This rule keeps that vocabulary out of the output unless it genuinely helps the reader. When the two pull in opposite directions, this rule wins at the output boundary.
+- `grounded-assertions` decides whether a claim has evidence; the source-placement section here decides where that evidence sits in the artifact. A claim that passes the first and fails the second is sourced but unfindable.
 - The repo's own `CLAUDE.md` forbids mid-sentence hard breaks in Markdown (let it soft-wrap). The line-break section here covers the other side: when a hard break is unavoidable, where it should fall.
 
 ## Rules
@@ -115,3 +153,4 @@ Each line is now one complete sentence instead of trailing off mid-phrase into t
 - Soft-wrapping prose (Markdown, chat) takes no source-level hard breaks — never split a sentence across lines, let it wrap. A rendered break (`\`, `<br>`, or a blank-line paragraph in Markdown) is a presentation choice, not a wrap: allowed where the flow pauses, never mid-sentence.
 - A file's incumbent hard-wrap style is not a width limit. Unless a linter or formatter errors on the width, re-flow the paragraphs you edit so no sentence is split across lines, rather than imitating the wrap. Breaking after a sentence is allowed, never required.
 - The viewer's screen/terminal width is not a width limit — never insert a hard break to fit your current display. Only a file-level column convention or a fixed-width medium justifies one.
+- Attach each source where its claim is made — at the end of the sentence or list item, in the table cell or caption, at the head of a quote — instead of in a references block at the end of the document. Link evidence elsewhere in the document by anchor, never by a pointer in words, and give a source with no deep link the nearest stable page plus the path in words.
