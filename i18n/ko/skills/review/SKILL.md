@@ -142,9 +142,9 @@ elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 # synthesis does not parse the event log. -m pins the model as a literal on
 # purpose — a model bump is a repo-wide search-and-replace of the literal.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -m gpt-5.6-sol -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -m gpt-6-astra -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex exec --json --sandbox read-only -o "$FINAL" -m gpt-5.6-sol -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex exec --json --sandbox read-only -o "$FINAL" -m gpt-6-astra -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
 command cat "$FINAL"
@@ -172,9 +172,9 @@ elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT_BIN=gtimeout; fi
 # Monitor keys on, --sandbox read-only as the enforced no-write boundary, -o for
 # the clean final report, -m for the same pinned model literal.
 if [ -n "$TIMEOUT_BIN" ]; then
-  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -m gpt-5.6-sol -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  "$TIMEOUT_BIN" 1200 codex exec --json --sandbox read-only -o "$FINAL" -m gpt-6-astra -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 else
-  codex exec --json --sandbox read-only -o "$FINAL" -m gpt-5.6-sol -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
+  codex exec --json --sandbox read-only -o "$FINAL" -m gpt-6-astra -c model_reasoning_effort=xhigh - < "$PROMPT" > "$LOG" 2>&1
 fi
 CODEX_EXIT=$?
 command cat "$FINAL"
