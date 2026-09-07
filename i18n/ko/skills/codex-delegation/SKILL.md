@@ -31,7 +31,7 @@ Codex 작업은 두 갈래로 들어온다. 요청된 방식에 맞춰 진입점
 
 ## Reasoning effort 설정
 
-항상 xhigh. 모든 호출에 `-c model_reasoning_effort=xhigh`를 넘긴다.
+항상 medium. 모든 호출에 `-c model_reasoning_effort=medium`을 넘긴다.
 
 ## 플래그 배치 (codex-cli ≥ 0.125)
 
@@ -49,11 +49,11 @@ codex review [REVIEW FLAGS]    # 설계상 read-only; --sandbox / -a 를 받지 
 | Need | Invocation |
 |------|------------|
 | 독립적 + 보안 민감 리뷰 | `/review` 스킬 |
-| 세 번 실패 후 막힘 | `codex exec --sandbox read-only -m gpt-6-astra -c model_reasoning_effort=xhigh` |
-| 최신 docs 또는 웹 리서치 | `codex --search -a never exec --sandbox read-only -m gpt-6-astra -c model_reasoning_effort=xhigh` |
-| 범위가 정해진 구현(workspace 편집) | `codex exec --full-auto -m gpt-6-astra -c model_reasoning_effort=xhigh` |
-| 무인 장시간 구현(workspace + 리서치) | `codex --search -a never exec --sandbox workspace-write -m gpt-6-astra -c model_reasoning_effort=xhigh` |
-| 명시적 no-sandbox 실행(사용자가 명시적으로 요청할 때만) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -m gpt-6-astra -c model_reasoning_effort=xhigh` |
+| 세 번 실패 후 막힘 | `codex exec --sandbox read-only -m gpt-6-astra -c model_reasoning_effort=medium` |
+| 최신 docs 또는 웹 리서치 | `codex --search -a never exec --sandbox read-only -m gpt-6-astra -c model_reasoning_effort=medium` |
+| 범위가 정해진 구현(workspace 편집) | `codex exec --full-auto -m gpt-6-astra -c model_reasoning_effort=medium` |
+| 무인 장시간 구현(workspace + 리서치) | `codex --search -a never exec --sandbox workspace-write -m gpt-6-astra -c model_reasoning_effort=medium` |
+| 명시적 no-sandbox 실행(사용자가 명시적으로 요청할 때만) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -m gpt-6-astra -c model_reasoning_effort=medium` |
 
 필요에 맞는 가장 좁은 모드를 고른다. 리서치에는 쓰기 권한이 필요 없다. 이미지 생성에는 ecosystem capability가 필요하지, no-sandbox 접근이 필요한 게 아니다. 의존성 설치, 외부 CLI, 사설 네트워크 호출은 별개의 요구사항이고 brief에 명시해야 한다.
 

@@ -30,7 +30,7 @@ Codex work arrives two ways. Match the entry point to how it was requested.
 
 ## Reasoning effort
 
-Always xhigh. Pass `-c model_reasoning_effort=xhigh` on every invocation.
+Always medium. Pass `-c model_reasoning_effort=medium` on every invocation.
 
 ## Flag placement (codex-cli ≥ 0.125)
 
@@ -48,11 +48,11 @@ codex review [REVIEW FLAGS]    # read-only by design; does not accept --sandbox 
 | Need | Invocation |
 |------|------------|
 | Independent + security-sensitive review | `/review` skill |
-| Stuck after three failed attempts | `codex exec --sandbox read-only -m gpt-6-astra -c model_reasoning_effort=xhigh` |
-| Current docs or web research | `codex --search -a never exec --sandbox read-only -m gpt-6-astra -c model_reasoning_effort=xhigh` |
-| Bounded implementation (workspace edits) | `codex exec --full-auto -m gpt-6-astra -c model_reasoning_effort=xhigh` |
-| Unattended long implementation (workspace + research) | `codex --search -a never exec --sandbox workspace-write -m gpt-6-astra -c model_reasoning_effort=xhigh` |
-| Explicit no-sandbox run (only when user explicitly asks) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -m gpt-6-astra -c model_reasoning_effort=xhigh` |
+| Stuck after three failed attempts | `codex exec --sandbox read-only -m gpt-6-astra -c model_reasoning_effort=medium` |
+| Current docs or web research | `codex --search -a never exec --sandbox read-only -m gpt-6-astra -c model_reasoning_effort=medium` |
+| Bounded implementation (workspace edits) | `codex exec --full-auto -m gpt-6-astra -c model_reasoning_effort=medium` |
+| Unattended long implementation (workspace + research) | `codex --search -a never exec --sandbox workspace-write -m gpt-6-astra -c model_reasoning_effort=medium` |
+| Explicit no-sandbox run (only when user explicitly asks) | `codex --search --dangerously-bypass-approvals-and-sandbox exec -m gpt-6-astra -c model_reasoning_effort=medium` |
 
 Pick the narrowest mode that fits the need. Research does not need write access. Image generation needs ecosystem capability, not no-sandbox access. Dependency installation, external CLIs, and private network calls are separate requirements that must be named in the brief.
 
