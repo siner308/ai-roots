@@ -1,90 +1,53 @@
-# Guardrail Maker — Tacit Knowledge Auto-Capture
+# Guardrail Maker
 
-When the user corrects your understanding or behavior, that correction is tacit knowledge surfacing. Detect it automatically and propose a persistent guardrail so the same correction never needs to happen twice.
+When the user corrects your understanding or behavior, detect it and propose a persistent guardrail so the same correction never happens twice.
 
-## Detection
+## Rules
 
-Scan every user message for correction signals. Detection is semantic, not literal — match the intent, regardless of language or phrasing.
+- Scan every user message for correction signals and match the intent regardless of language or phrasing; the Detection tiers table grades them.
+- Apply the correction first and fix the current task; then append the proposal (The proposal section) to the reply and wait for confirmation before writing.
+- Capture only corrections that prevent a future mistake, judged by the Worth capturing? table, and let the rest go.
+- Search existing rules and `CLAUDE.md` for overlap first. On overlap, propose updating the existing rule and show the diff rather than adding a second copy. If new, write to the agreed location, matching the target file's existing style.
+- Write resident rules into the git-tracked source tree (`rules/...`), never into an installed symlink or a generated block. Resolve the real path first (`readlink -f ~/.claude/rules/ai-roots`). Situational skills go in `skills/<name>/SKILL.md` with YAML frontmatter carrying `name` and a trigger-focused `description`. Re-running `install.sh` propagates both.
+- A skill's `description` must match something visible in the request: a task type, an artifact, a phrase the user said, a countable property. A trigger that asks the model to notice its own state ("when work tempts autopilot", "when the outcome is uncertain", "after a vague ask cost time") does not fire: four skills phrased that way fired 0-1 times in 4, and rewritten around observable conditions they fired 2-4 times in 4. That figure measures firing only; whether firing improves the output is not measurable, since a control arm needs the skill unreachable while the agent runs and skill visibility is fixed at session start.
+- Write in imperative form ("Use X", not "You should use X"), self-contained, with one sentence of WHY and a concrete good/bad pair when the distinction is subtle. Prefer positive framing ("Use X" over "Don't use Y"), but a prohibition is fine when the mistake is the core signal.
+- Ask whether the rule applies to other projects when the scope is unclear.
+- Confirm what was written and where, after writing.
+- Memories track context; guardrails enforce behavior.
 
-### Tier 1 — Direct Corrections (High Confidence)
+## Detection tiers
 
-The user explicitly tells you something is wrong and provides the right answer. Includes identity/meaning corrections, prohibitions ("don't / stop / never"), mandates ("always / from now on"), and substitutions ("use X instead of Y").
+| Tier | Signal | Confidence |
+|------|--------|------------|
+| 1 | Direct correction: this is wrong and here is the right answer. Includes identity and meaning corrections, prohibitions ("don't", "stop", "never"), mandates ("always", "from now on"), substitutions ("use X instead of Y"). | High |
+| 2 | Repeated correction: "I already told you this", "same mistake again", "how many times do I have to say it". Highest-value. | High |
+| 3 | Convention declaration: a project, team, or domain rule stated preemptively with no preceding mistake. Naming conventions, architectural patterns, workflow rules, domain term definitions. | Medium |
+| 4 | Implicit correction: "not quite right", "close but not exactly", a silent rephrasing, or quietly fixing your output and continuing. Verify worthiness more carefully. | Medium |
 
-### Tier 2 — Repeated Corrections (High Confidence)
+## Worth capturing?
 
-The user signals they have corrected this before. Highest-value candidates because the gap is actively causing repeated waste — "I already told you this", "same mistake again", "how many times do I have to say it".
+| Capture | Skip |
+|---------|------|
+| Convention applicable to future work | One-time factual error (wrong path, typo) |
+| Repeated correction pattern | Misunderstanding resolved by clarification |
+| Domain knowledge not derivable from code | Already in existing rules or `CLAUDE.md` |
+| Behavioral rule (always/never) | Preference for this conversation only |
+| Cross-project principle | Ephemeral state (branch name, current PR) |
 
-### Tier 3 — Convention Declarations (Medium Confidence)
-
-The user states a project, team, or domain rule preemptively, without a preceding mistake — naming conventions, architectural patterns, workflow rules, domain term definitions.
-
-### Tier 4 — Implicit Corrections (Medium Confidence)
-
-The user signals something is off without being fully explicit — "not quite right", "close but not exactly", silent rephrasing of something you appeared to understand, or quietly fixing your output and continuing. Verify worthiness more carefully before proposing.
-
-## Response Protocol
-
-### Step 1: Apply First, Propose Second
-
-Accept the correction immediately. Fix the current task first, and raise the guardrail only afterward.
-
-### Step 2: Assess Guardrail Worthiness
-
-| Capture as guardrail | Skip |
-|---------------------|----------------|
-| Convention applicable to future work | One-time factual error (wrong file path, typo) |
-| Repeated correction pattern | Simple misunderstanding resolved by clarification |
-| Domain knowledge not derivable from code | Info already in existing rules or CLAUDE.md |
-| Behavioral rule (always/never patterns) | Task-specific preference for current conversation only |
-| Cross-project principle | Correction about ephemeral state (branch name, current PR) |
-
-### Step 3: Propose the Guardrail
-
-After applying the correction, append this proposal:
+## The proposal
 
 ```
 ---
-Guardrail proposal — saving this as a rule prevents the same mistake in future conversations.
+Guardrail proposal. Saving this as a rule prevents the same mistake in future conversations.
 
 Rule: [one-line rule in imperative form]
 Example: [concrete good/bad pair if applicable]
 Location: [placement recommendation with rationale]
 ```
 
-When the correction was a repeated one, keep it to one line:
+For a repeated correction, one line is enough:
+
 ```
 ---
-Guardrail proposal: "[one-line rule]" — save to [location]?
+Guardrail proposal: "[one-line rule]", save to [location]?
 ```
-
-Wait for user confirmation before writing.
-
-### Step 4: Write on Confirmation
-
-1. **Search for overlap** — check existing rules and CLAUDE.md for related content
-2. **If overlap found** — propose updating the existing rule, show the diff
-3. **If new** — write to the agreed location, matching the target file's existing style
-4. **After writing** — confirm what was written and where
-
-## Placement Decision
-
-**Writing location:** every surface a harness reads is installed from this repository — a symlink or a generated block, never the source. Resolve the real path first (`readlink -f ~/.claude/rules/ai-roots` gets you there) and write resident rules into the git-tracked tree (`rules/...`), never into the installed copy, since the canonical source is the repo and a generated block is overwritten on the next install. Situational skills go in `skills/<name>/SKILL.md` in the same repo, each with YAML frontmatter carrying `name` and a trigger-focused `description`. Re-running `install.sh` propagates both to every harness it supports.
-
-**Writing a trigger:** the `description` must match on something visible in the request — a task type, an artifact, a phrase the user said, a countable property. A trigger that asks the model to notice its own state ("when work tempts autopilot", "when the outcome is uncertain", "after a vague ask cost time") does not fire, because noticing is exactly what fails in the situation the skill exists for. Measured: four skills phrased that way fired 0-1 times in 4; rewritten around observable conditions they fired 2-4 times in 4. Firing rate is measurable this way; whether firing then improves the output is not, since a control arm needs the skill unreachable at the moment the agent runs and skill visibility is fixed when a session starts.
-
-When unsure about scope, ask the user whether the rule applies to other projects too.
-
-## Writing Standards
-
-A well-crafted guardrail:
-- **Imperative form** — "Use X" over "You should use X"
-- **Concrete example** — at least one good/bad pair when the distinction is subtle
-- **Brief rationale** — one sentence on WHY, so edge cases can be judged
-- **Self-contained** — understandable without reading other rules
-- **Positive framing preferred** — "Use X" over "Don't use Y", but prohibitions are fine when the mistake is the core signal
-
-## Boundaries
-
-- Writes a guardrail only after the user confirms
-- Captures only the corrections that prevent future mistakes, and lets the rest go
-- Complements the memory system — memories track context, guardrails enforce behavior

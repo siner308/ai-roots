@@ -29,8 +29,26 @@ A hook's **doc** page (`hooks/<name>.md`) does: mirror it as `i18n/ko/hooks/<nam
 `hooks/comment-discipline.py` is a `PostToolUse` hook on `Edit|Write|MultiEdit`: it detects comment lines an edit newly adds to a code file (pre-existing comments excluded) and emits `decision: "block"` demanding a per-line verdict against the `comment-discipline` allowlist, with delete as the default.
 When an added comment spans multiple lines it also asks the model to check that each break falls at a meaning boundary, not mid-phrase — the code-comment side of line-break discipline, judged by the model so it works in any language.
 `hooks/prose-discipline.py` is the non-code counterpart on the same event: on Markdown it flags mid-sentence hard breaks and, past a sentence-count gate, asks for a conciseness pass; on Markdown and HTML it flags a references block bunched under a heading and asks for each link to move to its claim. The two never double-fire — code edits hit `comment-discipline`, Markdown and HTML edits hit `prose-discipline`.
-Both enforce what a resident prose rule alone couldn't.
+`hooks/char-discipline.py` is the third on that event and the only one that runs on every file type: it flags characters a keyboard doesn't type, both the visible tells (em dash, middle dot, curly quotes, ellipsis, arrows, decorative bullets) and the invisible codepoints (non-breaking and fixed-width spaces, zero-width marks, byte-order mark, soft hyphen, directional overrides), and asks for a verdict per occurrence with replace as the default.
+It doesn't split by medium the way the other two do, since a curly quote in a string literal is a bug rather than a style question, so a Markdown or code edit can draw both it and the medium-specific hook.
+It is also registered on `Stop`, where it scans the turn's final message, because prose composed straight into a reply never passes through a file at all; `stop_hook_active` caps that at one block per turn.
+Its tables live in `hooks/char_tables.py` (a support module, symlinked via `SUPPORT_MODULES` in `register.py`, not a hook) and are shared with `gh-markdown-style.py`, which gates the same set on PR and issue bodies. One table, three surfaces: file edits, chat replies, published bodies.
+All four enforce what a resident prose rule alone couldn't.
 `hooks/grounded-assertions.py` is a `Stop` hook: when a turn's final message passes a sentence-count gate, it blocks and demands a claim-by-claim audit — evidenced claims stay untouched, verifiable ones get verified now, the rest get their uncertainty markers restored, and a defect in the work itself gets fixed rather than described. A follow-up round then checks that the audit applied what it found; a per-turn counter caps the loop at `MAX_ROUNDS` (default 2). It is the enforcement layer for the `grounded-assertions` rule; `/fact-check` (skill) toggles it or tunes the gate, and `AI_ROOTS_FACT_CHECK=0` is the emergency off switch.
+
+## Resident rule budget
+
+`rules/*.md` loads into every session, so its size is a standing tax. The budget is **45,000 bytes (~15,000 tokens)** across the whole directory; `python3 -c "import glob,os;print(sum(os.path.getsize(f) for f in glob.glob('rules/*.md')))"` checks it.
+Past the budget, the move is to compact, never to truncate. Adding a rule means finding the bytes, which is the question that keeps the set from accreting: does this belong in a resident rule, a lazy skill, or a hook?
+
+Compaction follows what the three agent harnesses converged on ([Claude Code's 9-section template](https://github.com/Piebald-AI/claude-code-system-prompts/blob/main/system-prompts/agent-prompt-conversation-summarization.md), [Codex's handoff summary](https://gist.github.com/sam-saffron-jarvis/30403c1bc5682bf9f69fa00933aad815), [Gemini CLI's state snapshot](https://aipositive.substack.com/p/a-look-at-context-engineering-in)):
+
+- **One schema per file.** Title, one-line scope, `## Rules`, then the sections that carry what a directive cannot. Directives go first, the way every snapshot leads with goal and intent.
+- **Verbatim what cannot be re-derived.** Claude Code keeps user messages verbatim because intent drifts when rephrased. In a rule, that is the directives and the `❌`/`✅` pairs. Explanation regenerates from a directive; a directive never regenerates from explanation, so prose is what gets cut.
+- **Never stack summaries.** Codex filters prior summaries out by prefix so they cannot accumulate. A body that explains a directive plus a trailing `## Rules` that restates it is exactly that stack: state each directive once, and where it needs a per-case table, the table *is* the statement and `## Rules` carries a pointer line.
+- **Full replacement, not in-place trim.** Codex discards history and rebuilds. Trimming sentences in place is what produced the accretion.
+
+After compacting, verify no directive was lost by checking a distinctive phrase from each one against the new tree, then re-flow the Korean mirror to match.
 
 ## Writing discipline: three layers, one concern
 
@@ -40,6 +58,7 @@ Use this map to find where a writing concern lives before changing it.
 
 | Concern | Knowledge (rule) | Enforcement (hook) | Situational (skill) |
 |---------|------------------|--------------------|---------------------|
+| Typographic tells (em dash, middle dot, curly quotes, invisible codepoints) | `prose-style` | `char-discipline.py` (file edits + `Stop`), `gh-markdown-style.py` (bodies) | — |
 | Comment existence | `comment-discipline` | `comment-discipline.py` | — |
 | Code-comment line breaks | `prose-style` | `comment-discipline.py` (multi-line comments) | — |
 | Markdown line breaks | `prose-style` | `prose-discipline.py` | — |
