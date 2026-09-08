@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""PreToolUse gate for Bash blocking two body corruptions the skill can't self-enforce.
+"""PreToolUse gate for Bash blocking three body problems the skill can't self-enforce.
 
 1. gh CLI corrupts markdown in every body channel (`- ` -> `•`, backticks stripped, `- [ ]` -> `[ ]`), and that happens inside gh AFTER the model has done everything right — so even a body that perfectly follows the `github-pr-markdown` skill comes out broken. A prompt rule can't fix a corruption that happens past the prompt; only a gate can. So a `gh pr/issue ...` body that CONTAINS markdown is blocked: create with an empty body, then PATCH via the GitHub API. A plain-text body (nothing for gh to mangle) passes.
 
 2. A body built by capturing an aliased renderer's output (bat/glow reflow the text: `- ` -> `•` bullets, 80-column hard wraps mid-sentence, fixed-width trailing-space padding) posts a comment whose line breaks are broken and whose bullets are literal `•`. That corruption is already in the bytes before gh runs, so it slips through even `gh api` (the otherwise-safe delivery path). This is gated on ANY channel — `gh pr/issue` and `gh api ... /pulls|/issues` — because the renderer artifacts are unambiguous and never appear in hand-written markdown.
+
+3. A body carrying the characters the `prose-style` character rule bars (em dash, middle dot, curly quotes, ellipsis, arrows, decorative bullets, and the invisible codepoints) publishes the machine signature to a channel nobody edits afterward. The tables are shared with `char-discipline`, so this is the delivery gate for the same rule that guards file edits and chat replies; fenced blocks are skipped, since a PR body quotes commands and diffs verbatim.
 
 Everything else — bullet/checkbox/section formatting, body length, structure — is the `github-pr-markdown` skill's job. This hook does not re-encode those rules; it points at the skill. Duplicating them here is what let the two drift apart.
 
@@ -14,6 +16,8 @@ import os
 import re
 import shlex
 import sys
+
+from char_tables import KEEPS, report, scan, strip_fences
 
 GH_CLI_RE = re.compile(
     r"\bgh\s+(?:pr\s+(?:create|edit|comment|review)|issue\s+(?:create|edit|comment))\b"
@@ -103,6 +107,14 @@ def main():
             "aliased 렌더러(bat/glow)를 거쳐 캡처된 텍스트로 보입니다. "
             "명령 출력을 캡처할 땐 `command` 프리픽스나 Write 툴로 원본 마크다운을 만드세요. "
             "본문 작성·전달 방법은 github-pr-markdown 스킬을 따르세요."
+        )
+    counts, samples = scan(strip_fences(body))
+    if counts:
+        block(
+            "본문에 prose-style 문자 규칙이 막는 문자가 있습니다:\n"
+            + report(counts, samples)
+            + "\n게시하기 전에 ASCII 형태로 바꾸세요. "
+            f"그 문자가 내용일 때만 남깁니다: {KEEPS}."
         )
     if is_cli and MARKDOWN_RE.search(body):
         block(

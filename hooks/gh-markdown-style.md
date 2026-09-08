@@ -12,10 +12,12 @@ So this hook enforces exactly that — the channel — and nothing else. Bullet/
 
 ## What it does
 
-On every `Bash` call it checks whether the command writes a `gh` body — via the CLI (`gh pr create/edit/comment/review`, `gh issue create/edit/comment`) or the API (`gh api … /pulls|/issues` with a `body=` field). Two checks apply:
+On every `Bash` call it checks whether the command writes a `gh` body — via the CLI (`gh pr create/edit/comment/review`, `gh issue create/edit/comment`) or the API (`gh api … /pulls|/issues` with a `body=` field). Three checks apply:
 
 - **Markdown in a CLI body** is **blocked** — `gh` CLI would mangle it, so the body must be created empty and then PATCHed via the GitHub API. A plain-text CLI body (nothing to mangle) passes.
 - **Renderer artifacts** — `•` bullets, or lines padded with 5+ trailing spaces — are **blocked on any channel, including `gh api`**. These only appear when a body is captured from an aliased renderer (bat/glow reflow the text and convert `- ` → `•`), and that corruption is already in the bytes before `gh` runs, so it slips through the otherwise-safe API path. (A real markdown hard break is exactly two trailing spaces, so the 5+ threshold doesn't catch intent.)
+
+- **Barred characters** are **blocked on any channel**. The em dash, en dash, middle dot, curly quotes, ellipsis, arrows, decorative bullets, and the invisible codepoints all reach a published body that nobody edits afterward, so this is the delivery gate for the character section of [`prose-style`](../rules/prose-style.md). The tables come from `char_tables.py`, shared with [`char-discipline`](char-discipline), and fenced blocks are skipped since a PR body quotes commands and diffs verbatim.
 
 A block (exit 2) feeds the reason back to the model, pointing it at the `github-pr-markdown` skill for how to author and deliver the body.
 

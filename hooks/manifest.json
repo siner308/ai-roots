@@ -24,6 +24,18 @@
     "run": "python3"
   },
   {
+    "event": "PostToolUse",
+    "matcher": "Edit|Write|MultiEdit",
+    "script": "char-discipline.py",
+    "run": "python3"
+  },
+  {
+    "event": "Stop",
+    "matcher": "",
+    "script": "char-discipline.py",
+    "run": "python3"
+  },
+  {
     "event": "Stop",
     "matcher": "",
     "script": "grounded-assertions.py",

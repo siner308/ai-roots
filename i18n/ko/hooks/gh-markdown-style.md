@@ -12,10 +12,12 @@
 
 ## 무엇을 하나
 
-매 `Bash` 호출마다 그 명령이 `gh` 본문을 쓰는지 검사한다 — CLI(`gh pr create/edit/comment/review`, `gh issue create/edit/comment`)든 API(`gh api … /pulls|/issues`에 `body=` 필드)든. 두 검사를 적용한다:
+매 `Bash` 호출마다 그 명령이 `gh` 본문을 쓰는지 검사한다 — CLI(`gh pr create/edit/comment/review`, `gh issue create/edit/comment`)든 API(`gh api … /pulls|/issues`에 `body=` 필드)든. 세 검사를 적용한다:
 
 - **CLI 본문의 Markdown**은 **차단**한다 — `gh` CLI가 망가뜨리므로 본문을 비운 채로 만들고 GitHub API로 PATCH해야 한다. 일반 텍스트 CLI 본문(망가뜨릴 게 없다)은 통과한다.
 - **렌더러 아티팩트**(`•` 불릿, 또는 5칸 이상 후행 공백으로 패딩된 줄)는 **`gh api`를 포함한 모든 채널에서 차단**한다. 이건 본문을 aliased 렌더러(bat/glow가 텍스트를 리플로우하고 `- ` → `•`로 바꾼다)에서 캡처했을 때만 나타나며, 그 손상은 `gh`가 돌기 전에 이미 바이트에 박혀 있어 안전한 API 경로로도 새어나간다. (진짜 Markdown 하드 브레이크는 정확히 후행 공백 두 칸이라, 5칸 이상 임계값은 의도를 오탐하지 않는다.)
+
+- **막힌 문자**는 **모든 채널에서 차단**한다. em dash, en dash, 가운뎃점, 굽은 인용부호, 줄임표, 화살표, 장식용 불릿, 보이지 않는 codepoint는 게시된 뒤 아무도 다시 손대지 않는 본문에 그대로 남으니, 여기가 [`prose-style`](../rules/prose-style.md) 문자 절의 전달 게이트다. 표는 [`char-discipline`](char-discipline)과 공유하는 `char_tables.py`에서 오고, PR 본문은 명령과 diff를 그대로 인용하므로 fenced block은 건너뛴다.
 
 차단(exit 2)되면 그 이유가 모델에 피드백되고, 본문을 어떻게 작성·전달할지는 `github-pr-markdown` 스킬을 가리킨다.
 

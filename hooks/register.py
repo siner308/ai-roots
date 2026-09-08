@@ -14,7 +14,7 @@ import shutil
 import sys
 import time
 
-SUPPORT_MODULES = ["hook_lang.py"]
+SUPPORT_MODULES = ["hook_lang.py", "char_tables.py"]
 
 
 def relink(src, dst):
