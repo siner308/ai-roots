@@ -8,6 +8,7 @@ Applies to every piece of prose you write: chat replies, docs, comments, commit 
 - Type the characters a keyboard types, and never an invisible codepoint. See the replacement table.
 - Keep a barred character only where it is the content: text about the character, quoted source or upstream data, an identifier, punctuation the language requires, a math/unit/currency symbol, or a `❌`/`✅` comparison label.
 - Use verbs over nominalizations, and write the sentence you would say out loud to a colleague.
+- Say it literally whenever a literal phrase exists. A metaphor put in place of the direct statement makes the reader work so the writer can perform, and it drags in connotations you did not choose ([Anthropic prompt engineering docs](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1#writing-density)).
 - Keep precise technical terms. Plainness targets rhythm, not vocabulary depth.
 - Word-choice discipline applies everywhere prose appears, including tables and headings.
 - Match the user's language and register. Spoken rhythm is the default only for conversational and explanatory prose; structured artifacts keep their own register.
@@ -37,6 +38,7 @@ The em dash is named outright as a ChatGPT fingerprint ([AI타임스](https://ww
 
 ## Words
 
+- **Mannered prose**: a metaphor or a flourish standing in for the plain statement. "a dial worth turning" for "a parameter worth varying", "this point earns its keep" for "this point still matters". Keep a metaphor only where it carries something the literal sentence cannot.
 - **Abstract-noun stacks**: chains of `-tion`/`-성`/`-화` nouns joined by particles or prepositions: "the minimization of operational burden through the acquisition of observability".
 - **Translated-English rhythm**: "~을 통한", "~에 대한", "~의 관점에서" piled up where a verb would do.
 - **Narrating the brief**: restating the request's framing inside the deliverable, whether the audience ("so a beginner can follow"), the instruction ("as requested"), or the format ask.
@@ -46,6 +48,8 @@ The em dash is named outright as a ChatGPT fingerprint ([AI타임스](https://ww
 
 | Lang | ❌ | ✅ |
 |------|----|----|
+| EN | a dial worth turning | a parameter worth varying |
+| KO | 이 대목은 제 몫을 합니다 | 이 부분은 여전히 중요합니다 |
 | EN | utilization of caching for latency reduction | cache it so requests come back faster |
 | KO | 관찰 가능성 확보를 통한 운영 부담의 최소화 | 로그를 잘 남겨두면 나중에 운영할 때 덜 고생해요 |
 | KO | `Create`의 묵음 dedup | `Create`는 중복이 들어와도 에러 없이 조용히 무시해요 |

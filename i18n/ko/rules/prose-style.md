@@ -8,6 +8,7 @@
 - 키보드가 치는 문자를 치고, 보이지 않는 codepoint는 절대 쓰지 않는다. 대체 표를 본다.
 - 막힌 문자를 남기는 건 그 문자가 내용일 때뿐이다: 그 문자를 다루는 글, 인용한 원문이나 상위 데이터, 식별자, 언어가 요구하는 부호, 수식과 단위와 통화 기호, `❌`/`✅` 비교 라벨.
 - 명사화보다 동사를 쓰고, 동료에게 소리 내어 할 법한 문장을 쓴다.
+- 그대로 말할 표현이 있으면 그대로 말한다. 직설적인 서술 자리에 넣은 비유는 글쓴이가 돋보이려고 독자를 더 애쓰게 만들고, 의도하지 않은 함축까지 끌고 온다([Anthropic prompt engineering 문서](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1#writing-density)).
 - 정확한 전문용어는 유지한다. 평이함이 겨냥하는 건 리듬이지 어휘 깊이가 아니다.
 - 낱말 선택 규율은 산문이 나타나는 모든 곳에 적용된다. 표와 제목도 포함이다.
 - 사용자의 언어와 어투에 맞춘다. 구어체 리듬은 대화체와 설명체 산문에서만 기본이고, 구조적 산출물은 자기 어조를 지킨다.
@@ -37,6 +38,7 @@ em dash는 ChatGPT의 지문으로 아예 지목되고([AI타임스](https://www
 
 ## 낱말
 
+- **겉멋 든 문체**: 평범한 서술 자리에 비유나 수식을 세우는 것. "바꿔볼 만한 parameter" 대신 "돌려볼 만한 다이얼", "이 부분은 여전히 중요합니다" 대신 "이 대목은 제 몫을 합니다". 비유는 그대로 쓴 문장이 담지 못하는 것을 담을 때만 남긴다.
 - **추상명사 사슬**: `-tion`/`-성`/`-화` 명사를 조사나 전치사로 엮은 사슬. "the minimization of operational burden through the acquisition of observability".
 - **번역투 리듬**: 동사면 될 자리에 "~을 통한", "~에 대한", "~의 관점에서"를 쌓는 것.
 - **지시 내용 옮겨 적기**: 시킨 내용의 틀을 산출물 안에 옮겨 적는 것. 대상("초보도 이해되게"), 지시("요청하신 대로"), 형식 요구.
@@ -46,6 +48,8 @@ em dash는 ChatGPT의 지문으로 아예 지목되고([AI타임스](https://www
 
 | Lang | ❌ | ✅ |
 |------|----|----|
+| EN | a dial worth turning | a parameter worth varying |
+| KO | 이 대목은 제 몫을 합니다 | 이 부분은 여전히 중요합니다 |
 | EN | utilization of caching for latency reduction | cache it so requests come back faster |
 | KO | 관찰 가능성 확보를 통한 운영 부담의 최소화 | 로그를 잘 남겨두면 나중에 운영할 때 덜 고생해요 |
 | KO | `Create`의 묵음 dedup | `Create`는 중복이 들어와도 에러 없이 조용히 무시해요 |
