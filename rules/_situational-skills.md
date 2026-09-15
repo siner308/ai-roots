@@ -7,7 +7,7 @@ Context-specific rules live as skills under `ai-roots/skills/<name>/` and load o
 - When a row's condition holds, invoke that skill before acting on the matching work; if you catch yourself mid-work without it, stop and load it. Invoking is mandatory: a lazily loaded skill binds like a resident rule.
 - The user's explicit instruction outranks a skill's. On conflict, follow the user and name the skill line you set aside.
 - When a skill makes you pause, ask for confirmation, leave requested work unfinished, or change direction, name the skill file, quote the exact line, and separate what it requires from how you interpreted it.
-- `codex-delegation` and `codex-imagegen` hand work to the Codex CLI, so they fire only in a harness that is not Codex. Inside Codex, do the work directly.
+- `codex-delegation` hands work to the Codex CLI, so it fires only in a harness that is not Codex. Inside Codex, do the work directly. `codex-imagegen` calls the image CLI Codex bundles, so it applies in any harness where Codex is installed.
 
 ## Triggers
 
@@ -19,7 +19,7 @@ Context-specific rules live as skills under `ai-roots/skills/<name>/` and load o
 | Choosing sequential vs subagent vs team, or inline vs subagent, or foreground vs background | `parallel-execution-modes` |
 | A problem has multiple plausible causes across layers, or output must pass multiple independent judgment criteria | `parallel-hypothesis-investigation` |
 | Delegating to the OpenAI Codex CLI: rescue debugging, cross-provider review, current-docs research, or bounded implementation (Codex on `PATH`) | `codex-delegation` |
-| The request asks to draw, generate, or make an image, or names a missing `.png`/`.jpg`/`.webp` asset to create (Codex on `PATH`) | `codex-imagegen` |
+| The request asks to draw, generate, or make an image, or names a missing `.png`/`.jpg`/`.webp` asset to create (Codex installed) | `codex-imagegen` |
 | Writing code against something you cannot see from here: external API, browser, tricky shell quoting, unfamiliar library, data pipeline | `incremental-verification` |
 | Porting or rewriting code between languages/frameworks, or answering what existing code does at runtime | `simulate-dont-just-scan` |
 | A long-running task runs in the background and the user needs completion or progress visibility, or you are tempted to monitor a subprocess via tmux split panes, sentinel strings, or a foreground tail/grep loop | `background-task-monitoring` |

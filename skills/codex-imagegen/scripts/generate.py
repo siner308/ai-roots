@@ -1,71 +1,79 @@
 #!/usr/bin/env python3
-"""Generate one raster image by delegating to the Codex CLI's imagegen skill."""
+"""Generate one raster image through the image CLI that ships with the Codex CLI."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
-
-def build_prompt(description: str, destination: Path, style: str, extra: str) -> str:
-    constraints = [f"- {line}" for line in filter(None, [style, extra])]
-    body = "\n".join(constraints)
-    return f"""Use the imagegen skill to produce one image.
-
-Subject: {description}
-
-{body}
-
-Save the finished file to {destination}. Do nothing else."""
+DEFAULT_STYLE = "Do not make it photorealistic. Use a painterly or diagrammatic style."
 
 
-def resolve_target(out: Path, workspace: Path) -> tuple[Path, Path]:
-    """Return (absolute target, workspace codex may write to)."""
-    workspace = workspace.resolve()
-    target = (out if out.is_absolute() else workspace / out).resolve()
-    # workspace-write confines codex to this tree; for a target outside it codex still generates the image but leaves it in ~/.codex/generated_images/.
-    inside = workspace in target.parents
-    return target, workspace if inside else target.parent
+def cli_path() -> Path:
+    home = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex")
+    return home / "skills" / ".system" / "imagegen" / "scripts" / "image_gen.py"
 
 
-def run(prompt: str, workspace: Path, model: str | None) -> subprocess.CompletedProcess:
-    command = [
-        "codex", "exec", "--skip-git-repo-check",
-        "--sandbox", "workspace-write", "--color", "never",
-        "--cd", str(workspace), "-",
-    ]
-    if model:
-        command[-1:-1] = ["--model", model]
-    return subprocess.run(command, input=prompt, text=True, capture_output=True)
+def build_command(cli: Path, args: argparse.Namespace, target: Path, dry_run: bool) -> list[str]:
+    command = [sys.executable, str(cli), "generate", "--prompt", args.description, "--out", str(target), "--force"]
+    for flag, value in (
+        ("--style", args.style),
+        ("--constraints", args.extra),
+        ("--model", args.model),
+        ("--size", args.size),
+        ("--quality", args.quality),
+    ):
+        if value:
+            command += [flag, value]
+    if dry_run:
+        command.append("--dry-run")
+    return command
+
+
+def parse_payload(stdout: str) -> object:
+    start = stdout.find("{")
+    if start < 0:
+        return stdout.strip()
+    try:
+        return json.loads(stdout[start:])
+    except json.JSONDecodeError:
+        return stdout.strip()
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("description", help="what the image should show")
-    parser.add_argument("--out", required=True, type=Path, help="save path — absolute, or relative to the workspace")
-    parser.add_argument("--workspace", type=Path, default=Path.cwd(), help="where codex runs; widened when --out falls outside it")
-    parser.add_argument(
-        "--style",
-        default="Do not make it photorealistic. Use a painterly or diagrammatic style.",
-        help="style constraint; pass an empty string to generate without one",
-    )
-    parser.add_argument("--extra", default="", help="one more constraint line — composition, things to exclude")
-    parser.add_argument("--model", default=None)
+    parser.add_argument("--out", required=True, type=Path, help="save path; missing directories are created")
+    parser.add_argument("--style", default=DEFAULT_STYLE, help="style constraint; pass an empty string to generate without one")
+    parser.add_argument("--extra", default="", help="one more constraint line: composition, things to exclude")
+    parser.add_argument("--model", default=None, help="image model; the CLI's default applies when omitted")
+    parser.add_argument("--size", default=None, help="WIDTHxHEIGHT or auto")
+    parser.add_argument("--quality", default=None, help="low for drafts, medium/high/auto for finals")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    target, workspace = resolve_target(args.out, args.workspace)
-    prompt = build_prompt(args.description, target, args.style, args.extra)
+    cli = cli_path()
+    if not cli.exists():
+        print(f"Codex's bundled image CLI is missing at {cli}; install or update the codex CLI", file=sys.stderr)
+        return 1
+
+    target = args.out.resolve()
+    # The CLI assembles the final prompt itself, so a dry run is the only way to record exactly what was sent.
+    preview = subprocess.run(build_command(cli, args, target, True), text=True, capture_output=True)
+    if preview.returncode != 0:
+        print((preview.stderr or preview.stdout)[-800:], file=sys.stderr)
+        return 1
     if args.dry_run:
-        print(prompt)
+        print(preview.stdout.strip())
         return 0
 
-    workspace.mkdir(parents=True, exist_ok=True)
-    result = run(prompt, workspace, args.model)
-    if not target.exists():
+    target.parent.mkdir(parents=True, exist_ok=True)
+    result = subprocess.run(build_command(cli, args, target, False), text=True, capture_output=True)
+    if result.returncode != 0 or not target.exists():
         tail = (result.stderr or result.stdout or "")[-800:]
         print(f"generation failed: {target} was not created\n{tail}", file=sys.stderr)
         return 1
@@ -78,8 +86,7 @@ def main() -> int:
                 "description": args.description,
                 "style": args.style,
                 "extra": args.extra,
-                "prompt": prompt,
-                "model": args.model,
+                "request": parse_payload(preview.stdout),
             },
             ensure_ascii=False,
             indent=2,

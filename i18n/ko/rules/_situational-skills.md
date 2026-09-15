@@ -7,7 +7,7 @@
 - 어느 행의 조건이 성립하면 해당 작업에 손대기 전에 그 skill을 invoke한다. skill 없이 그 작업을 하고 있는 자신을 발견하면 멈추고 로드한다. invoke는 의무다. lazy 로드된 skill도 상주 규칙과 똑같이 구속한다.
 - 사용자의 명시적 지시가 skill보다 우선한다. 충돌하면 사용자를 따르고 제쳐둔 skill 문장을 밝힌다.
 - skill 때문에 멈추거나 확인을 요청하거나 요청받은 작업을 미완으로 두거나 방향을 바꾸게 되면, skill 파일 이름을 대고 해당 문장을 그대로 인용하고 그것이 요구하는 것과 네가 해석한 것을 나눠 말한다.
-- `codex-delegation`과 `codex-imagegen`은 작업을 Codex CLI에 넘기므로 Codex가 아닌 harness에서만 발동한다. Codex 안에서는 직접 작업한다.
+- `codex-delegation`은 작업을 Codex CLI에 넘기므로 Codex가 아닌 harness에서만 발동한다. Codex 안에서는 직접 작업한다. `codex-imagegen`은 Codex가 번들한 이미지 CLI를 부르므로 Codex가 설치된 harness라면 어디서든 적용된다.
 
 ## 트리거
 
@@ -19,7 +19,7 @@
 | 순차 vs subagent vs team, inline vs subagent, foreground vs background를 고를 때 | `parallel-execution-modes` |
 | 문제의 그럴듯한 원인이 여러 계층에 걸쳐 있거나, 출력이 독립적인 판단 기준 여러 개를 통과해야 할 때 | `parallel-hypothesis-investigation` |
 | OpenAI Codex CLI에 위임할 때: 막힌 뒤의 rescue 디버깅, 교차 provider 리뷰, 최신 문서 조사, 범위가 정해진 구현 (Codex가 `PATH`에 있을 때) | `codex-delegation` |
-| 이미지를 그리거나 만들어 달라는 요청, 또는 없는 `.png`/`.jpg`/`.webp` 자산을 만들라는 요청 (Codex가 `PATH`에 있을 때) | `codex-imagegen` |
+| 이미지를 그리거나 만들어 달라는 요청, 또는 없는 `.png`/`.jpg`/`.webp` 자산을 만들라는 요청 (Codex가 설치돼 있을 때) | `codex-imagegen` |
 | 여기서 볼 수 없는 것을 상대로 코드를 쓸 때: 외부 API, 브라우저, 까다로운 shell 인용, 낯선 라이브러리, 데이터 파이프라인 | `incremental-verification` |
 | 언어나 프레임워크 사이로 코드를 옮기거나 다시 쓸 때, 또는 기존 코드가 런타임에 무엇을 하는지 답할 때 | `simulate-dont-just-scan` |
 | 오래 걸리는 작업이 background에서 돌고 사용자가 완료나 진행 상황을 봐야 할 때, 또는 tmux 분할 창이나 sentinel 문자열, foreground tail/grep 루프로 subprocess를 지켜보고 싶어질 때 | `background-task-monitoring` |
