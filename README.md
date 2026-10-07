@@ -58,6 +58,7 @@ Body enters context only when invoked via the Skill tool. The trigger column mir
 |-------|---------|-------------|
 | `skills/css-discipline/` | Editing/writing/reviewing CSS or framework styling | Close four commonly abused CSS axes — cascade (`!important`), box model, unit soup, style location |
 | `skills/verify-each-instance/` | A request hands you three or more items to process the same way | A recurring pattern is a hypothesis, not a license — check each instance against its own facts instead of stamping the template |
+| `skills/technical-doc-precision/` | Writing or editing a README, reference doc, runbook, config doc, changelog, or proofreading technical text | Keep conditions, values, and boundaries intact: meaning-preserving edits, explicit logic scope, absent-value cases, range and time bases, placeholders, commands apart from output |
 | `skills/user-growth-coaching/` | The user signals a repeat, or the request omitted something you had to guess | Post-solve coaching to improve user's question patterns — nudge vague requests toward specific ones |
 | `skills/memory-minimalism/` | About to save a memory entry, or weighing memory vs a version-controlled surface | Prefer version-controlled rules/docs over the device-local memory system; memory only for strictly personal, non-shareable context |
 | `skills/github-pr-markdown/` | Composing or editing a PR body/title | Enforce GitHub-flavored Markdown conventions for PRs, plus the safe API-PATCH body delivery |

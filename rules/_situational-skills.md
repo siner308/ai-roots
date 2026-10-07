@@ -26,5 +26,6 @@ Context-specific rules live as skills under `ai-roots/skills/<name>/` and load o
 | A long-running task runs in the background and the user needs completion or progress visibility, or you are tempted to monitor a subprocess via tmux split panes, sentinel strings, or a foreground tail/grep loop | `background-task-monitoring` |
 | Browsing the web, extracting page content, scraping data, or fetching figures from sites, including when agent-browser returns blocked/empty/dynamic content and you are tempted to retry with another engine or guess sibling URLs | `web-research` |
 | About to save a memory entry, or weighing whether a fact belongs in memory vs a version-controlled surface (rule, `CLAUDE.md`, project doc) | `memory-minimalism` |
+| Writing or editing a README, reference doc, runbook, config or env-var doc, changelog, or migration note, or proofreading existing technical text | `technical-doc-precision` |
 | A request hands you three or more items to process the same way (fields, env vars, endpoints, records, files, test cases), or a batch edit across many sites. The count triggers it, not how uniform the items look | `verify-each-instance` |
 | The user says or implies this is a repeat ("again", "세 번째인데"), or their request omitted something you had to ask for or guess | `user-growth-coaching` |

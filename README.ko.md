@@ -66,6 +66,7 @@ Claude Code의 사고를 확장시키는 사고 기반과 교훈 모음.
 | `skills/incremental-verification/` | 결과 불확실(API/브라우저/셸/파이프라인) | 불확실한 작업은 가장 작은 검증 단위로 — 인라인 테스트 먼저, 스크립트는 나중에, 점진적 확장 |
 | `skills/simulate-dont-just-scan/` | 읽었지만 실행 안 한 코드 포팅/디버깅 | 실제 실행 결과를 머릿속으로 시뮬레이션한 뒤 행동 |
 | `skills/background-task-monitoring/` | 장시간 백그라운드 작업의 완료·진행 가시성, 또는 tmux/sentinel/tail로 감시하려는 충동 | 가장 저렴한 가시성 메커니즘 선택 — 완료 알림 우선, 이벤트 스트림 다음, 폴링은 최후; tmux-sentinel post-mortem 포함 |
+| `skills/technical-doc-precision/` | README, 참조 문서, 런북, 설정 문서, 변경 이력을 쓰거나 고칠 때, 기술 문서를 교정할 때 | 조건과 값, 경계를 지킨다: 의미를 보존하는 교정, 논리 범위 명시, 값이 없을 때의 경우 구분, 범위와 시간의 기준, 자리표시자, 명령과 출력 분리 |
 | `skills/web-research/` | 웹 브라우징/스크래핑, 또는 페이지가 차단/빈 응답으로 올 때 | agent-browser 엔진 선택과 차단 신호 → 검색 fallback (라이브 렌더링에 걸린 차단은 더 센 브라우저가 아니라 인덱스 읽기로 우회) |
 | `skills/fact-check/` | 주장 감사를 켜고 끄거나 게이트를 조정할 때 | `/fact-check` — grounded-assertions Stop hook과 문장 수 게이트를 토글 |
 | `skills/push-gate/` | 레포별 push 확인 게이트를 켜고 끌 때 | `/push-gate` — 현재 레포의 push-gate hook을 토글 |

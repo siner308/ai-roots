@@ -6,6 +6,7 @@ The Korean extension of `prose-style`: the tells that mark Korean as machine-mad
 
 - Every term is a Korean word or English letters, never a Hangul transliteration. A plain concept goes to Korean whenever the dictionary has a word for it, whether it arrived in English or in Hangul (`concept`, `컨셉` to `개념`); a domain term keeps its English spelling (`커밋` to `commit`); a loanword settled in the dictionary counts as Korean (`파일` stays).
 - The English-letters allowance covers one word (`commit`, `route`). A compound of two or more gets said in Korean however standard it looks in English.
+- Put a particle outside the code span, and when an identifier's reading leaves the particle unclear, add a noun before it. ❌ `` `cache를` 비운다``, `` `ID`가 `` ✅ `` `cache`를 비운다``, `` `ID` 값이 ``.
 - Prefer verbs over `-화`/`-성` nominalizations, and cut commas Korean does not need. Comma habit is the single strongest AI tell.
 - Watch the frequency tells (`-들`, `~할 수 있다`, three-beat lists, `이러한`): one is fine, repetition is the tell. Break a repeated `A, B, C` triplet with two items or a clause.
 - Vary sentence length, and let a short sentence land after a long one.

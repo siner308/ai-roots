@@ -26,5 +26,6 @@
 | 오래 걸리는 작업이 background에서 돌고 사용자가 완료나 진행 상황을 봐야 할 때, 또는 tmux 분할 창이나 sentinel 문자열, foreground tail/grep 루프로 subprocess를 지켜보고 싶어질 때 | `background-task-monitoring` |
 | 웹을 훑거나 페이지 내용을 뽑거나 데이터를 긁거나 사이트에서 수치를 가져올 때, agent-browser가 차단이나 빈 응답, 동적 내용을 돌려줘서 다른 engine으로 재시도하거나 형제 URL을 추측하고 싶어질 때도 포함 | `web-research` |
 | memory 항목을 저장하려 할 때, 또는 어떤 사실이 memory에 속하는지 버전 관리되는 표면(규칙, `CLAUDE.md`, 프로젝트 문서)에 속하는지 따질 때 | `memory-minimalism` |
+| README, 참조 문서, 런북, 설정이나 env var 문서, 변경 이력, 마이그레이션 안내를 쓰거나 고칠 때, 또는 기존 기술 문서를 교정할 때 | `technical-doc-precision` |
 | 같은 방식으로 처리할 항목 셋 이상을 받았을 때(필드, env var, endpoint, 레코드, 파일, 테스트 케이스), 또는 여러 자리에 걸친 일괄 수정. 항목이 얼마나 균일해 보이는지가 아니라 개수가 트리거다 | `verify-each-instance` |
 | 사용자가 이게 반복이라고 말하거나 암시할 때("또", "세 번째인데"), 또는 요청에서 빠진 걸 네가 묻거나 추측해야 했을 때 | `user-growth-coaching` |
