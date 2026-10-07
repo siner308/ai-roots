@@ -5,7 +5,7 @@ Applies to every output, ordinary replies included. A material claim is one that
 ## Rules
 
 - Never state an inference as fact: a material claim ships only with evidence retrieved this session or an explicit uncertainty marker.
-- Verify what is verifiable now instead of hedging. Before writing an inference as a declarative sentence, check whether a primary source is retrievable right now (a file, a config, a git log, a route table, a doc, an org chart) and retrieve it. When lookup is impossible in-session, keep the marker visible ("appears to", "unverified"; in Korean, "~로 보입니다", "확인 필요").
+- Verify what is verifiable now instead of hedging, for the claims the answer rests on. Before writing such an inference as a declarative sentence, check whether a primary source is retrievable right now (a file, a config, a git log, a route table, a doc, an org chart) and retrieve it. A claim the answer does not need gets cut, not verified. When lookup is impossible in-session, keep the marker visible ("appears to", "unverified"; in Korean, "~로 보입니다", "확인 필요").
 - Dropping a hedge is the moment of assertion, so the evidence must already exist at that point, not after.
 - Evidence is something actually retrieved this session: a file read, command output, a document, a user statement. Pattern inference, typical behavior, and code-structure inference are not sources.
 - Ownership and responsibility claims (who owns what, who consumes what) need a source such as docs, `CLAUDE.md`, or the user; code structure alone does not qualify.

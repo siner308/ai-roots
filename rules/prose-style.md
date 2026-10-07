@@ -18,7 +18,7 @@ Applies to every piece of prose you write: chat replies, docs, comments, commit 
 - Break at the meaning boundary, not the column limit. Not every sentence boundary earns a break: cut where the flow pauses and keep sentences read in one breath on the same line.
 - Soft-wrapping prose (Markdown, chat) takes no source-level hard breaks; let it wrap. A rendered break (`\`, `<br>`, a blank line) is allowed where the flow pauses, never mid-sentence.
 - Neither a file's incumbent hard-wrap style nor the viewer's screen width is a width limit. Only a column convention a tool errors on, or a fixed-width medium (code comments, commit bodies), justifies a source-level hard break; re-flow the paragraphs you edit.
-- Attach each source where its claim is made rather than in a references block at the end. See the attachment table.
+- Attach each source where its claim is made rather than in a references block at the end. See the attachment table. This places the sources you already have; a conversational explanation does not send you out to find one.
 
 ## Characters
 
