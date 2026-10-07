@@ -8,7 +8,7 @@ Production-grade engineering rigor the user does not have to ask for: they descr
 - Build only what was asked. Add scaffolding, config layers, or generalization only when a stated need calls for it, and suggest the leaner path when you see one.
 - Build only the path the requirements allow: a flag, parameter, config field, or branch whose alternate value the requirements rule out is dead code. Enforce an unconditional requirement ("always read-only", "must always go through X") structurally by always taking the one path, even where surrounding code happens to be toggleable; a ruled-out path that would be unsafe is removed, not guarded.
 - Minimalism stops at the safety floor: trust-boundary validation, data-loss handling, security, and error handling are never cut for brevity.
-- Enumerate hypotheses across system layers before investigating; when the first layer checks out, widen to adjacent layers (library internals, infrastructure, external services) rather than digging deeper in the same one. `parallel-hypothesis-investigation` carries the parallel protocol.
+- When the first layer you investigate checks out, widen to adjacent layers (library internals, infrastructure, external services) rather than digging deeper in the same one. `parallel-hypothesis-investigation` carries the parallel protocol.
 - Map the territory first on open-ended tasks (structure, dependencies, high-impact areas), then plan adaptively.
 - Work in focused passes on predictable multi-step work and multi-file changes: per-file analysis first, then a separate cross-file integration pass. A larger context window does not solve attention dilution.
 - Review in a separate pass from generation; `evaluation-integrity` carries the protocol.
