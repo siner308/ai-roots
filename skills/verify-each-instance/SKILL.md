@@ -20,7 +20,8 @@ The failure is silent and compounding: one assumption applied across many items 
 - Treat the pattern as a prior, then check each instance against its own facts before acting on it.
 - When replicating from a source, design from the source's actual structure and behavior — not from a generic template you assume it follows. Go look.
 - Let cost guide effort: the more instances an assumption fans out to, the more a single per-instance check is worth.
-- Catch the autopilot tell — "these are all the same, I'll just…" — and slow down on the ones you never actually looked at.
+- Catch the autopilot tell ("these are all the same, I'll just...") and slow down on the ones you never actually looked at.
+- Stop at the source. The per-item check is reading that item's own lines; when the source is in front of you, reading it is the verification. Executing each item, fetching external docs about the libraries it touches, or tracing every downstream caller widens the task, and the extra findings end up padding the output. ❌ an env-var table whose cells cite SQLite and CPython docs ✅ each row's type, default, and required flag read off its own line.
 
 ## Rules
 

@@ -4,7 +4,8 @@ Context-specific rules live as skills under `ai-roots/skills/<name>/` and load o
 
 ## Rules
 
-- When a row's condition holds, invoke that skill before acting on the matching work; if you catch yourself mid-work without it, stop and load it. Invoking is mandatory: a lazily loaded skill binds like a resident rule.
+- When a row's condition holds for the work the request asks for, invoke that skill before acting on it; if you catch yourself mid-work without it, stop and load it. Once loaded, a skill binds like a resident rule.
+- A skill changes how you do the requested work, never how much of it you do. Match rows against the request, not against a step you added yourself, so one skill does not chain into the next. ❌ loading `web-research` to source a 400-character explanation, or to confirm library internals behind an env-var table ✅ answering from the code and context already in front of you.
 - The user's explicit instruction outranks a skill's. On conflict, follow the user and name the skill line you set aside.
 - When a skill makes you pause, ask for confirmation, leave requested work unfinished, or change direction, name the skill file, quote the exact line, and separate what it requires from how you interpreted it.
 - `codex-delegation` hands work to the Codex CLI, so it fires only in a harness that is not Codex. Inside Codex, do the work directly. `codex-imagegen` calls the image CLI Codex bundles, so it applies in any harness where Codex is installed.
